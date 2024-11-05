@@ -1,4 +1,4 @@
-package com.example.greatarchitecture;
+package com.example.ku_novel;
 
 public class Main {
     public static void main(String[] args) {
