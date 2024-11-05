@@ -1,13 +1,30 @@
 package com.example.ku_novel.client;
 
+import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.ui.LoginUI;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ClientMain {
 
     public static void main(String[] args) {
-        new ClientMain().showLoginUI();
+        Socket socket = null;
+        try {
+            socket = new Socket("127.0.0.1", 10100);
+            new ClientListenerThread(socket).run();
+
+            new ClientMain().showLoginUI();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally {
+            try {
+                if (socket != null && !socket.isClosed()) socket.close();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public void showLoginUI() {
