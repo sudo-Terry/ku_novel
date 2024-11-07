@@ -45,7 +45,7 @@ public class Message {
     }
 
     // Getters
-    public String getType() {
+    public MessageType getType() {
         return type;
     }
 
