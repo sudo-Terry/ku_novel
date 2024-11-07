@@ -1,19 +1,25 @@
 package com.example.ku_novel.server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerMain {
+    private static final int PORT = 10100;
+
     public static void main(String[] args) {
-        try {
-            ServerSocket serverSocket = new ServerSocket(10100);
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server is running...");
 
             while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("클라이언트 연결 확인");
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("New client connected: " + clientSocket.getInetAddress());
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                Thread clientThread = new Thread(clientHandler);
+                clientThread.start();
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
