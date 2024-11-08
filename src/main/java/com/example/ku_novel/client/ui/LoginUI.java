@@ -1,6 +1,6 @@
 package com.example.ku_novel.client.ui;
 
-import com.example.ku_novel.client.ClientMain;
+import com.example.ku_novel.client.connection.ClientSenderThread;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,10 +9,7 @@ import java.awt.event.ActionListener;
 
 public class LoginUI extends JFrame {
 
-    private ClientMain clientMain;
-
-    public LoginUI(ClientMain clientMain) {
-        this.clientMain = clientMain;
+    public LoginUI(ClientSenderThread senderThread) {
 
         setTitle("Login");
         setSize(1080, 720);
@@ -42,10 +39,10 @@ public class LoginUI extends JFrame {
                 String username = userText.getText();
                 String password = new String(passwordText.getPassword());
 
-                System.out.println("서버에 로그인 요청 전송: " + username + " / " + password);
-
+                try {
+                    senderThread.requestLogin(username, password);
+                } catch (Exception ex) {}
                 dispose();
-                clientMain.startClient(username);
             }
         });
 
