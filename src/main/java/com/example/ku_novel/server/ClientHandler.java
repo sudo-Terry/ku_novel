@@ -89,7 +89,8 @@ class ClientHandler implements Runnable {
         // 클라이언트 종료 로직
     }
 
-    private void sendMessageToClient(Message message) {  
+    private void sendMessageToClient(Message message) {
+        System.out.println("[SEND] " + message);
         out.println(message.toJson());
     }
 
