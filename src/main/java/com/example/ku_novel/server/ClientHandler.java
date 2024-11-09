@@ -1,4 +1,5 @@
 package com.example.ku_novel.server;
+
 import java.io.*;
 import java.net.*;
 
@@ -34,7 +35,7 @@ class ClientHandler implements Runnable {
             closeConnection();
         }
     }
-    
+
     private Message parseMessage(String messageJson) {
         Gson gson = new Gson();
         return gson.fromJson(messageJson, Message.class);
@@ -47,8 +48,7 @@ class ClientHandler implements Runnable {
 
         switch (message.getType()) {
             case LOGIN:
-                System.out.print("login 수락");
-                handleLogin(messageJson);
+                handleLogin(message);
                 break;
             case LOGOUT:
                 handleLogout(messageJson);
@@ -60,17 +60,22 @@ class ClientHandler implements Runnable {
                 handleLogout(messageJson);
                 break;
             // case CHAT:
-            //     handleChatMessage(messageJson);
-            //     break;
+            // handleChatMessage(messageJson);
+            // break;
             // 기타 요청 처리...
         }
     }
 
-    private void handleLogin(String messageJson) {
+    private void handleLogin(Message message) {
         // 로그인 비즈니스 로직 처리
         System.out.println("Login request received.");
+
+        Message responseMessage = new Message();
+        responseMessage.setType(MessageType.LOGIN_SUCCESS);
+        responseMessage.setContent("로그인이 성공되었습니다.");
+
         // 로그인 성공 시 클라이언트에 응답 전송
-        sendMessageToClient("{\"type\":\"LOGIN_RESPONSE\", \"status\":\"SUCCESS\"}");
+        sendMessageToClient(responseMessage);
     }
 
     private void handleChatMessage(String messageJson) {
@@ -84,15 +89,18 @@ class ClientHandler implements Runnable {
         // 클라이언트 종료 로직
     }
 
-    private void sendMessageToClient(String responseJson) {
-        out.println(responseJson);
+    private void sendMessageToClient(Message message) {  
+        out.println(message.toJson());
     }
 
     private void closeConnection() {
         try {
-            if (in != null) in.close();
-            if (out != null) out.close();
-            if (socket != null) socket.close();
+            if (in != null)
+                in.close();
+            if (out != null)
+                out.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
