@@ -70,6 +70,11 @@ public class Message {
         return gson.toJson(this);
     }
 
+    @Override
+    public String toString() {
+        return toJson().toString();
+    }
+    
     public static Message fromJson(String json) {
         Gson gson = new GsonBuilder().create();
         return gson.fromJson(json, Message.class);
