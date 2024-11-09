@@ -2,6 +2,10 @@ package com.example.ku_novel.server;
 import java.io.*;
 import java.net.*;
 
+import com.example.ku_novel.common.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
@@ -30,24 +34,36 @@ class ClientHandler implements Runnable {
             closeConnection();
         }
     }
+    
+    private Message parseMessage(String messageJson) {
+        Gson gson = new Gson();
+        return gson.fromJson(messageJson, Message.class);
+    }
 
     private void processClientRequest(String messageJson) {
         // JSON 파싱하여 MessageType 분기 처리
         // MessageType에 따라 비즈니스 로직 호출
-        // MessageType type = parseMessageType(messageJson);
+        Message message = parseMessage(messageJson);
 
-        // switch (type) {
-        //     case LOGIN_REQUEST:
-        //         handleLogin(messageJson);
-        //         break;
-        //     case CHAT_MESSAGE:
-        //         handleChatMessage(messageJson);
-        //         break;
-        //     case LOGOUT_REQUEST:
-        //         handleLogout(messageJson);
-        //         break;
-        //     // 기타 요청 처리...
-        // }
+        switch (message.getType()) {
+            case LOGIN:
+                System.out.print("login 수락");
+                handleLogin(messageJson);
+                break;
+            case LOGOUT:
+                handleLogout(messageJson);
+                break;
+            case LOGIN_FAILED:
+                handleLogout(messageJson);
+                break;
+            case LOGIN_SUCCESS:
+                handleLogout(messageJson);
+                break;
+            // case CHAT:
+            //     handleChatMessage(messageJson);
+            //     break;
+            // 기타 요청 처리...
+        }
     }
 
     private void handleLogin(String messageJson) {
