@@ -7,8 +7,12 @@ public enum MessageType {
     LOGIN_FAILED("LOGIN_FAILED"), // 로그인 실패
 
     SIGNUP("SIGNUP"), // 회원가입 요청
-    CHECK_USERNAME("CHECK_USERNAME"), // 아이디 중복 확인
+    CHECK_ID("CHECK_ID"), // 아이디 중복 확인
+    VALID_ID("VALID_ID"), // 유효한 아이디
+    INVALID_ID("INVALID_ID"), // 무효한 아이디
     CHECK_NICKNAME("CHECK_NICKNAME"), // 닉네임 중복 확인
+    VALID_NICKNAME("VALID_NICKNAME"), // 유효한 닉네임
+    INVALID_NICKNAME("INVALID_NICKNAME"), // 무효한 닉네임
     SIGNUP_SUCCESS("SIGNUP_SUCCESS"), // 회원가입 성공
     SIGNUP_FAILED("SIGNUP_FAILED");  // 회원가입 실패
 
