@@ -11,9 +11,11 @@ class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private DatabaseManager dbManager;
 
-    public ClientHandler(Socket clientSocket) {
+    public ClientHandler(Socket clientSocket, DatabaseManager dbManager) {
         this.socket = clientSocket;
+        this.dbManager = dbManager;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -45,6 +47,7 @@ class ClientHandler implements Runnable {
         // JSON 파싱하여 MessageType 분기 처리
         // MessageType에 따라 비즈니스 로직 호출
         Message message = parseMessage(messageJson);
+        System.out.println("[RECEIVE] " + message);
 
         switch (message.getType()) {
             case LOGIN:
@@ -90,8 +93,8 @@ class ClientHandler implements Runnable {
     }
 
     private void sendMessageToClient(Message message) {
-        System.out.println("[SEND] " + message);
         out.println(message.toJson());
+        System.out.println("[SEND] " + message);
     }
 
     private void closeConnection() {
