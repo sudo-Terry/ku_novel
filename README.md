@@ -17,3 +17,6 @@ ku_novel
 ## Dependencies
 - SDK `Oracle OpenJDK 22.0.2 - aarch64`
 - GSON `v2.8.9` 
+  - [MVN Repository](https://mvnrepository.com/artifact/com.google.code.gson/gson)
+- sqlite-jdbc: `3.43.2.0`
+  - **Installation Guide**: [SQLite JDBC Installation](https://www.sqlitetutorial.net/sqlite-java/sqlite-jdbc-driver/)
