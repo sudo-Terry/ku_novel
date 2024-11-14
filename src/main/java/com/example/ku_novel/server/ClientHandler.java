@@ -5,7 +5,6 @@ import java.net.*;
 
 import com.example.ku_novel.common.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 class ClientHandler implements Runnable {
     private Socket socket;
@@ -62,11 +61,54 @@ class ClientHandler implements Runnable {
             case LOGIN_SUCCESS:
                 handleLogout(messageJson);
                 break;
+            case SIGNUP:
+                handleSignUp(message);
+                break;
+            case CHECK_ID:
+                checkUsername(message);
+                break;
+            case CHECK_NICKNAME:
+                checkNickname(message);
+                break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
             // 기타 요청 처리...
         }
+    }
+
+    private void handleSignUp(Message message) {
+        String userId = message.getSender();
+        String password = message.getPassword();
+        String nickname = message.getNickname();
+
+        boolean success = dbManager.registerUser(userId, password, nickname);
+        Message responseMessage = new Message();
+
+        if (success) {
+            responseMessage.setType(MessageType.SIGNUP_SUCCESS)
+                    .setContent("회원가입이 성공했습니다.");
+        } else {
+            responseMessage.setType(MessageType.SIGNUP_FAILED)
+                    .setContent("회원가입에 실패했습니다.");
+        }
+        sendMessageToClient(responseMessage);
+    }
+
+    private void checkUsername(Message message) {
+        boolean isDuplicate = dbManager.isUsernameExists(message.getSender());
+        Message responseMessage = new Message()
+                .setType(isDuplicate ? MessageType.INVALID_ID : MessageType.VALID_ID)
+                .setContent(isDuplicate ? "아이디가 이미 존재합니다." : "사용 가능한 아이디입니다.");
+        sendMessageToClient(responseMessage);
+    }
+
+    private void checkNickname(Message message) {
+        boolean isDuplicate = dbManager.isNicknameExists(message.getNickname());
+        Message responseMessage = new Message()
+                .setType(isDuplicate ? MessageType.INVALID_NICKNAME : MessageType.VALID_NICKNAME)
+                .setContent(isDuplicate ? "닉네임이 이미 존재합니다." : "사용 가능한 닉네임입니다.");
+        sendMessageToClient(responseMessage);
     }
 
     private void handleLogin(Message message) {
