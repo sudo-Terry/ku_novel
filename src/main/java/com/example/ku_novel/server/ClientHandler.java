@@ -4,17 +4,21 @@ import java.io.*;
 import java.net.*;
 
 import com.example.ku_novel.common.*;
+import com.example.ku_novel.repository.UserRepository;
+import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
 
 class ClientHandler implements Runnable {
-    private Socket socket;
+    private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private DatabaseManager dbManager;
 
-    public ClientHandler(Socket clientSocket, DatabaseManager dbManager) {
+    private final UserService userService;
+    private UserRepository userRepository;
+
+    public ClientHandler(Socket clientSocket, UserService userService) {
         this.socket = clientSocket;
-        this.dbManager = dbManager;
+        this.userService = userService;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -82,7 +86,7 @@ class ClientHandler implements Runnable {
         String password = message.getPassword();
         String nickname = message.getNickname();
 
-        boolean success = dbManager.registerUser(userId, password, nickname);
+        boolean success = userService.registerUser(userId, password, nickname);
         Message responseMessage = new Message();
 
         if (success) {
@@ -90,13 +94,13 @@ class ClientHandler implements Runnable {
                     .setContent("회원가입이 성공했습니다.");
         } else {
             responseMessage.setType(MessageType.SIGNUP_FAILED)
-                    .setContent("회원가입에 실패했습니다.");
+                    .setContent("아이디 또는 닉네임이 이미 존재합니다.");
         }
         sendMessageToClient(responseMessage);
     }
 
     private void checkUsername(Message message) {
-        boolean isDuplicate = dbManager.isUsernameExists(message.getSender());
+        boolean isDuplicate = userService.isUserIdExists(message.getSender());
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.INVALID_ID : MessageType.VALID_ID)
                 .setContent(isDuplicate ? "아이디가 이미 존재합니다." : "사용 가능한 아이디입니다.");
@@ -104,7 +108,7 @@ class ClientHandler implements Runnable {
     }
 
     private void checkNickname(Message message) {
-        boolean isDuplicate = dbManager.isNicknameExists(message.getNickname());
+        boolean isDuplicate = userService.isNicknameExists(message.getNickname());
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.INVALID_NICKNAME : MessageType.VALID_NICKNAME)
                 .setContent(isDuplicate ? "닉네임이 이미 존재합니다." : "사용 가능한 닉네임입니다.");
@@ -112,26 +116,38 @@ class ClientHandler implements Runnable {
     }
 
     private void handleLogin(Message message) {
-        // 로그인 비즈니스 로직 처리
+
         System.out.println("Login request received.");
 
-        Message responseMessage = new Message();
-        responseMessage.setType(MessageType.LOGIN_SUCCESS);
-        responseMessage.setContent("로그인이 성공되었습니다.");
+        String userId = message.getSender();
+        String password = message.getPassword();
 
+        // 로그인 비즈니스 로직 처리
+        boolean isAuthenticated = userService.validateUserCredentials(userId, password);
+
+        Message responseMessage = new Message();
+        if (isAuthenticated) {
+            responseMessage.setType(MessageType.LOGIN_SUCCESS);
+            responseMessage.setContent("로그인이 성공되었습니다.");
+        } else {
+            responseMessage.setType(MessageType.LOGIN_FAILED);
+            responseMessage.setContent("로그인 실패: 사용자 ID 또는 비밀번호가 잘못되었습니다.");
+        }
         // 로그인 성공 시 클라이언트에 응답 전송
         sendMessageToClient(responseMessage);
-    }
-
-    private void handleChatMessage(String messageJson) {
-        // 채팅 메시지 처리 로직
-        System.out.println("Chat message received.");
-        // Broadcast message to all clients
     }
 
     private void handleLogout(String messageJson) {
         System.out.println("Logout request received.");
         // 클라이언트 종료 로직
+        closeConnection();
+    }
+
+
+    private void handleChatMessage(String messageJson) {
+        // 채팅 메시지 처리 로직
+        System.out.println("Chat message received.");
+        // Broadcast message to all clients
     }
 
     private void sendMessageToClient(Message message) {
