@@ -14,7 +14,6 @@ class ClientHandler implements Runnable {
     private PrintWriter out;
 
     private final UserService userService;
-    private UserRepository userRepository;
 
     public ClientHandler(Socket clientSocket, UserService userService) {
         this.socket = clientSocket;
