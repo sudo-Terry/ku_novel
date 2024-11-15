@@ -22,7 +22,8 @@ dependencies {
     implementation ("org.projectlombok:lombok")
     implementation ("org.slf4j:slf4j-api:1.7.30")
     implementation ("org.hibernate:hibernate-core:5.6.10.Final")
-    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor ("org.projectlombok:lombok:1.18.28")
+
 }
 
 tasks.test {
