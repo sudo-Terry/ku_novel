@@ -19,6 +19,7 @@ public class UIHandler {
     public UIHandler() {
         try {
             socket = new Socket("127.0.0.1", 10100);
+            System.out.println("[Client] Connected to server.");
 
             // 서버 요청 수신 스레드
             ClientListenerThread clientListenerThread = new ClientListenerThread(socket, messageQueue);

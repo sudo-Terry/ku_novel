@@ -2,6 +2,7 @@ package com.example.ku_novel.server;
 
 import com.example.ku_novel.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +11,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 @Component
-public class ServerMain {
+public class ServerMain implements CommandLineRunner {
     private static final int PORT = 10100;
     private final UserService userService;
 
     @Autowired
     public ServerMain(UserService userService) {
         this.userService = userService;
+    }
+
+    @Override
+    public void run(String... args) throws Exception { // Spring Boot 애플리케이션 시작 시 실행
+        start();
     }
 
     public void start() {

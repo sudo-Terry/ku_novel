@@ -2,7 +2,6 @@ package com.example.ku_novel.client.connection;
 
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.common.MessageType;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,7 +24,7 @@ public class ClientSenderThread extends Thread{
         }
     }
 
-    public void requestLogin(String username, String password){
+    public void requestLogin(String id, String password){
         Message loginMessage = new Message();
         loginMessage.setType(MessageType.LOGIN);
 
