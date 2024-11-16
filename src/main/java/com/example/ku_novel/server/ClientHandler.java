@@ -51,6 +51,8 @@ class ClientHandler implements Runnable {
     private void processClientRequest(String messageJson) {
         // JSON 파싱하여 MessageType 분기 처리
         // MessageType에 따라 비즈니스 로직 호출
+
+
         Message message = parseMessage(messageJson);
         System.out.println("[RECEIVE] " + message);
 
@@ -61,17 +63,11 @@ class ClientHandler implements Runnable {
             case LOGOUT:
                 handleLogout(messageJson);
                 break;
-            case LOGIN_FAILED:
-                handleLogout(messageJson);
-                break;
-            case LOGIN_SUCCESS:
-                handleLogout(messageJson);
-                break;
             case SIGNUP:
                 handleSignUp(message);
                 break;
             case ID_CHECK:
-                checkUsername(message);
+                checkId(message);
                 break;
             case NICKNAME_CHECK:
                 checkNickname(message);
@@ -101,7 +97,7 @@ class ClientHandler implements Runnable {
         sendMessageToClient(responseMessage);
     }
 
-    private void checkUsername(Message message) {
+    private void checkId(Message message) {
         boolean isDuplicate = userService.isUserIdExists(message.getSender());
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.ID_INVALID : MessageType.ID_VALID)
@@ -145,10 +141,12 @@ class ClientHandler implements Runnable {
 
     private void handleLogout(String messageJson) {
         System.out.println("Logout request received.");
-        // 클라이언트 종료 로직
-        closeConnection();
+        // 로그아웃 로직
+        synchronized (activeClients) {
+            activeClients.remove(id);
+        }
+        id = null;
     }
-
 
     private void handleChatMessage(String messageJson) {
         // 채팅 메시지 처리 로직
