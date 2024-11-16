@@ -15,7 +15,6 @@ public class UIHandler {
     private Socket socket;
     private PrintWriter writer;
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
-    private ClientSenderThread clientSenderThread;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -28,8 +27,8 @@ public class UIHandler {
             clientListenerThread.start();
 
             // 서버 요청 전송 스레드
-            clientSenderThread = new ClientSenderThread(socket);
-            clientSenderThread.start();
+            ClientSenderThread.initialize(socket);
+            ClientSenderThread.getInstance().start();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }/*finally {
@@ -50,8 +49,8 @@ public class UIHandler {
 
 
     public void showLoginUI() {
-        SwingUtilities.invokeLater(() -> new LoginUI(clientSenderThread));
+        SwingUtilities.invokeLater(() -> new LoginUI());
     }
 
-    public void showSignUpModalUI(JFrame frame) { SwingUtilities.invokeLater(() -> new SignUpModalUI(frame, clientSenderThread)); }
+    public void showSignUpModalUI(JFrame frame) { SwingUtilities.invokeLater(() -> new SignUpModalUI(frame)); }
 }

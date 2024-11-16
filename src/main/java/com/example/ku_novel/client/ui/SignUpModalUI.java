@@ -10,7 +10,7 @@ public class SignUpModalUI extends JDialog {
     private JPasswordField passwordField;
     private JTextField userNameField;
 
-    public SignUpModalUI(JFrame parent, ClientSenderThread senderThread) {
+    public SignUpModalUI(JFrame parent) {
         super(parent, "회원가입", true);
         setSize(800, 600);
         setLocationRelativeTo(parent);
@@ -38,7 +38,7 @@ public class SignUpModalUI extends JDialog {
         mainPanel.add(userIdField, gbc);
 
         JButton idValidationButton = new JButton("아이디 중복 확인");
-        idValidationButton.addActionListener(e -> handleUserIdValidation(senderThread));
+        idValidationButton.addActionListener(e -> handleUserIdValidation());
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(idValidationButton, gbc);
@@ -70,14 +70,14 @@ public class SignUpModalUI extends JDialog {
         mainPanel.add(userNameField, gbc);
 
         JButton userNameValidationButton = new JButton("닉네임 중복 확인");
-        userNameValidationButton.addActionListener(e -> handleUserNameValidation(senderThread));
+        userNameValidationButton.addActionListener(e -> handleUserNameValidation());
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userNameValidationButton, gbc);
 
         // 회원가입 버튼
         JButton signUpButton = new JButton("회원가입");
-        signUpButton.addActionListener(e -> handleSignUp(senderThread));
+        signUpButton.addActionListener(e -> handleSignUp());
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
@@ -94,7 +94,7 @@ public class SignUpModalUI extends JDialog {
         setVisible(true);
     }
 
-    private void handleSignUp(ClientSenderThread senderThread) {
+    private void handleSignUp() {
         String userId = userIdField.getText();
         String password = new String(passwordField.getPassword());
         String userName = userNameField.getText();
@@ -106,14 +106,14 @@ public class SignUpModalUI extends JDialog {
         }
 
         try {
-            senderThread.requestSignUp(userId, password, userName);
+            ClientSenderThread.getInstance().requestSignUp(userId, password, userName);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
 
-    private void handleUserIdValidation(ClientSenderThread senderThread) {
+    private void handleUserIdValidation() {
         String userId = userIdField.getText();
 
         if (userId.isEmpty()) {
@@ -122,14 +122,14 @@ public class SignUpModalUI extends JDialog {
         }
 
         try {
-            senderThread.requestIdValidation(userId);
+            ClientSenderThread.getInstance().requestIdValidation(userId);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
 
-    private void handleUserNameValidation(ClientSenderThread senderThread) {
+    private void handleUserNameValidation() {
         String userName = userNameField.getText();
 
         if (userName.isEmpty()) {
@@ -138,7 +138,7 @@ public class SignUpModalUI extends JDialog {
         }
 
         try {
-            senderThread.requestNicknameValidation(userName);
+            ClientSenderThread.getInstance().requestNicknameValidation(userName);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
