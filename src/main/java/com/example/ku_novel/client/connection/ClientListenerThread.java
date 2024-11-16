@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.connection;
 
+import com.example.ku_novel.client.ui.HomeUI;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.common.MessageType;
 import com.google.gson.Gson;
@@ -37,6 +38,7 @@ public class ClientListenerThread extends Thread {
                 }else if (messageType.equals(MessageType.LOGIN_SUCCESS.toString())) {
                     // 로그인 성공 처리
                     System.out.println("로그인 성공");
+                    HomeUI homeUI = new HomeUI();
                 }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())){
                     // 로그인 실패 처리
                     System.out.println("로그인 실패");
