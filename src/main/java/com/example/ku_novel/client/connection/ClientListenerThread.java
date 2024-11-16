@@ -43,10 +43,16 @@ public class ClientListenerThread extends Thread {
                     System.out.println("로그인 성공");
                     HomeUI homeUI = new HomeUI();
                     uiHandler.disposeLoginUI();
-                }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())){
+                }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())) {
                     // 로그인 실패 처리
                     System.out.println("로그인 실패");
                     uiHandler.showAlertModal(null, "경고", "아이디 비밀번호를 다시 확인해 주세요.", JOptionPane.ERROR_MESSAGE);
+                }else if (messageType.equals(MessageType.ID_INVALID.toString()) || messageType.equals(MessageType.ID_VALID.toString())) {
+                    // 아이디 중복 확인
+                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+                }else if (messageType.equals(MessageType.NICKNAME_INVALID.toString()) || messageType.equals(MessageType.NICKNAME_VALID.toString())){
+                    // 닉네임 중복 확인
+                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
                 } else{ // 메시지 큐에 추가해서 UI 컴포넌트 내에서 처리
                     Message message = gson.fromJson(jsonObject, Message.class);
                     messageQueue.add(message);
