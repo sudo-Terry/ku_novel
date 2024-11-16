@@ -38,6 +38,7 @@ public class SignUpModalUI extends JDialog {
         mainPanel.add(userIdField, gbc);
 
         JButton idValidationButton = new JButton("아이디 중복 확인");
+        idValidationButton.addActionListener(e -> handleUserIdValidation(senderThread));
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(idValidationButton, gbc);
@@ -69,6 +70,7 @@ public class SignUpModalUI extends JDialog {
         mainPanel.add(userNameField, gbc);
 
         JButton userNameValidationButton = new JButton("닉네임 중복 확인");
+        userNameValidationButton.addActionListener(e -> handleUserNameValidation(senderThread));
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userNameValidationButton, gbc);
@@ -105,6 +107,38 @@ public class SignUpModalUI extends JDialog {
 
         try {
             senderThread.requestSignUp(userId, password, userName);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private void handleUserIdValidation(ClientSenderThread senderThread) {
+        String userId = userIdField.getText();
+
+        if (userId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "아이디 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            senderThread.requestIdValidation(userId);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private void handleUserNameValidation(ClientSenderThread senderThread) {
+        String userName = userNameField.getText();
+
+        if (userName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "닉네임 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            senderThread.requestNicknameValidation(userName);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();

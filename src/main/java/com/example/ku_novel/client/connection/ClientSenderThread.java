@@ -42,4 +42,20 @@ public class ClientSenderThread extends Thread{
 
         writer.println(signUpMessage.toJson());
     }
+
+    public void requestIdValidation(String id){
+        Message idValidationMessage = new Message();
+        idValidationMessage.setType(MessageType.ID_CHECK);
+        idValidationMessage.setSender(id);
+
+        writer.println(idValidationMessage.toJson());
+    }
+
+    public void requestNicknameValidation(String nickname){
+        Message nicknameValidationMessage = new Message();
+        nicknameValidationMessage.setType(MessageType.NICKNAME_CHECK);
+        nicknameValidationMessage.setNickname(nickname);
+
+        writer.println(nicknameValidationMessage.toJson());
+    }
 }
