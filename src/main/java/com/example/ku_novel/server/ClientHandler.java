@@ -2,6 +2,7 @@ package com.example.ku_novel.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.service.UserService;
@@ -11,12 +12,15 @@ class ClientHandler implements Runnable {
     private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private String id;
 
     private final UserService userService;
+    private final HashMap<String, PrintWriter> activeClients;
 
-    public ClientHandler(Socket clientSocket, UserService userService) {
+    public ClientHandler(Socket clientSocket, UserService userService, HashMap<String, PrintWriter> activeClients) {
         this.socket = clientSocket;
         this.userService = userService;
+        this.activeClients = activeClients;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -117,14 +121,18 @@ class ClientHandler implements Runnable {
 
         System.out.println("Login request received.");
 
-        String userId = message.getSender();
+        String id = message.getSender();
         String password = message.getPassword();
 
         // 로그인 비즈니스 로직 처리
-        boolean isAuthenticated = userService.validateUserCredentials(userId, password);
+        boolean isAuthenticated = userService.validateUserCredentials(id, password);
 
         Message responseMessage = new Message();
         if (isAuthenticated) {
+            this.id = id;
+            synchronized (activeClients) {
+                activeClients.put(id, out);
+            }
             responseMessage.setType(MessageType.LOGIN_SUCCESS);
             responseMessage.setContent("로그인이 성공되었습니다.");
         } else {
@@ -155,6 +163,9 @@ class ClientHandler implements Runnable {
 
     private void closeConnection() {
         try {
+            synchronized (activeClients) {
+                activeClients.remove(id);
+            }
             if (in != null)
                 in.close();
             if (out != null)
