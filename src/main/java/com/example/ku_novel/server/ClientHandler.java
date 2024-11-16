@@ -66,10 +66,10 @@ class ClientHandler implements Runnable {
             case SIGNUP:
                 handleSignUp(message);
                 break;
-            case CHECK_ID:
+            case ID_CHECK:
                 checkUsername(message);
                 break;
-            case CHECK_NICKNAME:
+            case NICKNAME_CHECK:
                 checkNickname(message);
                 break;
             // case CHAT:
@@ -100,7 +100,7 @@ class ClientHandler implements Runnable {
     private void checkUsername(Message message) {
         boolean isDuplicate = userService.isUserIdExists(message.getSender());
         Message responseMessage = new Message()
-                .setType(isDuplicate ? MessageType.INVALID_ID : MessageType.VALID_ID)
+                .setType(isDuplicate ? MessageType.ID_INVALID : MessageType.ID_VALID)
                 .setContent(isDuplicate ? "아이디가 이미 존재합니다." : "사용 가능한 아이디입니다.");
         sendMessageToClient(responseMessage);
     }
@@ -108,7 +108,7 @@ class ClientHandler implements Runnable {
     private void checkNickname(Message message) {
         boolean isDuplicate = userService.isNicknameExists(message.getNickname());
         Message responseMessage = new Message()
-                .setType(isDuplicate ? MessageType.INVALID_NICKNAME : MessageType.VALID_NICKNAME)
+                .setType(isDuplicate ? MessageType.NICKNAME_INVALID : MessageType.NICKNAME_VALID)
                 .setContent(isDuplicate ? "닉네임이 이미 존재합니다." : "사용 가능한 닉네임입니다.");
         sendMessageToClient(responseMessage);
     }
