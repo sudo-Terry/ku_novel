@@ -7,10 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 
 @Component
 public class ServerMain implements CommandLineRunner {
@@ -29,7 +27,6 @@ public class ServerMain implements CommandLineRunner {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            HashMap<String, PrintWriter> activeClients = new HashMap<>();
             System.out.println("Server is running...");
 
             while (true) {
@@ -37,7 +34,7 @@ public class ServerMain implements CommandLineRunner {
                 System.out.println("New client connected: " + clientSocket.getInetAddress());
 
                 // ClientHandler에 서비스 주입
-                ClientHandler clientHandler = new ClientHandler(clientSocket, userService, activeClients);
+                ClientHandler clientHandler = new ClientHandler(clientSocket, userService);
                 Thread clientThread = new Thread(clientHandler);
                 clientThread.start();
             }

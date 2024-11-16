@@ -9,18 +9,18 @@ import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
 
 class ClientHandler implements Runnable {
+    private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
+
     private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private String id;
 
     private final UserService userService;
-    private final HashMap<String, PrintWriter> activeClients;
 
-    public ClientHandler(Socket clientSocket, UserService userService, HashMap<String, PrintWriter> activeClients) {
+    public ClientHandler(Socket clientSocket, UserService userService) {
         this.socket = clientSocket;
         this.userService = userService;
-        this.activeClients = activeClients;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -51,7 +51,6 @@ class ClientHandler implements Runnable {
     private void processClientRequest(String messageJson) {
         // JSON 파싱하여 MessageType 분기 처리
         // MessageType에 따라 비즈니스 로직 호출
-
 
         Message message = parseMessage(messageJson);
         System.out.println("[RECEIVE] " + message);
