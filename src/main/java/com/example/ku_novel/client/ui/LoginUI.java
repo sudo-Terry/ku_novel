@@ -46,7 +46,7 @@ public class LoginUI extends JFrame {
                 try {
                     senderThread.requestLogin(username, password);
                 } catch (Exception ex) {}
-                dispose();
+                //dispose();
             }
         });
 

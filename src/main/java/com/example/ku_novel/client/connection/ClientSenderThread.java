@@ -27,9 +27,19 @@ public class ClientSenderThread extends Thread{
     public void requestLogin(String id, String password){
         Message loginMessage = new Message();
         loginMessage.setType(MessageType.LOGIN);
-        loginMessage.setId(id);
+        loginMessage.setSender(id);
         loginMessage.setPassword(password);
 
         writer.println(loginMessage.toJson());
+    }
+
+    public void requestSignUp(String id, String password, String userName){
+        Message signUpMessage = new Message();
+        signUpMessage.setType(MessageType.SIGNUP);
+        signUpMessage.setSender(id);
+        signUpMessage.setNickname(userName);
+        signUpMessage.setPassword(password);
+
+        writer.println(signUpMessage.toJson());
     }
 }

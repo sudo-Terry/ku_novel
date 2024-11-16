@@ -28,7 +28,7 @@ public class ClientListenerThread extends Thread {
             String line = null;
             while ((line = br.readLine()) != null) {
                 JsonObject jsonObject = gson.fromJson(line, JsonObject.class);
-                String messageType = jsonObject.has("messageType") ? jsonObject.get("messageType").getAsString() : "";
+                String messageType = jsonObject.has("type") ? jsonObject.get("type").getAsString() : "";
 
                 System.out.println(line + "응답 도착");
                 // 새 UI 컴포넌트 실행
