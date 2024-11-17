@@ -52,4 +52,6 @@ public class UIHandler {
     public void showLoginUI() {
         SwingUtilities.invokeLater(() -> new LoginUI(clientSenderThread));
     }
+
+    public void showSignUpModalUI(JFrame frame) { SwingUtilities.invokeLater(() -> new SignUpModalUI(frame, clientSenderThread)); }
 }
