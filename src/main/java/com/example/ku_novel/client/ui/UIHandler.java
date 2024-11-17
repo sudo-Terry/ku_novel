@@ -5,11 +5,13 @@ import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.common.Message;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class UIHandler {
+    private static UIHandler instance;
     private Socket socket;
     private PrintWriter writer;
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
@@ -38,6 +40,14 @@ public class UIHandler {
             }
         }*/
     }
+
+    public static UIHandler getInstance() {
+        if (instance == null) {
+            instance = new UIHandler();
+        }
+        return instance;
+    }
+
 
     public void showLoginUI() {
         SwingUtilities.invokeLater(() -> new LoginUI(clientSenderThread));

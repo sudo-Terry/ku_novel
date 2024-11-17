@@ -15,7 +15,7 @@ ku_novel
 - `server` : Server-Side 코드 디렉토리
 
 ## Dependencies
-- SDK `Oracle OpenJDK 22.0.2 - aarch64`
+- SDK `Amazon corretto-17.0.13`
 - GSON `v2.8.9` 
   - [MVN Repository](https://mvnrepository.com/artifact/com.google.code.gson/gson)
 - sqlite-jdbc: `3.43.2.0`
