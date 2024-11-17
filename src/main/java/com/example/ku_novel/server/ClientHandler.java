@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.HashMap;
 
 import com.example.ku_novel.common.*;
+import com.example.ku_novel.domain.NovelRoom;
+import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
 
@@ -17,10 +19,12 @@ class ClientHandler implements Runnable {
     private String id;
 
     private final UserService userService;
+    private final NovelRoomService novelRoomService;
 
-    public ClientHandler(Socket clientSocket, UserService userService) {
+    public ClientHandler(Socket clientSocket, UserService userService, NovelRoomService novelRoomService) {
         this.socket = clientSocket;
         this.userService = userService;
+        this.novelRoomService = novelRoomService;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -94,6 +98,18 @@ class ClientHandler implements Runnable {
                     .setContent("아이디 또는 닉네임이 이미 존재합니다.");
         }
         sendMessageToClient(responseMessage);
+    }
+
+    private void handleCreateRoom() {
+        NovelRoom success = novelRoomService.createNovelRoom("이것은 소설방 제목이에요", "소설방 설명은 여기에...", "방장아이디", 5);
+//        Message responseMessage = new Message();
+
+        if (success != null) {
+         System.out.println("생성");
+        } else {
+
+        }
+
     }
 
     private void checkId(Message message) {

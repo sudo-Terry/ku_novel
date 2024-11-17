@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.time.Instant;
+import java.util.List;
 
 public class Message {
 
@@ -14,6 +15,11 @@ public class Message {
     private String timestamp;
     private String password;
     private String nickname;
+
+    private List<Message> novelRooms;
+    private String title;
+    private String description;
+    private boolean isParticipating;
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
     public Message() {
