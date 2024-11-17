@@ -18,9 +18,9 @@ public enum MessageType {
     SIGNUP_SUCCESS("SIGNUP_SUCCESS"), // 회원가입 성공
     SIGNUP_FAILED("SIGNUP_FAILED"), // 회원가입 실패
 
-    ROOMS("ROOMS"), // 전체 소설방 조회 요청
-    ROOMS_SUCCESS("ROOMS_SUCCESS"), // 전체 소설방 조회 성공
-    ROOMS_FAILED("ROOMS_FAILED");
+    GET_ROOM_LIST("GET_ROOM_LIST"), // 전체 소설방 조회 요청
+    GET_ROOM_LIST_SUCCESS("GET_ROOM_LIST_SUCCESS"), // 전체 소설방 조회 성공
+    GET_ROOM_LIST_FAILED("GET_ROOM_LIST_FAILED");
 
     private String messageType;
 
