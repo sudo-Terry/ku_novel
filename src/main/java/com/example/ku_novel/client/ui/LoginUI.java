@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 public class LoginUI extends JFrame {
 
-    public LoginUI(ClientSenderThread senderThread) {
+    public LoginUI() {
 
         setTitle("로그인");
         setSize(1080, 720);
@@ -44,9 +44,8 @@ public class LoginUI extends JFrame {
                 String password = new String(passwordText.getPassword());
 
                 try {
-                    senderThread.requestLogin(username, password);
+                    ClientSenderThread.getInstance().requestLogin(username, password);
                 } catch (Exception ex) {}
-                dispose();
             }
         });
 
