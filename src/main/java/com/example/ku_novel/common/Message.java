@@ -12,6 +12,7 @@ public class Message {
     private String receiver;
     private String content;
     private String timestamp;
+    private String id;
     private String password;
     private String nickname;
 
@@ -79,6 +80,14 @@ public class Message {
 
     public String getTimestamp() {
         return timestamp;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPassword() {

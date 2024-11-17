@@ -27,6 +27,8 @@ public class ClientSenderThread extends Thread{
     public void requestLogin(String id, String password){
         Message loginMessage = new Message();
         loginMessage.setType(MessageType.LOGIN);
+        loginMessage.setId(id);
+        loginMessage.setPassword(password);
 
         writer.println(loginMessage.toJson());
     }

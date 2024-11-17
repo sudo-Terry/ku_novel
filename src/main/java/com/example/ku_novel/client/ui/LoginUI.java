@@ -56,7 +56,7 @@ public class LoginUI extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // RegisterUI 호출부
+                UIHandler.getInstance().showSignUpModalUI(LoginUI.this);
             }
         });
 
