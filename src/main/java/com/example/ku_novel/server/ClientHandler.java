@@ -114,18 +114,6 @@ class ClientHandler implements Runnable {
         sendMessageToClient(responseMessage);
     }
 
-    private void handleCreateRoom() {
-        NovelRoom success = novelRoomService.createNovelRoom("이것은 소설방 제목이에요", "소설방 설명은 여기에...", "방장아이디", 5);
-//        Message responseMessage = new Message();
-
-        if (success != null) {
-         System.out.println("생성");
-        } else {
-
-        }
-
-    }
-
     private void checkId(Message message) {
         boolean isDuplicate = userService.isUserIdExists(message.getSender());
         Message responseMessage = new Message()
