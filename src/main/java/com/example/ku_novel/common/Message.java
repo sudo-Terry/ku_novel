@@ -17,8 +17,8 @@ public class Message {
     private String nickname;
 
     private List<Message> novelRooms;
-    private String title;
-    private String description;
+    private String novelRoomTitle;
+    private String novelRoomDescription;
     private boolean isParticipating;
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
