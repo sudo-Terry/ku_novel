@@ -1,5 +1,6 @@
 package com.example.ku_novel.domain;
 
+import com.example.ku_novel.LocalDateTimeConverter;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,11 +12,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class NovelRoom {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment 설정 -> 버그가 있어서 주석처리
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment 설정
+    @Column(name = "room_id")
+    private Long id;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -29,11 +32,13 @@ public class NovelRoom {
     @Column(name = "max_participants", nullable = false)
     private Integer maxParticipants;
 
+    @Builder.Default
     @Column(name = "status", nullable = false)
     private String status = "ACTIVE";
 
+    @Convert(converter = LocalDateTimeConverter.class)
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "novel_content")
     private String novelContent; // JSON 형식 또는 구분자 방식으로 저장
@@ -43,4 +48,12 @@ public class NovelRoom {
 
     @Column(name = "current_vote_id")
     private Integer currentVoteId;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
+
 }
