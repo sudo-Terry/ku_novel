@@ -167,21 +167,6 @@ class ClientHandler implements Runnable {
 
     /* 소설방 관련 로직 */
 
-    private void sendActiveRoomsToClient(List<NovelRoom> userActiveRooms, List<NovelRoom> allRooms) {
-        Message responseMessage = new Message();
-        responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS);
-
-        // 참여 중인 소설방과 활성화된 전체 소설방을 JSON으로 변환하여 전송
-        Map<String, Object> responseContent = new HashMap<>();
-        responseContent.put("userActiveRooms", userActiveRooms);
-        responseContent.put("allRooms", allRooms);
-
-        Gson gson = new Gson();
-        responseMessage.setContent(gson.toJson(responseContent));
-
-        sendMessageToClient(responseMessage);
-    }
-
 
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
