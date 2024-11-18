@@ -22,5 +22,5 @@ public interface NovelRoomRepository extends JpaRepository<NovelRoom, Long> {
     List<NovelRoom> findByMaxParticipantsGreaterThanEqual(Integer minParticipants);
 
     // 특정 제목의 소설방 조회
-    List<NovelRoom> findByTitle(String title);
+    List<NovelRoom> findByTitleContaining(String title);
 }

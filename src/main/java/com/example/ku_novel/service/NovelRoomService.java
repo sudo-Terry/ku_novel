@@ -37,7 +37,6 @@ public class NovelRoomService {
         return novelRoomRepository.save(novelRoom);
     }
 
-
     // 아이디로 소설 방 조회
     public Optional<NovelRoom> getNovelRoomById(Long id) {
         return novelRoomRepository.findById(id);
@@ -50,7 +49,7 @@ public class NovelRoomService {
 
     // 제목으로 소설 방 조회
     public List<NovelRoom> getNovelRoomByTitle(String title) {
-        return novelRoomRepository.findByTitle(title);
+        return novelRoomRepository.findByTitleContaining(title);
     }
 
     // 모든 소설 방 조회

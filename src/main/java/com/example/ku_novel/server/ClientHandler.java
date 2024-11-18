@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.NovelRoom;
@@ -76,7 +77,7 @@ class ClientHandler implements Runnable {
             case NICKNAME_CHECK:
                 checkNickname(message);
                 break;
-            case CREATE_ROOM:
+            case ROOM_CREATE:
                 handleCreateRoom(message);
                 break;
             case ROOM_FETCH:
@@ -165,6 +166,22 @@ class ClientHandler implements Runnable {
     }
 
     /* 소설방 관련 로직 */
+
+    private void sendActiveRoomsToClient(List<NovelRoom> userActiveRooms, List<NovelRoom> allRooms) {
+        Message responseMessage = new Message();
+        responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS);
+
+        // 참여 중인 소설방과 활성화된 전체 소설방을 JSON으로 변환하여 전송
+        Map<String, Object> responseContent = new HashMap<>();
+        responseContent.put("userActiveRooms", userActiveRooms);
+        responseContent.put("allRooms", allRooms);
+
+        Gson gson = new Gson();
+        responseMessage.setContent(gson.toJson(responseContent));
+
+        sendMessageToClient(responseMessage);
+    }
+
 
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
