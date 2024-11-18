@@ -2,15 +2,19 @@ package com.example.ku_novel.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
 
 class ClientHandler implements Runnable {
+    private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
+
     private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private String id;
 
     private final UserService userService;
 
@@ -47,6 +51,7 @@ class ClientHandler implements Runnable {
     private void processClientRequest(String messageJson) {
         // JSON 파싱하여 MessageType 분기 처리
         // MessageType에 따라 비즈니스 로직 호출
+
         Message message = parseMessage(messageJson);
         System.out.println("[RECEIVE] " + message);
 
@@ -57,17 +62,11 @@ class ClientHandler implements Runnable {
             case LOGOUT:
                 handleLogout(messageJson);
                 break;
-            case LOGIN_FAILED:
-                handleLogout(messageJson);
-                break;
-            case LOGIN_SUCCESS:
-                handleLogout(messageJson);
-                break;
             case SIGNUP:
                 handleSignUp(message);
                 break;
             case ID_CHECK:
-                checkUsername(message);
+                checkId(message);
                 break;
             case NICKNAME_CHECK:
                 checkNickname(message);
@@ -97,7 +96,7 @@ class ClientHandler implements Runnable {
         sendMessageToClient(responseMessage);
     }
 
-    private void checkUsername(Message message) {
+    private void checkId(Message message) {
         boolean isDuplicate = userService.isUserIdExists(message.getSender());
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.ID_INVALID : MessageType.ID_VALID)
@@ -117,14 +116,18 @@ class ClientHandler implements Runnable {
 
         System.out.println("Login request received.");
 
-        String userId = message.getSender();
+        String id = message.getSender();
         String password = message.getPassword();
 
         // 로그인 비즈니스 로직 처리
-        boolean isAuthenticated = userService.validateUserCredentials(userId, password);
+        boolean isAuthenticated = userService.validateUserCredentials(id, password);
 
         Message responseMessage = new Message();
         if (isAuthenticated) {
+            this.id = id;
+            synchronized (activeClients) {
+                activeClients.put(id, out);
+            }
             responseMessage.setType(MessageType.LOGIN_SUCCESS);
             responseMessage.setContent("로그인이 성공되었습니다.");
         } else {
@@ -137,10 +140,12 @@ class ClientHandler implements Runnable {
 
     private void handleLogout(String messageJson) {
         System.out.println("Logout request received.");
-        // 클라이언트 종료 로직
-        closeConnection();
+        // 로그아웃 로직
+        synchronized (activeClients) {
+            activeClients.remove(id);
+        }
+        id = null;
     }
-
 
     private void handleChatMessage(String messageJson) {
         // 채팅 메시지 처리 로직
@@ -155,6 +160,9 @@ class ClientHandler implements Runnable {
 
     private void closeConnection() {
         try {
+            synchronized (activeClients) {
+                activeClients.remove(id);
+            }
             if (in != null)
                 in.close();
             if (out != null)
