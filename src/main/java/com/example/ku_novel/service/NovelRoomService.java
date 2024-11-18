@@ -25,6 +25,19 @@ public class NovelRoomService {
     }
 
     // 아이디로 소설 방 조회
+    public Optional<NovelRoom> getNovelRoomById(Long id) {
+        return novelRoomRepository.findById(id);
+    }
+
+    // 활성화된 소설 방 조회
+    public List<NovelRoom> getActiveNovelRooms() {
+        return novelRoomRepository.findByStatus("ACTIVE");
+    }
+
+    // 제목으로 소설 방 조회
+    public List<NovelRoom> getNovelRoomByTitle(String title) {
+        return novelRoomRepository.findByTitleContaining(title);
+    }
 
     // 모든 소설 방 조회
 
