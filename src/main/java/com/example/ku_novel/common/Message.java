@@ -2,20 +2,13 @@ package com.example.ku_novel.common;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 
-@Getter
-@Setter
 public class Message {
 
-    // Getters
-    @Getter
     private MessageType type;
-    @Getter
     private String sender;
     private String receiver;
     private String content;
@@ -24,11 +17,8 @@ public class Message {
     private String nickname;
 
     private List<Message> novelRooms;
-    private Long novelRoomId;
     private String novelRoomTitle;
     private String novelRoomDescription;
-    private String novelRoomStatus;
-    private int maxParticipants;
     private boolean isParticipating;
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
@@ -73,6 +63,36 @@ public class Message {
     public Message setNickname(String nickname) {
         this.nickname = nickname;
         return this;
+    }
+
+
+    // Getters
+    public MessageType getType() {
+        return type;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     public String toJson() {
