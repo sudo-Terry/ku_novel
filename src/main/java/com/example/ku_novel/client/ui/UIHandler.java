@@ -15,7 +15,7 @@ public class UIHandler {
     private Socket socket;
     private PrintWriter writer;
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
-    private ClientSenderThread clientSenderThread;
+    private LoginUI loginUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -28,8 +28,8 @@ public class UIHandler {
             clientListenerThread.start();
 
             // 서버 요청 전송 스레드
-            clientSenderThread = new ClientSenderThread(socket);
-            clientSenderThread.start();
+            ClientSenderThread.initialize(socket);
+            ClientSenderThread.getInstance().start();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }/*finally {
@@ -48,8 +48,28 @@ public class UIHandler {
         return instance;
     }
 
-
     public void showLoginUI() {
-        SwingUtilities.invokeLater(() -> new LoginUI(clientSenderThread));
+        SwingUtilities.invokeLater(() -> {
+            if (loginUI == null || !loginUI.isVisible()) { // 이미 창이 열려 있지 않을 때만 새로 생성
+                loginUI = new LoginUI();
+            }
+        });
+    }
+
+    public void disposeLoginUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (loginUI != null) { // 로그인 UI가 존재하면 닫기
+                loginUI.dispose();
+                loginUI = null; // 참조 해제
+            }
+        });
+    }
+
+    public void showSignUpModalUI(JFrame frame) { SwingUtilities.invokeLater(() -> new SignUpModalUI(frame)); }
+
+    public void showAlertModal(Component parentComponent, String title, String message, int messageType) {
+        SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(parentComponent, message, title, messageType)
+        );
     }
 }
