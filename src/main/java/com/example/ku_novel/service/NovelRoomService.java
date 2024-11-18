@@ -50,7 +50,7 @@ public class NovelRoomService {
 
     // 제목으로 소설 방 조회
     public List<NovelRoom> getNovelRoomByTitle(String title) {
-        return novelRoomRepository.findByTitle(title);
+        return novelRoomRepository.findByTitleContaining(title);
     }
 
     // 모든 소설 방 조회

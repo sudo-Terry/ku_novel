@@ -76,7 +76,7 @@ class ClientHandler implements Runnable {
             case NICKNAME_CHECK:
                 checkNickname(message);
                 break;
-            case CREATE_ROOM:
+            case ROOM_CREATE:
                 handleCreateRoom(message);
                 break;
             case ROOM_FETCH:
