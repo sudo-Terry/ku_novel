@@ -6,9 +6,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-public class HomeUI extends JFrame {
-    public HomeUI() {
-        setTitle("릴레이 소설방");
+public class MyPageUI extends JFrame {
+    public MyPageUI() {
+        setTitle("마이페이지");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);    // 크기 조절 비활성화
@@ -24,7 +24,7 @@ public class HomeUI extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
         topPanel.setBackground(Color.WHITE);
 
-        JLabel titleLabel = new JLabel("릴레이 소설방");
+        JLabel titleLabel = new JLabel("마이페이지");
         titleLabel.setPreferredSize(new Dimension(600, 100));
         try {
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(32f);
@@ -34,23 +34,6 @@ public class HomeUI extends JFrame {
             System.out.println("폰트를 로드하는 데 실패했습니다.");
         }
         topPanel.add(titleLabel);
-
-        JTextField searchField = new JTextField(20);
-        searchField.setPreferredSize(new Dimension(40, 45));
-
-        JButton searchButton = new JButton(scaleIcon("src/main/resources/icon/search.png", 45, 45));
-        searchButton.setPreferredSize(new Dimension(45, 45));
-        searchButton.setBorderPainted(false);
-        searchButton.setBackground(Color.LIGHT_GRAY);
-
-        JButton createButton = new JButton(scaleIcon("src/main/resources/icon/plus.png", 45, 45));
-        createButton.setPreferredSize(new Dimension(70, 65));
-        createButton.setBorderPainted(false);
-        createButton.setBackground(new Color(255, 165, 0));
-
-        topPanel.add(searchField);
-        topPanel.add(searchButton);
-        topPanel.add(createButton);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -69,9 +52,10 @@ public class HomeUI extends JFrame {
         attendanceButton.setBackground(Color.WHITE);
         attendanceButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
 
-        JButton myButton = new JButton(scaleIcon("src/main/resources/icon/my.png", 45, 45));
-        myButton.setBackground(new Color(255, 165, 0));
-        myButton.setBorderPainted(false);
+        JButton homeButton = new JButton("HOME");
+        homeButton.setBackground(new Color(255, 165, 0));
+        homeButton.setBorderPainted(false);
+
         sidePanel.add(rankingButton);
         sidePanel.add(attendanceButton);
         for(int i=0; i<4; i++) {
@@ -79,87 +63,111 @@ public class HomeUI extends JFrame {
             jPanel.setBackground(Color.WHITE);
             sidePanel.add(jPanel);
         }
-        sidePanel.add(myButton);
+        sidePanel.add(homeButton);
 
         mainPanel.add(sidePanel, BorderLayout.EAST);
 
         //============= 콘텐츠 패널
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 20, 25));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 25, 25));
 
-        //============= 1. "참여중인 소설방" 섹션
-        JPanel participatingLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel participatingLabel = new JLabel("참여중인 소설방");
-        participatingLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
-        participatingLabelPanel.add(participatingLabel);
+        //============= 1. "내 정보" 섹션
+        JPanel infoLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel infoLabel = new JLabel("내 정보");
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
+        infoLabelPanel.add(infoLabel);
 
         try {
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(20f);
-            participatingLabel.setFont(customFont);
+            infoLabel.setFont(customFont);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
             System.out.println("폰트를 로드하는 데 실패했습니다.");
         }
 
-        // to-do: 참여 중인 소설방 목록 데이터(
-        String[] participatingRooms = {
-                "소설방 1", "소설방 2", "소설방 3", "소설방 4",
-                "소설방 5", "소설방 6", "소설방 7", "소설방 8"
-        };
+        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        infoPanel.setPreferredSize(new Dimension(800, 240));
+        infoPanel.setBackground(Color.WHITE);
 
-        JList<String> novelList = new JList<>(participatingRooms);
-        novelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        novelList.setVisibleRowCount(1); // 한 줄만 표시
-        novelList.setLayoutOrientation(JList.HORIZONTAL_WRAP); // 가로로 나열
-        novelList.setFixedCellWidth(140); // 각 항목의 고정 너비 설정
-        novelList.setFixedCellHeight(140); // 각 항목의 고정 높이 설정
+        JLabel profileImage = new JLabel(scaleIcon("src/main/resources/sample.jpg", 180, 180));
+        profileImage.setPreferredSize(new Dimension(225, 225));
 
-        JScrollPane scrollPane = new JScrollPane(novelList);
-        scrollPane.setPreferredSize(new Dimension(980, 170));
-        scrollPane.setBorder(null);
+        JPanel infoListPanel = new JPanel(new GridLayout(3, 1));
+        infoListPanel.setBackground(Color.WHITE);
+        infoListPanel.setPreferredSize(new Dimension(600, 225));
+        infoListPanel.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        JPanel participatingPanel = new JPanel(new BorderLayout());
-        participatingPanel.add(scrollPane, BorderLayout.CENTER);
-
-        contentPanel.add(participatingLabelPanel);
-        contentPanel.add(participatingPanel);
-
-        //============= 2. "전체 소설방" 섹션
-        JPanel allRoomsLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel allRoomsLabel = new JLabel("전체 소설방");
-        allRoomsLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
-        allRoomsLabelPanel.add(allRoomsLabel);
-
+        JLabel idLabel = new JLabel("ID: userid");
         try {
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(20f);
-            allRoomsLabel.setFont(customFont);
+            idLabel.setFont(customFont);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
             System.out.println("폰트를 로드하는 데 실패했습니다.");
         }
 
-        // to-do: 참여 중인 소설방 목록 데이터
-        String[] allRooms = {
+        JLabel nameLabel = new JLabel("Nickname: username");
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(20f);
+            nameLabel.setFont(customFont);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            System.out.println("폰트를 로드하는 데 실패했습니다.");
+        }
+
+        JLabel pointLabel = new JLabel("point: 1000");
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(20f);
+            pointLabel.setFont(customFont);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            System.out.println("폰트를 로드하는 데 실패했습니다.");
+        }
+
+        infoListPanel.add(idLabel);
+        infoListPanel.add(nameLabel);
+        infoListPanel.add(pointLabel);
+
+        infoPanel.add(profileImage);
+        infoPanel.add(infoListPanel);
+
+        contentPanel.add(infoLabelPanel);
+        contentPanel.add(infoPanel);
+
+        //============= 2. "관심 소설방" 섹션
+        JPanel interestedLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel interestedLabel = new JLabel("관심 소설방");
+        interestedLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(20f);
+            interestedLabel.setFont(customFont);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            System.out.println("폰트를 로드하는 데 실패했습니다.");
+        }
+        interestedLabelPanel.add(interestedLabel);
+
+        // to-do: 관심 소설방 데이터
+        String[] interestedRooms = {
                 "소설방 1", "소설방 2", "소설방 3", "소설방 4",
                 "소설방 5", "소설방 6", "소설방 7", "소설방 8"
         };
 
-        JList<String> allNovelList = new JList<>(allRooms);
+        JList<String> allNovelList = new JList<>(interestedRooms);
         allNovelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        allNovelList.setVisibleRowCount(2); // 두 줄 표시
+        allNovelList.setVisibleRowCount(1); // 한 줄로 표시
         allNovelList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        allNovelList.setFixedCellWidth(150); // 각 항목의 고정 너비 설정
-        allNovelList.setFixedCellHeight(150); // 각 항목의 고정 높이 설정
+        allNovelList.setFixedCellWidth(160); // 각 항목의 고정 너비 설정
+        allNovelList.setFixedCellHeight(190); // 각 항목의 고정 높이 설정
 
         JScrollPane scrollPane2 = new JScrollPane(allNovelList);
-        scrollPane2.setPreferredSize(new Dimension(980, 320));
         scrollPane2.setBorder(null);
 
         JPanel allRoomsPanel = new JPanel(new BorderLayout());
         allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);
 
-        contentPanel.add(allRoomsLabelPanel);
+        contentPanel.add(interestedLabelPanel);
         contentPanel.add(allRoomsPanel);
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
@@ -173,7 +181,8 @@ public class HomeUI extends JFrame {
         return new ImageIcon(scaledImage);
     }
 
+    // 추후 삭제`
     public static void main(String[] args) {
-        new HomeUI();
+        new MyPageUI();
     }
 }
