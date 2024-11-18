@@ -37,7 +37,6 @@ public class NovelRoomService {
         return novelRoomRepository.save(novelRoom);
     }
 
-
     // 아이디로 소설 방 조회
     public Optional<NovelRoom> getNovelRoomById(Long id) {
         return novelRoomRepository.findById(id);

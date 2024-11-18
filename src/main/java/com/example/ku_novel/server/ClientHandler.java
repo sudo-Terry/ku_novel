@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.NovelRoom;
@@ -165,6 +166,7 @@ class ClientHandler implements Runnable {
     }
 
     /* 소설방 관련 로직 */
+
 
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
