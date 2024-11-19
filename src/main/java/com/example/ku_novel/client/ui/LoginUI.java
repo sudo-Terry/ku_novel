@@ -14,6 +14,7 @@ public class LoginUI extends JFrame {
         setTitle("로그인");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);    // 크기 조절 비활성화
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
