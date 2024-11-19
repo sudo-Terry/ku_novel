@@ -2,9 +2,7 @@ package com.example.ku_novel.server;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.NovelRoom;
@@ -111,7 +109,7 @@ class ClientHandler implements Runnable {
             responseMessage.setType(MessageType.SIGNUP_FAILED)
                     .setContent("아이디 또는 닉네임이 이미 존재합니다.");
         }
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     private void checkId(Message message) {
@@ -119,7 +117,7 @@ class ClientHandler implements Runnable {
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.ID_INVALID : MessageType.ID_VALID)
                 .setContent(isDuplicate ? "아이디가 이미 존재합니다." : "사용 가능한 아이디입니다.");
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     private void checkNickname(Message message) {
@@ -127,7 +125,7 @@ class ClientHandler implements Runnable {
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.NICKNAME_INVALID : MessageType.NICKNAME_VALID)
                 .setContent(isDuplicate ? "닉네임이 이미 존재합니다." : "사용 가능한 닉네임입니다.");
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     private void handleLogin(Message message) {
@@ -153,7 +151,7 @@ class ClientHandler implements Runnable {
             responseMessage.setContent("로그인 실패: 사용자 ID 또는 비밀번호가 잘못되었습니다.");
         }
         // 로그인 성공 시 클라이언트에 응답 전송
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     private void handleLogout(String messageJson) {
@@ -185,7 +183,7 @@ class ClientHandler implements Runnable {
             responseMessage.setType(MessageType.ROOM_CREATE_FAILED)
                     .setContent("소설 방 생성에 실패했습니다.");
         }
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     // 소설방 조회 로직
@@ -221,7 +219,7 @@ class ClientHandler implements Runnable {
             responseMessage.setType(MessageType.ROOM_FETCH_FAILED)
                     .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
         }
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
 
     // 소설방 참가 로직
@@ -238,9 +236,8 @@ class ClientHandler implements Runnable {
             responseMessage.setType(MessageType.ROOM_JOIN_FAILED)
                     .setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
         }
-        sendMessageToClient(responseMessage);
+        sendMessageToCurrentClient(responseMessage);
     }
-
 
     private void handleChatMessage(String messageJson) {
         // 채팅 메시지 처리 로직
@@ -248,9 +245,24 @@ class ClientHandler implements Runnable {
         // Broadcast message to all clients
     }
 
-    private void sendMessageToClient(Message message) {
-        out.println(message.toJson());
+    private void broadcastMessageToAll(Message message) {
+        synchronized (activeClients) {
+            Collection<PrintWriter> collection = activeClients.values();
+            Iterator<PrintWriter> iterator = collection.iterator();
+            while (iterator.hasNext()) {
+                PrintWriter writer = iterator.next();
+                sendMessageToWriter(writer, message);
+            }
+        }
+    }
+
+    private void sendMessageToWriter(PrintWriter writer, Message message) {
+        writer.println(message.toJson());
         System.out.println("[SEND] " + message);
+    }
+
+    private void sendMessageToCurrentClient(Message message) {
+        sendMessageToWriter(out, message);
     }
 
     private void closeConnection() {
