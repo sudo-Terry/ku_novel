@@ -78,8 +78,17 @@ class ClientHandler implements Runnable {
             case ROOM_CREATE:
                 handleCreateRoom(message);
                 break;
-            case ROOM_FETCH:
-                handleGetRoom(message);
+            case ROOM_FETCH_BY_ID:
+                handleGetRoomById(message);
+                break;
+            case ROOM_FETCH_BY_TITLE:
+                handleGetRoomByTitle(message);
+                break;
+            case ROOM_FETCH_ACTIVE:
+                handleGetActiveRooms();
+                break;
+            case ROOM_FETCH_ALL:
+                handleGetAllRooms();
                 break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
@@ -186,41 +195,75 @@ class ClientHandler implements Runnable {
         sendMessageToCurrentClient(responseMessage);
     }
 
-    // 소설방 조회 로직
-    private void handleGetRoom(Message message) {
-        Message responseMessage = new Message();
+
+    // ID로 소설 방 조회
+    private void handleGetRoomById(Message message) {
         try {
-            if (message.getNovelRoomId() != null) {
-                // 특정 ID로 소설 방 조회
-                NovelRoom room = novelRoomService.getNovelRoomById(message.getNovelRoomId())
-                        .orElseThrow(() -> new IllegalArgumentException("소설 방을 찾을 수 없습니다."));
-                responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS)
-                        .setContent(new Gson().toJson(room));
-            } else if (message.getNovelRoomTitle() != null) {
-                // 제목으로 소설 방 조회
-                List<NovelRoom> rooms = novelRoomService.getNovelRoomByTitle(message.getNovelRoomTitle());
-                if (rooms.isEmpty()) {
-                    throw new IllegalArgumentException("해당 제목의 소설 방이 존재하지 않습니다.");
-                }
-                responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS)
-                        .setContent(new Gson().toJson(rooms));
-            } else if (message.getNovelRoomStatus() != null) {
-                // 활성화된 소설 방 조회
-                List<NovelRoom> rooms = novelRoomService.getActiveNovelRooms();
-                responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS)
-                        .setContent(new Gson().toJson(rooms));
-            } else {
-                // 모든 소설 방 조회
-                List<NovelRoom> allRooms = novelRoomService.getAllNovelRooms();
-                responseMessage.setType(MessageType.ROOM_FETCH_SUCCESS)
-                        .setContent(new Gson().toJson(allRooms));
-            }
+            NovelRoom room = novelRoomService.getNovelRoomById(message.getNovelRoomId())
+                    .orElseThrow(() -> new IllegalArgumentException("소설 방을 찾을 수 없습니다."));
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_BY_ID_SUCCESS)
+                    .setContent(new Gson().toJson(room));
+            sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
-            responseMessage.setType(MessageType.ROOM_FETCH_FAILED)
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_BY_ID_FAILED)
                     .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
+            sendMessageToCurrentClient(responseMessage);
         }
-        sendMessageToCurrentClient(responseMessage);
     }
+
+    // 제목으로 소설 방 조회
+    private void handleGetRoomByTitle(Message message) {
+        try {
+            List<NovelRoom> rooms = novelRoomService.getNovelRoomByTitle(message.getNovelRoomTitle());
+            if (rooms.isEmpty()) {
+                throw new IllegalArgumentException("해당 제목의 소설 방이 존재하지 않습니다.");
+            }
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_BY_TITLE_SUCCESS)
+                    .setContent(new Gson().toJson(rooms));
+            sendMessageToCurrentClient(responseMessage);
+        } catch (Exception e) {
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_BY_TITLE_FAILED)
+                    .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
+            sendMessageToCurrentClient(responseMessage);
+        }
+    }
+
+    // 활성화된 소설 방 조회
+    private void handleGetActiveRooms() {
+        try {
+            List<NovelRoom> rooms = novelRoomService.getActiveNovelRooms();
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_ACTIVE_SUCCESS)
+                    .setContent(new Gson().toJson(rooms));
+            sendMessageToCurrentClient(responseMessage);
+        } catch (Exception e) {
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_ACTIVE_FAILED)
+                    .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
+            sendMessageToCurrentClient(responseMessage);
+        }
+    }
+
+    // 모든 소설 방 조회
+    private void handleGetAllRooms() {
+        try {
+            List<NovelRoom> allRooms = novelRoomService.getAllNovelRooms();
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_ALL_SUCCESS)
+                    .setContent(new Gson().toJson(allRooms));
+            sendMessageToCurrentClient(responseMessage);
+        } catch (Exception e) {
+            Message responseMessage = new Message()
+                    .setType(MessageType.ROOM_FETCH_ALL_FAILED)
+                    .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
+            sendMessageToCurrentClient(responseMessage);
+        }
+    }
+
 
     // 소설방 참가 로직
     private void handleJoinRoom(Message message) {
