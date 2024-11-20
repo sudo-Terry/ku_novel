@@ -22,6 +22,12 @@ public class UIHandler {
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
         try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
             socket = new Socket("127.0.0.1", 10100);
             System.out.println("[Client] Connected to server.");
 
