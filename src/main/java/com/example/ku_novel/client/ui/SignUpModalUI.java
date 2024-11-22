@@ -13,6 +13,7 @@ public class SignUpModalUI extends JDialog {
     public SignUpModalUI(JFrame parent) {
         super(parent, "회원가입", true);
         setSize(800, 600);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -90,8 +91,11 @@ public class SignUpModalUI extends JDialog {
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(cancelButton, gbc);
+    }
 
-        setVisible(true);
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
     }
 
     private void handleSignUp() {

@@ -53,7 +53,14 @@ public class ClientListenerThread extends Thread {
                 }else if (messageType.equals(MessageType.NICKNAME_INVALID.toString()) || messageType.equals(MessageType.NICKNAME_VALID.toString())){
                     // 닉네임 중복 확인
                     uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
-                } else{ // 메시지 큐에 추가해서 UI 컴포넌트 내에서 처리
+                }else if(messageType.equals(MessageType.SIGNUP_SUCCESS.toString())){
+                    // 회원가입 성공 처리
+                    uiHandler.disposeSignUpModalUI();
+                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+                }else if(messageType.equals(MessageType.SIGNUP_FAILED.toString())){
+                    // 회원가입 실패 처리
+                    uiHandler.showAlertModal(null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
+                }else{ // 메시지 큐에 추가해서 UI 컴포넌트 내에서 처리
                     Message message = gson.fromJson(jsonObject, Message.class);
                     messageQueue.add(message);
                     System.out.println(message + " 가 큐에 추가됨");
