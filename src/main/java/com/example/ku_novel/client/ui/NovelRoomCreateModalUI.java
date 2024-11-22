@@ -111,7 +111,7 @@ public class NovelRoomCreateModalUI extends JDialog {
 
         try {
             // 서버에 소설방 생성 요청
-            // ClientSenderThread.getInstance().requestCreateNovelRoom(roomTitle, roomDescription, novelistTime, voteTime);
+            ClientSenderThread.getInstance().requestCreateNovelRoom(roomTitle, roomDescription, novelistTime, voteTime);
             JOptionPane.showMessageDialog(this, "소설방이 생성되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (Exception ex) {

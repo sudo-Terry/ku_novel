@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.connection;
 
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.common.MessageType;
@@ -75,6 +76,20 @@ public class ClientSenderThread extends Thread{
         nicknameValidationMessage.setNickname(nickname);
 
         writer.println(nicknameValidationMessage.toJson());
+    }
+
+    public void requestCreateNovelRoom(String roomTitle, String roomDescription, int novelistTime, int voteTime) {
+        Message createNovelRoomMessage = new Message();
+        createNovelRoomMessage.setType(MessageType.ROOM_CREATE);
+        createNovelRoomMessage.setSender(ClientDataModel.getInstance().getUserId());
+        createNovelRoomMessage.setNovelRoomTitle(roomTitle);
+        createNovelRoomMessage.setNovelRoomDescription(roomDescription);
+        // to-do : 서버측 response 구현 필요 maxParticipant 유지? 소설가 수만 제한?
+        createNovelRoomMessage.setMaxParticipants(1000);
+        // createNovelRoomMessage.setNovelistTime(novelistTime);
+        // createNovelRoomMessage.setVoteTime(voteTime);
+
+        writer.println(createNovelRoomMessage.toJson());
     }
 
     public void requestRoomFetchActive(){
