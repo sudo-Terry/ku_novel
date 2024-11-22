@@ -1,6 +1,5 @@
 package com.example.ku_novel.client.connection;
 
-import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.HomeUI;
 import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
