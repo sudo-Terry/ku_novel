@@ -26,17 +26,10 @@ public class User {
     private String nickname;
 
     @Convert(converter = LocalDateTimeConverter.class)
-    @Column(name = "last_attendance", nullable = false)
+    @Column(name = "last_attendance")
     private LocalDateTime lastAttendance;
 
     @Builder.Default
     @Column(name = "point", nullable = false)
     private Integer point = 500;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.lastAttendance == null) {
-            this.lastAttendance = LocalDateTime.now();
-        }
-    }
 }

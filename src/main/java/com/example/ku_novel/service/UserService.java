@@ -25,7 +25,7 @@ public class UserService {
                 .id(id)
                 .password(password)
                 .nickname(nickname)
-                .lastAttendance(LocalDateTime.now())
+                .lastAttendance(null)
                 .build();
 
         userRepository.save(user);
