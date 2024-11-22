@@ -4,6 +4,7 @@ import com.example.ku_novel.domain.User;
 import com.example.ku_novel.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -20,7 +21,13 @@ public class UserService {
         if (userRepository.existsById(id) || userRepository.existsByNickname(nickname)) {
             return false;
         }
-        User user = new User(id, password, nickname);
+        User user = User.builder()
+                .id(id)
+                .password(password)
+                .nickname(nickname)
+                .lastAttendance(LocalDateTime.now())
+                .build();
+
         userRepository.save(user);
         return true;
     }
