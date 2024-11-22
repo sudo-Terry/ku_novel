@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.domain.NovelRoom;
 

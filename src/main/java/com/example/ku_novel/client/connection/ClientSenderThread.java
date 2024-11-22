@@ -76,4 +76,11 @@ public class ClientSenderThread extends Thread{
 
         writer.println(nicknameValidationMessage.toJson());
     }
+
+    public void requestRoomFetchActive(){
+        Message roomListMessage = new Message();
+        roomListMessage.setType(MessageType.ROOM_FETCH_ACTIVE);
+
+        writer.println(roomListMessage.toJson());
+    }
 }
