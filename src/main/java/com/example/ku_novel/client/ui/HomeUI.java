@@ -115,6 +115,12 @@ public class HomeUI extends JFrame {
 
         // 소설방 만들기 버튼
         JButton createButton = createIconButton("src/main/resources/icon/plus.png", 70, 65, new Color(255, 165, 0));
+        createButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIHandler.getInstance().showNovelRoomCreateModalUI(HomeUI.this);
+            }
+        });
 
         topPanel.add(searchField);
         topPanel.add(searchButton);
