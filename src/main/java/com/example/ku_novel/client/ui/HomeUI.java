@@ -244,12 +244,14 @@ public class HomeUI extends JFrame {
         infoListPanel.setPreferredSize(new Dimension(600, 200));
         infoListPanel.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        JLabel idLabel = new JLabel("ID: userid");
+        JLabel idLabel = new JLabel("ID: " + ClientDataModel.getInstance().getUserId());
         idLabel.setFont(loadCustomFont(20f));
 
-        JLabel nameLabel = new JLabel("Nickname: username");
+        // JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
+        JLabel nameLabel = new JLabel("Nickname: 테스트 닉네임");
         nameLabel.setFont(loadCustomFont(20f));
 
+        // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
         JLabel pointLabel = new JLabel("point: 1000");
         pointLabel.setFont(loadCustomFont(20f));
 
