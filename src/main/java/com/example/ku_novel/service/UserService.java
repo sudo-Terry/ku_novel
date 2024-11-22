@@ -48,4 +48,24 @@ public class UserService {
         return user != null && user.getPassword().equals(password);
     }
 
+    // 포인트가 500 이상인지 확인
+    public boolean hasEnoughPoints(String id) {
+            User user = userRepository.findById(id).orElse(null);
+            if (user == null) {
+                return false;
+            }
+            return user.getPoint() >= 500;
+        }
+
+    // 포인트 500 차감
+    public boolean deductPoints(String id) {
+            User user = userRepository.findById(id).orElse(null);
+            if (user == null) {
+                return false;
+            }
+    
+            user.setPoint(user.getPoint() - 500);
+            userRepository.save(user); 
+            return true;
+        }
 }

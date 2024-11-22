@@ -93,9 +93,9 @@ class ClientHandler implements Runnable {
             case ROOM_JOIN:
                 handleJoinRoom(message);
                 break;
-//            case ROOM_STATUS_UPDATE:
-//                handleUpdateRoomStatus(message);
-//                break;
+            // case ROOM_STATUS_UPDATE:
+            // handleUpdateRoomStatus(message);
+            // break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
@@ -174,27 +174,30 @@ class ClientHandler implements Runnable {
 
     /* 소설방 관련 로직 */
 
-
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
+        String id = message.getSender();
         String title = message.getNovelRoomTitle();
         String description = message.getNovelRoomDescription();
         String hostUserId = message.getSender();
         Integer maxParticipants = message.getMaxParticipants();
 
-        NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants);
+        Message responseMessage = new Message().setType(MessageType.ROOM_CREATE_FAILED).setContent("소설 방 생성에 실패했습니다.");
 
-        Message responseMessage = new Message();
-        if (room != null) {
-            responseMessage.setType(MessageType.ROOM_CREATE_SUCCESS)
-                    .setContent("소설 방 생성에 성공했습니다.");
+        if (userService.hasEnoughPoints(id)) {
+            NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants);
+
+            if (room != null) {
+                userService.deductPoints(id); // 방이 생성되어있으니까 500 차감
+                responseMessage.setType(MessageType.ROOM_CREATE_SUCCESS)
+                        .setContent("소설 방 생성에 성공했습니다.");
+            }
         } else {
-            responseMessage.setType(MessageType.ROOM_CREATE_FAILED)
-                    .setContent("소설 방 생성에 실패했습니다.");
+            responseMessage.setContent("포인트 부족으로 방을 생성할 수 없습니다.");
         }
+
         sendMessageToCurrentClient(responseMessage);
     }
-
 
     // ID로 소설 방 조회
     private void handleGetRoomById(Message message) {
@@ -263,7 +266,6 @@ class ClientHandler implements Runnable {
             sendMessageToCurrentClient(responseMessage);
         }
     }
-
 
     // 소설방 참가 로직
     private void handleJoinRoom(Message message) {
