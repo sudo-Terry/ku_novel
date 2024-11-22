@@ -23,6 +23,8 @@ public class Message {
     private String password;
     private String nickname;
 
+    private int votingDuration;
+    private int submissionDuration;
     private List<Message> novelRooms;
     private Long novelRoomId;
     private String novelRoomTitle;
