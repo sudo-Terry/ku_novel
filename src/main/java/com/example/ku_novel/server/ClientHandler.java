@@ -155,6 +155,9 @@ class ClientHandler implements Runnable {
             }
             responseMessage.setType(MessageType.LOGIN_SUCCESS);
             responseMessage.setContent("로그인이 성공되었습니다.");
+            responseMessage.setSender(id);
+            responseMessage.setPassword(password);
+            // to-do: 회원 포인트 정보와 유저 닉네임 정보를 db에서 열람하여 반환
         } else {
             responseMessage.setType(MessageType.LOGIN_FAILED);
             responseMessage.setContent("로그인 실패: 사용자 ID 또는 비밀번호가 잘못되었습니다.");
