@@ -18,6 +18,7 @@ public class UIHandler {
     private PrintWriter writer;
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
     private LoginUI loginUI;
+    private SignUpModalUI signUpModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -73,7 +74,27 @@ public class UIHandler {
         });
     }
 
-    public void showSignUpModalUI(JFrame frame) { SwingUtilities.invokeLater(() -> new SignUpModalUI(frame)); }
+    public void showSignUpModalUI(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (signUpModalUI == null || !signUpModalUI.isVisible()) {
+                signUpModalUI = new SignUpModalUI(frame);
+                signUpModalUI.setVisible(true);
+            }else {
+                System.out.println("SignUpModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void disposeSignUpModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (signUpModalUI != null) {
+                signUpModalUI.dispose();
+                signUpModalUI = null;
+            }else{
+                System.out.println("SignUpModalUI가 null입니다.");
+            }
+        });
+    }
 
     public void showAlertModal(Component parentComponent, String title, String message, int messageType) {
         SwingUtilities.invokeLater(() ->
