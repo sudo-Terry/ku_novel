@@ -19,6 +19,7 @@ public class UIHandler {
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
     private LoginUI loginUI;
     private SignUpModalUI signUpModalUI;
+    private NovelRoomCreateModalUI novelRoomCreateModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -92,6 +93,28 @@ public class UIHandler {
                 signUpModalUI = null;
             }else{
                 System.out.println("SignUpModalUI가 null입니다.");
+            }
+        });
+    }
+
+    public void showNovelRoomCreateModalUI(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomCreateModalUI == null || !novelRoomCreateModalUI.isVisible()) {
+                novelRoomCreateModalUI = new NovelRoomCreateModalUI(frame);
+                novelRoomCreateModalUI.setVisible(true);
+            }else {
+                System.out.println("NovelRoomCreateModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void disposeNovelRoomCreateModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomCreateModalUI != null) {
+                novelRoomCreateModalUI.dispose();
+                novelRoomCreateModalUI = null;
+            }else{
+                System.out.println("NovelRoomCreateModalUI null입니다.");
             }
         });
     }
