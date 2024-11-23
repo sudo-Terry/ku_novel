@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.connection;
 
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.HomeUI;
 import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
@@ -41,6 +42,11 @@ public class ClientListenerThread extends Thread {
                 }else if (messageType.equals(MessageType.LOGIN_SUCCESS.toString())) {
                     // 로그인 성공 처리
                     System.out.println("로그인 성공");
+                    ClientDataModel.getInstance().setUserId(jsonObject.get("sender").getAsString());
+                    ClientDataModel.getInstance().setPassword(jsonObject.get("password").getAsString());
+                    // to-do : 서버쪽 response가 구현되면 주석 해제
+                    //ClientDataModel.getInstance().setUserName(jsonObject.get("nickname").getAsString());
+                    //ClientDataModel.getInstance().setUserPoint(jsonObject.get("userPoint").getAsString());
                     HomeUI homeUI = new HomeUI();
                     uiHandler.disposeLoginUI();
                 }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())) {
