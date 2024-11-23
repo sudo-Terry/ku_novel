@@ -47,6 +47,7 @@ public class ClientListenerThread extends Thread {
                     // to-do : 서버쪽 response가 구현되면 주석 해제
                     //ClientDataModel.getInstance().setUserName(jsonObject.get("nickname").getAsString());
                     //ClientDataModel.getInstance().setUserPoint(jsonObject.get("userPoint").getAsString());
+                    ClientSenderThread.getInstance().requestRoomFetchActive();
                     HomeUI homeUI = new HomeUI();
                     uiHandler.disposeLoginUI();
                 }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())) {
@@ -66,6 +67,9 @@ public class ClientListenerThread extends Thread {
                 }else if(messageType.equals(MessageType.SIGNUP_FAILED.toString())){
                     // 회원가입 실패 처리
                     uiHandler.showAlertModal(null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
+                }else if(messageType.equals(MessageType.ROOM_FETCH_ACTIVE_SUCCESS.toString())){
+                    // 진행중인 소설방 데이터 수신
+                    //ClientDataModel.getInstance().setChatRoomsActive(jsonObject.get("content").getAsString());
                 }else{ // 메시지 큐에 추가해서 UI 컴포넌트 내에서 처리
                     Message message = gson.fromJson(jsonObject, Message.class);
                     messageQueue.add(message);
