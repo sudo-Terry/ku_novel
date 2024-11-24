@@ -28,7 +28,7 @@ public class Message {
     private int votingDuration;
     private int submissionDuration;
     private List<Message> novelRooms;
-    private Long novelRoomId;
+    private Integer novelRoomId;
     private String novelRoomTitle;
     private String novelRoomDescription;
     private String novelRoomStatus;

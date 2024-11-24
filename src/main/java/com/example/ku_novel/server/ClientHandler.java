@@ -180,7 +180,7 @@ class ClientHandler implements Runnable {
 
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
-        String id = message.getSender();
+
         String title = message.getNovelRoomTitle();
         String description = message.getNovelRoomDescription();
         String hostUserId = message.getSender();
@@ -275,7 +275,7 @@ class ClientHandler implements Runnable {
 
     // 소설방 참가 로직
     private void handleJoinRoom(Message message) {
-        Long roomId = message.getNovelRoomId();
+        Integer roomId = message.getNovelRoomId();
         String participantId = message.getSender();
 
         Message responseMessage = new Message();

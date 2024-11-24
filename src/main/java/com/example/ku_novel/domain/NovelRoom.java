@@ -18,7 +18,7 @@ public class NovelRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment 설정
     @Column(name = "room_id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "title", nullable = false)
     private String title;
