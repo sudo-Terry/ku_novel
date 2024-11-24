@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.model;
 
+import com.example.ku_novel.domain.NovelRoom;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,12 +14,15 @@ public class ClientDataModel {
     private String password;
     private String userName;
     private String userPoint;
-    private List<String> chatRoomsActive;
+    private long currentRoomId;
+    private List<NovelRoom> chatRoomsAll;
+    private List<NovelRoom> chatRoomsActive;
+    private List<NovelRoom> chatRoomsParticipating;
+    private List<NovelRoom> chatRoomsFavorite;
 
     private static volatile ClientDataModel instance;
 
     private ClientDataModel() {
-        chatRoomsActive = new ArrayList<>();
     }
 
     public static ClientDataModel getInstance() {
@@ -30,21 +34,5 @@ public class ClientDataModel {
             }
         }
         return instance;
-    }
-
-    // ==== lombok에서는 ThreadSafe getter setter을 지원하지 않는 듯? ====
-
-    public synchronized void addChatRoom(String chatRoom) {
-        if (!chatRoomsActive.contains(chatRoom)) {
-            chatRoomsActive.add(chatRoom);
-        }
-    }
-
-    public synchronized List<String> getChatRoomsActive() {
-        return new ArrayList<>(chatRoomsActive);
-    }
-
-    public synchronized void removeChatRoom(String chatRoom) {
-        chatRoomsActive.remove(chatRoom);
     }
 }
