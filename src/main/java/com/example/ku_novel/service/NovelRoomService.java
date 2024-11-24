@@ -22,7 +22,7 @@ public class NovelRoomService {
     }
 
     // 소설 방 생성
-    public NovelRoom createNovelRoom(String title, String description, String hostUserId, Integer maxParticipants) {
+    public NovelRoom createNovelRoom(String title, String description, String hostUserId, Integer maxParticipants, Integer submissionDuration, Integer votingDuration) {
         NovelRoom novelRoom = NovelRoom.builder()
                 .title(title)
                 .description(description)
@@ -32,6 +32,8 @@ public class NovelRoomService {
                 .createdAt(LocalDateTime.now())
                 .novelContent(null)
                 .hostUserId(hostUserId)
+                .submissionDuration(submissionDuration)
+                .votingDuration(votingDuration)
                 .currentVoteId(null)
                 .build();
 

@@ -179,15 +179,18 @@ class ClientHandler implements Runnable {
 
     // 소설방 생성 로직
     private void handleCreateRoom(Message message) {
+        String id = message.getSender();
         String title = message.getNovelRoomTitle();
         String description = message.getNovelRoomDescription();
         String hostUserId = message.getSender();
         Integer maxParticipants = message.getMaxParticipants();
+        Integer submissionDuration = message.getSubmissionDuration();
+        Integer votingDuration = message.getVotingDuration();
 
         Message responseMessage = new Message().setType(MessageType.ROOM_CREATE_FAILED).setContent("소설 방 생성에 실패했습니다.");
 
         if (userService.hasEnoughPoints(hostUserId)) {
-            NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants);
+            NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants, submissionDuration, votingDuration);
 
             if (room != null) {
                 userService.deductPoints(hostUserId); // 방이 생성되어있으니까 500 차감

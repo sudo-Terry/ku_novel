@@ -49,6 +49,12 @@ public class NovelRoom {
     @Column(name = "current_vote_id")
     private Integer currentVoteId;
 
+    @Column(name = "submission_duration", nullable = false)
+    private Integer submissionDuration; // 소설가 입력 시간 (분 단위)
+
+    @Column(name = "voting_duration", nullable = false)
+    private Integer votingDuration; 
+
     @PrePersist
     public void prePersist() {
         if (this.createdAt == null) {

@@ -26,61 +26,71 @@ public class ClientListenerThread extends Thread {
 
     @Override
     public void run() {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String line = null;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            UIHandler uiHandler = UIHandler.getInstance();
+            String line;
+
             while ((line = br.readLine()) != null) {
-                UIHandler uiHandler = UIHandler.getInstance();
+                System.out.println(line + " 응답 도착");
+
                 JsonObject jsonObject = gson.fromJson(line, JsonObject.class);
                 String messageType = jsonObject.has("type") ? jsonObject.get("type").getAsString() : "";
 
-                System.out.println(line + "응답 도착");
-                // 새 UI 컴포넌트 실행
                 if (messageType.isEmpty()) {
-                    throw new Exception();
-                }else if (messageType.equals(MessageType.LOGIN_SUCCESS.toString())) {
-                    // 로그인 성공 처리
-                    System.out.println("로그인 성공");
-                    ClientDataModel.getInstance().setUserId(jsonObject.get("sender").getAsString());
-                    ClientDataModel.getInstance().setPassword(jsonObject.get("password").getAsString());
-                    // to-do : 서버쪽 response가 구현되면 주석 해제
-                    //ClientDataModel.getInstance().setUserName(jsonObject.get("nickname").getAsString());
-                    //ClientDataModel.getInstance().setUserPoint(jsonObject.get("userPoint").getAsString());
-                    HomeUI homeUI = new HomeUI();
-                    uiHandler.disposeLoginUI();
-                }else if (messageType.equals(MessageType.LOGIN_FAILED.toString())) {
-                    // 로그인 실패 처리
-                    System.out.println("로그인 실패");
-                    uiHandler.showAlertModal(null, "경고", "아이디 비밀번호를 다시 확인해 주세요.", JOptionPane.ERROR_MESSAGE);
-                }else if (messageType.equals(MessageType.ID_INVALID.toString()) || messageType.equals(MessageType.ID_VALID.toString())) {
-                    // 아이디 중복 확인
-                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
-                }else if (messageType.equals(MessageType.NICKNAME_INVALID.toString()) || messageType.equals(MessageType.NICKNAME_VALID.toString())){
-                    // 닉네임 중복 확인
-                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
-                }else if(messageType.equals(MessageType.SIGNUP_SUCCESS.toString())){
-                    // 회원가입 성공 처리
-                    uiHandler.disposeSignUpModalUI();
-                    uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
-                }else if(messageType.equals(MessageType.SIGNUP_FAILED.toString())){
-                    // 회원가입 실패 처리
-                    uiHandler.showAlertModal(null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
-                }else{ // 메시지 큐에 추가해서 UI 컴포넌트 내에서 처리
-                    Message message = gson.fromJson(jsonObject, Message.class);
-                    messageQueue.add(message);
-                    System.out.println(message + " 가 큐에 추가됨");
+                    throw new IllegalArgumentException("메시지 타입이 없습니다.");
                 }
+
+                handleMessageType(messageType, jsonObject, uiHandler);
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }finally {
-            try{
-                if (br != null) br.close();
-                if (socket != null) socket.close();
-            }catch (Exception e){
-                System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("오류 발생: " + e.getMessage());
+        } finally {
+            closeSocket();
+        }
+    }
+
+    private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
+        switch (messageType) {
+            case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
+            case "LOGIN_FAILED", "SIGNUP_FAILED" -> uiHandler.showAlertModal(
+                    null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
+            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID" -> uiHandler.showAlertModal(
+                    null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+            case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
+            default -> enqueueMessage(jsonObject);
+        }
+    }
+
+    private void handleLoginSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        System.out.println("로그인 성공");
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setUserId(jsonObject.get("sender").getAsString());
+        dataModel.setPassword(jsonObject.get("password").getAsString());
+        // TODO: 서버측 응답 구현되면 주석 해제
+        // dataModel.setUserName(jsonObject.get("nickname").getAsString());
+        // dataModel.setUserPoint(jsonObject.get("userPoint").getAsString());
+        new HomeUI();
+        uiHandler.disposeLoginUI();
+    }
+
+    private void handleSignupSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        uiHandler.disposeSignUpModalUI();
+        uiHandler.showAlertModal(null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void enqueueMessage(JsonObject jsonObject) {
+        Message message = gson.fromJson(jsonObject, Message.class);
+        messageQueue.add(message);
+        System.out.println(message + " 가 큐에 추가됨");
+    }
+
+    private void closeSocket() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
             }
+        } catch (IOException e) {
+            System.out.println("소켓 닫기 오류: " + e.getMessage());
         }
     }
 }

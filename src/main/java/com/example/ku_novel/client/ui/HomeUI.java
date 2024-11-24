@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -12,22 +13,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class HomeUI extends JFrame {
     private JPanel mainPanel, topPanel, sidePanel, contentPanel, contentLeftPanel, contentRightPanel;
     private JButton changeButton;
 
     NovelRoom[] testRooms = {
-            new NovelRoom(0l, "소설방1", "소설 내용이 길어지면 어떻게 되는지 궁금해서 적은 텍스트보다 더 길게 적은 텍스트", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방2", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방3", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방4", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방5", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방6", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방7", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방8", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방9", "소설 내용2", "", 0, "", null, "", "", 0),
-            new NovelRoom(0l, "소설방10", "소설 내용2", "", 0, "", null, "", "", 0)
+        new NovelRoom(0L, "소설방1", "소설 내용이 길어지면 어떻게 되는지 궁금해서 적은 텍스트보다 더 길게 적은 텍스트", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser1", null, 5, 3),
+        new NovelRoom(0L, "소설방2", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser2", null, 5, 3),
+        new NovelRoom(0L, "소설방3", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser3", null, 5, 3),
     };
 
     public HomeUI() {
@@ -115,6 +110,12 @@ public class HomeUI extends JFrame {
 
         // 소설방 만들기 버튼
         JButton createButton = createIconButton("src/main/resources/icon/plus.png", 70, 65, new Color(255, 165, 0));
+        createButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIHandler.getInstance().showNovelRoomCreateModalUI(HomeUI.this);
+            }
+        });
 
         topPanel.add(searchField);
         topPanel.add(searchButton);
