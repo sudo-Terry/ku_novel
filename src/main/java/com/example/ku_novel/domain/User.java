@@ -1,20 +1,19 @@
 package com.example.ku_novel.domain;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.ku_novel.LocalDateTimeConverter;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -26,4 +25,11 @@ public class User {
     @Column(name = "nickname")
     private String nickname;
 
+    @Convert(converter = LocalDateTimeConverter.class)
+    @Column(name = "last_attendance")
+    private LocalDateTime lastAttendance;
+
+    @Builder.Default
+    @Column(name = "point", nullable = false)
+    private Integer point = 500;
 }

@@ -187,15 +187,18 @@ class ClientHandler implements Runnable {
         Integer submissionDuration = message.getSubmissionDuration();
         Integer votingDuration = message.getVotingDuration();
 
-        NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants, submissionDuration, votingDuration);
+        Message responseMessage = new Message().setType(MessageType.ROOM_CREATE_FAILED).setContent("소설 방 생성에 실패했습니다.");
 
-        Message responseMessage = new Message();
-        if (room != null) {
-            responseMessage.setType(MessageType.ROOM_CREATE_SUCCESS)
-                    .setContent("소설 방 생성에 성공했습니다.");
+        if (userService.hasEnoughPoints(hostUserId)) {
+            NovelRoom room = novelRoomService.createNovelRoom(title, description, hostUserId, maxParticipants, submissionDuration, votingDuration);
+
+            if (room != null) {
+                userService.deductPoints(hostUserId); // 방이 생성되어있으니까 500 차감
+                responseMessage.setType(MessageType.ROOM_CREATE_SUCCESS)
+                        .setContent("소설 방 생성에 성공했습니다.");
+            }
         } else {
-            responseMessage.setType(MessageType.ROOM_CREATE_FAILED)
-                    .setContent("소설 방 생성에 실패했습니다.");
+            responseMessage.setContent("포인트 부족으로 방을 생성할 수 없습니다.");
         }
 
         sendMessageToCurrentClient(responseMessage);
