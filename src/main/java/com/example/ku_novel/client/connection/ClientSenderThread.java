@@ -78,16 +78,15 @@ public class ClientSenderThread extends Thread{
         writer.println(nicknameValidationMessage.toJson());
     }
 
-    public void requestCreateNovelRoom(String roomTitle, String roomDescription, int novelistTime, int voteTime) {
+    public void requestCreateNovelRoom(String roomTitle, String roomDescription, int submissionDuration, int votingDuration, int novelistCount) {
         Message createNovelRoomMessage = new Message();
         createNovelRoomMessage.setType(MessageType.ROOM_CREATE);
         createNovelRoomMessage.setSender(ClientDataModel.getInstance().getUserId());
         createNovelRoomMessage.setNovelRoomTitle(roomTitle);
         createNovelRoomMessage.setNovelRoomDescription(roomDescription);
-        // to-do : 서버측 response 구현 필요 maxParticipant 유지? 소설가 수만 제한?
-        createNovelRoomMessage.setMaxParticipants(1000);
-        // createNovelRoomMessage.setNovelistTime(novelistTime);
-        // createNovelRoomMessage.setVoteTime(voteTime);
+        createNovelRoomMessage.setMaxParticipants(novelistCount);
+        createNovelRoomMessage.setSubmissionDuration(submissionDuration);
+        createNovelRoomMessage.setVotingDuration(votingDuration);
 
         writer.println(createNovelRoomMessage.toJson());
     }
