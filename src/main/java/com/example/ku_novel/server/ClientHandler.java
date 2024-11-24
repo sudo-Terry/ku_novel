@@ -246,7 +246,7 @@ class ClientHandler implements Runnable {
             List<NovelRoom> rooms = novelRoomService.getActiveNovelRooms();
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_ACTIVE_SUCCESS)
-                    .setContent(new Gson().toJson(rooms));
+                    .setContent("소설 방 조회 성공했습니다.").setJson(new Gson().toJson(rooms));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()
@@ -262,7 +262,7 @@ class ClientHandler implements Runnable {
             List<NovelRoom> allRooms = novelRoomService.getAllNovelRooms();
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_ALL_SUCCESS)
-                    .setContent(new Gson().toJson(allRooms));
+                    .setContent("소설 방 조회 성공했습니다.").setJson(new Gson().toJson(allRooms));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()
