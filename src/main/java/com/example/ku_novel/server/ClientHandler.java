@@ -157,6 +157,7 @@ class ClientHandler implements Runnable {
             responseMessage.setContent("로그인이 성공되었습니다.");
             responseMessage.setSender(id);
             responseMessage.setPassword(password);
+
             // to-do: 회원 포인트 정보와 유저 닉네임 정보를 db에서 열람하여 반환
         } else {
             responseMessage.setType(MessageType.LOGIN_FAILED);
@@ -230,7 +231,7 @@ class ClientHandler implements Runnable {
             }
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_BY_TITLE_SUCCESS)
-                    .setContent(new Gson().toJson(rooms));
+                    .setContent("소설 방 조회 성공").setJson(new Gson().toJson(rooms));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()
@@ -246,7 +247,7 @@ class ClientHandler implements Runnable {
             List<NovelRoom> rooms = novelRoomService.getActiveNovelRooms();
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_ACTIVE_SUCCESS)
-                    .setContent(new Gson().toJson(rooms));
+                    .setContent("소설 방 조회 성공했습니다.").setJson(new Gson().toJson(rooms));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()
@@ -262,7 +263,7 @@ class ClientHandler implements Runnable {
             List<NovelRoom> allRooms = novelRoomService.getAllNovelRooms();
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_ALL_SUCCESS)
-                    .setContent(new Gson().toJson(allRooms));
+                    .setContent("소설 방 조회 성공했습니다.").setJson(new Gson().toJson(allRooms));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()

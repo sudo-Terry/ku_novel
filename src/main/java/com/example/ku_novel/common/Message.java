@@ -23,6 +23,8 @@ public class Message {
     private String password;
     private String nickname;
 
+    private String json;
+
     private int votingDuration;
     private int submissionDuration;
     private List<Message> novelRooms;
@@ -59,6 +61,11 @@ public class Message {
 
     public Message setReceiver(String receiver) {
         this.receiver = receiver;
+        return this;
+    }
+
+    public Message setJson(String json) {
+        this.json = json;
         return this;
     }
 
