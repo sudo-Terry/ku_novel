@@ -13,6 +13,8 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -60,12 +62,17 @@ public class HomeUI extends JFrame {
 
         JButton rankingButton = createIconButton("src/main/resources/icon/ranking.png", 45, 45, Color.LIGHT_GRAY);
         JButton attendanceButton = createIconButton("src/main/resources/icon/calender.png", 45, 45, Color.LIGHT_GRAY);
+        attendanceButton.addActionListener(e-> {
+            JOptionPane.showMessageDialog(null, "출석 완료 처리되었습니다.");
+        });
+        JButton downloadButton = createIconButton("src/main/resources/icon/download.png", 45, 45, Color.LIGHT_GRAY);
 
         changeButton = createIconButton("src/main/resources/icon/my.png", 45, 45, new Color(255, 165, 0));
 
         sidePanel.add(rankingButton);
         sidePanel.add(attendanceButton);
-        for(int i=0; i<4; i++) {
+        sidePanel.add(downloadButton);
+        for(int i=0; i<3; i++) {
             JPanel jPanel = new JPanel();
             jPanel.setBackground(Color.WHITE);
             sidePanel.add(jPanel);
