@@ -22,6 +22,8 @@ public class UIHandler {
     private SignUpModalUI signUpModalUI;
     private NovelRoomCreateModalUI novelRoomCreateModalUI;
     private RoomSearchResultsModalUI roomSearchResultsModalUI;
+    private NovelInputModalUI novelInputModalUI;
+    private VoteModalUI voteModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -136,5 +138,23 @@ public class UIHandler {
         SwingUtilities.invokeLater(() ->
                 JOptionPane.showMessageDialog(parentComponent, message, title, messageType)
         );
+    }
+
+    public void showNovelInputModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if(novelInputModalUI == null || !novelInputModalUI.isVisible()) {
+                novelInputModalUI = new NovelInputModalUI(frame);
+                novelInputModalUI.setVisible(true);
+            }
+        });
+    }
+
+    public void showVoteModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if(voteModalUI == null || !voteModalUI.isVisible()) {
+                voteModalUI = new VoteModalUI(frame);
+                voteModalUI.setVisible(true);
+            }
+        });
     }
 }

@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -104,12 +106,20 @@ public class NovelRoomUI extends JFrame {
         writeButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         buttonPanel.add(writeButton);
 
+        writeButton.addActionListener(e-> {
+            UIHandler.getInstance().showNovelInputModal(NovelRoomUI.this);
+        });
+
         // 투표 버튼
         JButton voteButton = new JButton("(일반) 투표");
         voteButton.setPreferredSize(new Dimension(120, 40));
         voteButton.setBackground(Color.WHITE);
         voteButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         buttonPanel.add(voteButton);
+
+        voteButton.addActionListener(e-> {
+            UIHandler.getInstance().showVoteModal(NovelRoomUI.this);
+        });
 
         contentPanel.add(buttonPanel);
 
