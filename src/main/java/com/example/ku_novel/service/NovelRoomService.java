@@ -36,12 +36,11 @@ public class NovelRoomService {
                 .votingDuration(votingDuration)
                 .currentVoteId(null)
                 .build();
-
         return novelRoomRepository.save(novelRoom);
     }
 
     // 아이디로 소설 방 조회
-    public Optional<NovelRoom> getNovelRoomById(Long id) {
+    public Optional<NovelRoom> getNovelRoomById(Integer id) {
         return novelRoomRepository.findById(id);
     }
 
@@ -61,7 +60,7 @@ public class NovelRoomService {
     }
 
     // 소설 방 참가
-    public void joinNovelRoom(Long id, String participantId) {
+    public void joinNovelRoom(Integer id, String participantId) {
         Optional<NovelRoom> optionalRoom = novelRoomRepository.findById(id);
         if (optionalRoom.isPresent()) {
             NovelRoom novelRoom = optionalRoom.get();
