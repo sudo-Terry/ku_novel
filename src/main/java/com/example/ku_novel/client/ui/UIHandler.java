@@ -3,6 +3,7 @@ package com.example.ku_novel.client.ui;
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.common.Message;
+import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,7 @@ public class UIHandler {
     private LoginUI loginUI;
     private SignUpModalUI signUpModalUI;
     private NovelRoomCreateModalUI novelRoomCreateModalUI;
+    private RoomSearchResultsModalUI roomSearchResultsModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -115,6 +117,17 @@ public class UIHandler {
                 novelRoomCreateModalUI = null;
             }else{
                 System.out.println("NovelRoomCreateModalUI null입니다.");
+            }
+        });
+    }
+
+    public void showRoomSearchResultsModal(NovelRoom[] rooms) {
+        SwingUtilities.invokeLater(() -> {
+            if (roomSearchResultsModalUI == null || !roomSearchResultsModalUI.isVisible()) {
+                roomSearchResultsModalUI = new RoomSearchResultsModalUI(null, rooms);
+                roomSearchResultsModalUI.showModal();
+            }else {
+                System.out.println("RoomSearchResultsModal 이미 열려 있음");
             }
         });
     }

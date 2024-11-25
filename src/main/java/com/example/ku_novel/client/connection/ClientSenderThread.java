@@ -91,6 +91,14 @@ public class ClientSenderThread extends Thread{
         writer.println(createNovelRoomMessage.toJson());
     }
 
+    public void requestRoomFetchByTitle(String roomTitle) {
+        Message fetchByTitleMessage = new Message();
+        fetchByTitleMessage.setType(MessageType.ROOM_FETCH_BY_TITLE);
+        fetchByTitleMessage.setNovelRoomTitle(roomTitle);
+
+        writer.println(fetchByTitleMessage.toJson());
+    }
+
     public void requestRoomFetchActive(){
         Message roomListMessage = new Message();
         roomListMessage.setType(MessageType.ROOM_FETCH_ACTIVE);
