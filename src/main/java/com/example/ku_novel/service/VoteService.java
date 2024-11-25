@@ -20,11 +20,6 @@ public class VoteService {
         this.voteRepository = voteRepository;
     }
 
-    // 투표 생성
-    public Vote createVote(int novelRoomId) {
-        Vote vote = Vote.builder()
-                .novelRoomId(novelRoomId)
-                .build();
-        return voteRepository.save(vote);
-    }
+
+    // 투표 생성과 관련된 메소드는 NovelRoomService에서 구현해서 투표 관련 상호작용 로직만 구현.
 }
