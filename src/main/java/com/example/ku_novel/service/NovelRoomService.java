@@ -2,7 +2,9 @@ package com.example.ku_novel.service;
 
 
 import com.example.ku_novel.domain.NovelRoom;
+import com.example.ku_novel.domain.Vote;
 import com.example.ku_novel.repository.NovelRoomRepository;
+import com.example.ku_novel.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,12 @@ import java.util.Optional;
 public class NovelRoomService {
 
     private final NovelRoomRepository novelRoomRepository;
+    private final VoteRepository voteRepository;
 
     @Autowired
-    public NovelRoomService(NovelRoomRepository novelRoomRepository) {
+    public NovelRoomService(NovelRoomRepository novelRoomRepository, VoteRepository voteRepository) {
         this.novelRoomRepository = novelRoomRepository;
+        this.voteRepository = voteRepository;
     }
 
     // 소설 방 생성
@@ -36,7 +40,20 @@ public class NovelRoomService {
                 .votingDuration(votingDuration)
                 .currentVoteId(null)
                 .build();
-        return novelRoomRepository.save(novelRoom);
+
+        NovelRoom newRoom = novelRoomRepository.save(novelRoom);
+
+        // Room 먼저 저장하고 아이디 얻은 다음에 투표 저장
+        Vote vote = Vote.builder()
+                .novelRoomId(newRoom.getId())
+                .build();
+        voteRepository.save(vote);
+
+        // Vote 저장하고 투표아이디 얻은 다음에 Room 투표 아이디 업데이트
+        newRoom.setCurrentVoteId(vote.getId());
+        novelRoomRepository.save(newRoom);
+
+        return newRoom;
     }
 
     // 아이디로 소설 방 조회
