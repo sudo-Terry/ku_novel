@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NovelRoomRepository extends JpaRepository<NovelRoom, Long> {
+public interface NovelRoomRepository extends JpaRepository<NovelRoom, Integer> {
 
     // 특정 제목의 소설방이 존재하는지 확인
     boolean existsByTitle(String title);
