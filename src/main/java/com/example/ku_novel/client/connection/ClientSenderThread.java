@@ -98,7 +98,7 @@ public class ClientSenderThread extends Thread{
         writer.println(fetchByTitleMessage.toJson());
     }
 
-    public void requestRoomJoin(long roomId) {
+    public void requestRoomJoin(int roomId) {
         Message joinRoomMessage = new Message();
         joinRoomMessage.setType(MessageType.ROOM_JOIN);
         joinRoomMessage.setNovelRoomId(roomId);

@@ -192,7 +192,7 @@ public class HomeUI extends JFrame {
                     int row = novelListTable.rowAtPoint(evt.getPoint());
                     if (row >= 0) {
                         String roomTitle = (String) novelListTable.getValueAt(row, 0);
-                        long roomId = testRooms[row].getId();
+                        int roomId = testRooms[row].getId();
                         handleNovelRoomClick(roomId, roomTitle);
                     }
                 }
@@ -256,7 +256,7 @@ public class HomeUI extends JFrame {
                     int row = novelListTable.rowAtPoint(evt.getPoint());
                     if (row >= 0) {
                         String roomTitle = (String) novelListTable.getValueAt(row, 0);
-                        long roomId = testRooms[row].getId();
+                        int roomId = testRooms[row].getId();
                         handleNovelRoomClick(roomId, roomTitle);
                     }
                 }
@@ -443,7 +443,7 @@ public class HomeUI extends JFrame {
         }
     }
 
-    private void handleNovelRoomClick(long roomId, String roomTitle) {
+    private void handleNovelRoomClick(int roomId, String roomTitle) {
         try {
             ClientSenderThread.getInstance().requestRoomJoin(roomId);
         } catch (IllegalStateException ex) {
