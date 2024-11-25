@@ -30,6 +30,6 @@ public class Vote {
     private String votes;
 
     @Convert(converter = LocalDateTimeConverter.class)
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
 }
