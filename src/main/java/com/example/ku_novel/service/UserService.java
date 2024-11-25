@@ -48,6 +48,11 @@ public class UserService {
         return user != null && user.getPassword().equals(password);
     }
 
+    // 사용자 반환
+    public User findById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     // 포인트가 500 이상인지 확인
     public boolean hasEnoughPoints(String id) {
             User user = userRepository.findById(id).orElse(null);

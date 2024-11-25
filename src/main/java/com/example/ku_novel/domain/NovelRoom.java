@@ -1,6 +1,9 @@
 package com.example.ku_novel.domain;
 
 import com.example.ku_novel.LocalDateTimeConverter;
+//import com.example.ku_novel.common.Message;
+//import com.google.gson.Gson;
+//import com.google.gson.GsonBuilder;
 import lombok.*;
 
 import javax.persistence.*;
@@ -53,7 +56,7 @@ public class NovelRoom {
     private Integer submissionDuration; // 소설가 입력 시간 (분 단위)
 
     @Column(name = "voting_duration", nullable = false)
-    private Integer votingDuration; 
+    private Integer votingDuration;
 
     @PrePersist
     public void prePersist() {
@@ -62,4 +65,22 @@ public class NovelRoom {
         }
     }
 
+//    // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
+//    public NovelRoom() {
+//    }
+//
+//    public String toJson() {
+//        Gson gson = new GsonBuilder().create();
+//        return gson.toJson(this);
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return toJson().toString();
+//    }
+//
+//    public static NovelRoom fromJson(String json) {
+//        Gson gson = new GsonBuilder().create();
+//        return gson.fromJson(json, NovelRoom.class);
+//    }
 }

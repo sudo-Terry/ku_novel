@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.*;
 
 import com.example.ku_novel.common.*;
-import com.example.ku_novel.domain.NovelRoom;
+import com.example.ku_novel.domain.*;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
@@ -153,12 +153,21 @@ class ClientHandler implements Runnable {
             synchronized (activeClients) {
                 activeClients.put(id, out);
             }
+
+            User user = userService.findById(id);
+            responseMessage.setPoint(user.getPoint());
+            responseMessage.setNickname(user.getNickname());
             responseMessage.setType(MessageType.LOGIN_SUCCESS);
             responseMessage.setContent("로그인이 성공되었습니다.");
             responseMessage.setSender(id);
             responseMessage.setPassword(password);
 
-            // to-do: 회원 포인트 정보와 유저 닉네임 정보를 db에서 열람하여 반환
+            List<NovelRoom> activeNovelRooms = novelRoomService.getActiveNovelRooms();
+            // to do: participatingRooms 메소드 구현해야함
+            List<NovelRoom> participatingRooms = novelRoomService.getActiveNovelRooms();
+
+            responseMessage.setActiveNovelRooms(_convertNovelRoomsToMessages(activeNovelRooms));
+            responseMessage.setParticipatingNovelRooms(_convertNovelRoomsToMessages(participatingRooms));
         } else {
             responseMessage.setType(MessageType.LOGIN_FAILED);
             responseMessage.setContent("로그인 실패: 사용자 ID 또는 비밀번호가 잘못되었습니다.");
@@ -239,6 +248,24 @@ class ClientHandler implements Runnable {
                     .setContent("소설 방 조회에 실패했습니다: " + e.getMessage());
             sendMessageToCurrentClient(responseMessage);
         }
+    }
+
+    // 활성화된 소설 방 조회
+    private List<Message> _convertNovelRoomsToMessages(List<NovelRoom> rooms) {
+        return rooms.stream().map(room -> {
+            Message message = new Message();
+            message.setNovelRoomId(room.getId());
+            message.setNovelRoomTitle(room.getTitle());
+            message.setNovelRoomDescription(room.getDescription());
+            message.setNovelRoomStatus(room.getStatus());
+            message.setNovelHostUser(room.getHostUserId());
+            message.setNovelParticipantIds(Collections.singletonList(room.getHostUserId()));
+            message.setVotingDuration(room.getVotingDuration());
+            message.setSubmissionDuration(room.getSubmissionDuration());
+            message.setMaxParticipants(room.getMaxParticipants());
+            message.setNovelContent(room.getNovelContent());
+            return message;
+        }).toList();
     }
 
     // 활성화된 소설 방 조회

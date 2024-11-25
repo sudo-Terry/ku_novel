@@ -22,18 +22,27 @@ public class Message {
     private String timestamp;
     private String password;
     private String nickname;
+    private int point;
 
     private String json;
 
-    private int votingDuration;
-    private int submissionDuration;
-    private List<Message> novelRooms;
-    private Integer novelRoomId;
+    private List<Message> allNovelRooms;
+    private List<Message> activeNovelRooms;
+    private List<Message> participatingNovelRooms;
+
+    /// 소설방 관련
+    private int novelRoomId;
     private String novelRoomTitle;
     private String novelRoomDescription;
     private String novelRoomStatus;
+    private int novelVoteId;
+    private String novelHostUser;
+    private List<String> novelParticipantIds;
+    private String novelContent;
+    private int votingDuration;
+    private int submissionDuration;
     private int maxParticipants;
-    private boolean isParticipating;
+//    private boolean isParticipating; // 안씀
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
     public Message() {
