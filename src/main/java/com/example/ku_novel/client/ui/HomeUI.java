@@ -112,31 +112,6 @@ public class HomeUI extends JFrame {
         JTextField searchField = new JTextField(20);
         searchField.setPreferredSize(new Dimension(40, 45));
 
-        String placeholder = "소설방 제목을 입력";
-
-        // 초기 상태에서 placeholder 텍스트 설정
-        searchField.setText(placeholder);
-        searchField.setForeground(Color.GRAY);
-
-        // placeholder 관리
-        searchField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals(placeholder)) {
-                    searchField.setText("");
-                    searchField.setForeground(Color.BLACK);
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText(placeholder);
-                    searchField.setForeground(Color.GRAY);
-                }
-            }
-        });
-
         // 검색 버튼
         JButton searchButton = createIconButton("src/main/resources/icon/search.png", 45, 45, Color.LIGHT_GRAY);
 
