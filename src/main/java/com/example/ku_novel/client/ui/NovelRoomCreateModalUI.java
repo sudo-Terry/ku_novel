@@ -10,6 +10,7 @@ public class NovelRoomCreateModalUI extends JDialog {
     private JTextField roomDescriptionField;
     private JSpinner novelistTimeSpinner;
     private JSpinner voteTimeSpinner;
+    private JSpinner novelistCountSpinner;
 
     public NovelRoomCreateModalUI(JFrame parent) {
         super(parent, "새로운 소설방 생성", true);
@@ -76,11 +77,23 @@ public class NovelRoomCreateModalUI extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(voteTimeSpinner, gbc);
 
+        // 소설가 수
+        JLabel novelistCountLabel = new JLabel("소설가 수:");
+        novelistCountSpinner = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1)); // 기본값 2, 최소 1, 최대 10
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.EAST;
+        mainPanel.add(novelistCountLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        mainPanel.add(novelistCountSpinner, gbc);
+
         // 확인 버튼
         JButton createButton = new JButton("생성");
         createButton.addActionListener(e -> handleRoomCreation());
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.EAST;
         mainPanel.add(createButton, gbc);
 
@@ -100,8 +113,9 @@ public class NovelRoomCreateModalUI extends JDialog {
     private void handleRoomCreation() {
         String roomTitle = roomTitleField.getText();
         String roomDescription = roomDescriptionField.getText();
-        int novelistTime = (int) novelistTimeSpinner.getValue();
-        int voteTime = (int) voteTimeSpinner.getValue();
+        int submissionDuration = (int) novelistTimeSpinner.getValue();
+        int voingDuration = (int) voteTimeSpinner.getValue();
+        int novelistCount = (int) novelistCountSpinner.getValue(); // 소설가 수 값 가져오기
 
         // 유효성 검사
         if (roomTitle.isEmpty() || roomDescription.isEmpty()) {
@@ -111,7 +125,7 @@ public class NovelRoomCreateModalUI extends JDialog {
 
         try {
             // 서버에 소설방 생성 요청
-            ClientSenderThread.getInstance().requestCreateNovelRoom(roomTitle, roomDescription, novelistTime, voteTime);
+            ClientSenderThread.getInstance().requestCreateNovelRoom(roomTitle, roomDescription, submissionDuration, voingDuration, novelistCount);
             JOptionPane.showMessageDialog(this, "소설방이 생성되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (Exception ex) {
