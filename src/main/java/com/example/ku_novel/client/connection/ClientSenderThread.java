@@ -1,7 +1,6 @@
 package com.example.ku_novel.client.connection;
 
 import com.example.ku_novel.client.model.ClientDataModel;
-import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.common.MessageType;
 
@@ -97,6 +96,14 @@ public class ClientSenderThread extends Thread{
         fetchByTitleMessage.setNovelRoomTitle(roomTitle);
 
         writer.println(fetchByTitleMessage.toJson());
+    }
+
+    public void requestRoomJoin(long roomId) {
+        Message joinRoomMessage = new Message();
+        joinRoomMessage.setType(MessageType.ROOM_JOIN);
+        joinRoomMessage.setNovelRoomId(roomId);
+
+        writer.println(joinRoomMessage.toJson());
     }
 
     public void requestRoomFetchActive(){
