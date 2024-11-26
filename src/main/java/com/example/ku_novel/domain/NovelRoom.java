@@ -1,13 +1,14 @@
 package com.example.ku_novel.domain;
 
 import com.example.ku_novel.LocalDateTimeConverter;
-//import com.example.ku_novel.common.Message;
-//import com.google.gson.Gson;
-//import com.google.gson.GsonBuilder;
+import com.example.ku_novel.common.Message;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "novel_room")
@@ -65,22 +66,53 @@ public class NovelRoom {
         }
     }
 
-//    // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
-//    public NovelRoom() {
-//    }
-//
-//    public String toJson() {
-//        Gson gson = new GsonBuilder().create();
-//        return gson.toJson(this);
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return toJson().toString();
-//    }
-//
-//    public static NovelRoom fromJson(String json) {
-//        Gson gson = new GsonBuilder().create();
-//        return gson.fromJson(json, NovelRoom.class);
-//    }
+    @Override
+    public String toString() { // 디버깅용으로 데이터 출력해보기 위해 추가
+        return "NovelRoom{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", participantIds='" + participantIds + '\'' +
+                ", maxParticipants=" + maxParticipants +
+                ", status='" + status + '\'' +
+                ", createdAt=" + createdAt +
+                ", novelContent='" + novelContent + '\'' +
+                ", hostUserId='" + hostUserId + '\'' +
+                ", currentVoteId=" + currentVoteId +
+                ", submissionDuration=" + submissionDuration +
+                ", votingDuration=" + votingDuration +
+                '}';
+    }
+
+    public Message toMessage() {
+        Message message = new Message();
+        message.setNovelRoomId(this.id);
+        message.setNovelRoomTitle(this.title);
+        message.setNovelRoomDescription(this.description);
+        message.setNovelRoomStatus(this.status);
+        message.setNovelHostUser(this.hostUserId);
+        message.setNovelParticipantIds(this.getParticipantIdsAsList());
+        message.setVotingDuration(this.votingDuration);
+        message.setSubmissionDuration(this.submissionDuration);
+        message.setMaxParticipants(this.maxParticipants);
+        message.setNovelContent(this.novelContent);
+        return message;
+    }
+
+    public List<String> getParticipantIdsAsList() {
+        if (participantIds == null || participantIds.isEmpty()) {
+            return List.of();
+        }
+        return Arrays.stream(participantIds.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+    }
+
+    public void setParticipantIdsFromList(List<String> participantIdsList) {
+        if (participantIdsList == null || participantIdsList.isEmpty()) {
+            this.participantIds = "";
+        } else {
+            this.participantIds = String.join(",", participantIdsList);
+        }
+    }
 }

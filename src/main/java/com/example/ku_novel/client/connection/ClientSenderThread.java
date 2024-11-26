@@ -101,6 +101,7 @@ public class ClientSenderThread extends Thread{
     public void requestRoomJoin(int roomId) {
         Message joinRoomMessage = new Message();
         joinRoomMessage.setType(MessageType.ROOM_JOIN);
+        joinRoomMessage.setSender(ClientDataModel.getInstance().getUserId());
         joinRoomMessage.setNovelRoomId(roomId);
 
         writer.println(joinRoomMessage.toJson());

@@ -3,12 +3,14 @@ package com.example.ku_novel.server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.*;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 class ClientHandler implements Runnable {
     private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
@@ -252,20 +254,9 @@ class ClientHandler implements Runnable {
 
     // 활성화된 소설 방 조회
     private List<Message> _convertNovelRoomsToMessages(List<NovelRoom> rooms) {
-        return rooms.stream().map(room -> {
-            Message message = new Message();
-            message.setNovelRoomId(room.getId());
-            message.setNovelRoomTitle(room.getTitle());
-            message.setNovelRoomDescription(room.getDescription());
-            message.setNovelRoomStatus(room.getStatus());
-            message.setNovelHostUser(room.getHostUserId());
-            message.setNovelParticipantIds(Collections.singletonList(room.getHostUserId()));
-            message.setVotingDuration(room.getVotingDuration());
-            message.setSubmissionDuration(room.getSubmissionDuration());
-            message.setMaxParticipants(room.getMaxParticipants());
-            message.setNovelContent(room.getNovelContent());
-            return message;
-        }).toList();
+        return rooms.stream()
+                .map(NovelRoom::toMessage)
+                .collect(Collectors.toList());
     }
 
     // 활성화된 소설 방 조회

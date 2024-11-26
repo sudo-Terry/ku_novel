@@ -66,12 +66,15 @@ public class ClientListenerThread extends Thread {
 
     private void handleLoginSuccess(JsonObject jsonObject, UIHandler uiHandler) {
         System.out.println("로그인 성공");
+
         ClientDataModel dataModel = ClientDataModel.getInstance();
+
         dataModel.setUserId(jsonObject.get("sender").getAsString());
         dataModel.setPassword(jsonObject.get("password").getAsString());
-        // TODO: 서버측 응답 구현되면 주석 해제
-        // dataModel.setUserName(jsonObject.get("nickname").getAsString());
-        // dataModel.setUserPoint(jsonObject.get("userPoint").getAsString());
+        dataModel.setUserName(jsonObject.get("nickname").getAsString());
+        dataModel.setUserPoint(jsonObject.get("point").getAsString());
+        dataModel.setChatRoomsFromJson(jsonObject);
+
         new HomeUI();
         uiHandler.disposeLoginUI();
     }

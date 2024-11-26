@@ -26,8 +26,8 @@ public class HomeUI extends JFrame {
 
     NovelRoom[] testRooms = {
         new NovelRoom(0, "소설방1", "소설 내용이 길어지면 어떻게 되는지 궁금해서 적은 텍스트보다 더 길게 적은 텍스트", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser1", null, 5, 3),
-        new NovelRoom(0, "소설방2", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser2", null, 5, 3),
-        new NovelRoom(0, "소설방3", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser3", null, 5, 3),
+        new NovelRoom(1, "소설방2", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser2", null, 5, 3),
+        new NovelRoom(2, "소설방3", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser3", null, 5, 3),
     };
 
     public HomeUI() {
