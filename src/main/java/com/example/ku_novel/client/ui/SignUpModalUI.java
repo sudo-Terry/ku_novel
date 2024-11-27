@@ -1,6 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,80 +18,120 @@ public class SignUpModalUI extends JDialog {
         setLocationRelativeTo(parent);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(Color.WHITE);
         add(mainPanel);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(10, 10, 20, 10);
 
-        Dimension fieldSize = new Dimension(250, 30);
+        Dimension fieldSize = new Dimension(240, 45);
+        Dimension buttonSize = new Dimension(120, 45);
 
-        // 아이디 입력
-        JLabel userIdLabel = new JLabel("아이디:");
-        userIdField = new JTextField();
-        userIdField.setPreferredSize(fieldSize);
+        // 회원 가입 제목
+        JLabel signLabel = new JLabel("회원가입");
+        signLabel.setFont(FontSetting.getInstance().loadCustomFont(48f));
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(signLabel, gbc);
+
+        // 아이디 입력;
+        gbc.insets = new Insets(10, 10, 0, 0);
+
+        JLabel userIdLabel = new JLabel("아이디");
+        userIdLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userIdLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        userIdField = new CustomizedTextField("아이디");
+        userIdField.setPreferredSize(fieldSize);
+        userIdField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
         mainPanel.add(userIdField, gbc);
 
-        JButton idValidationButton = new JButton("아이디 중복 확인");
+        RoundedButton idValidationButton = new RoundedButton("중복 확인", Color.WHITE, NovelColor.DARK_GREEN);
+        idValidationButton.setBorderColor(NovelColor.DARK_GREEN);
+        idValidationButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        idValidationButton.setPreferredSize(buttonSize);
         idValidationButton.addActionListener(e -> handleUserIdValidation());
-        gbc.gridx = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(idValidationButton, gbc);
 
         // 비밀번호 입력
-        JLabel passwordLabel = new JLabel("비밀번호:");
-        passwordField = new JPasswordField();
-        passwordField.setPreferredSize(fieldSize);
+        JLabel passwordLabel = new JLabel("비밀번호");
+        passwordLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(passwordLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        passwordField = new CustomizedPasswordField("비밀번호");
+        passwordField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        passwordField.setPreferredSize(new Dimension(370, 45));
+        gbc.gridx = 0;
+        gbc.gridy = 4;
         mainPanel.add(passwordField, gbc);
 
         // 닉네임 입력
-        JLabel userNameLabel = new JLabel("닉네임:");
-        userNameField = new JTextField();
-        userNameField.setPreferredSize(fieldSize);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
+        JLabel userNameLabel = new JLabel("닉네임");
+        userNameLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridwidth = 1;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userNameLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        userNameField = new CustomizedTextField("닉네임");
+        userNameField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        userNameField.setPreferredSize(fieldSize);
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.EAST;
         mainPanel.add(userNameField, gbc);
 
-        JButton userNameValidationButton = new JButton("닉네임 중복 확인");
+        RoundedButton userNameValidationButton = new RoundedButton("중복 확인", Color.WHITE, NovelColor.DARK_GREEN);
+        userNameValidationButton.setBorderColor(NovelColor.DARK_GREEN);
+        userNameValidationButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        userNameValidationButton.setPreferredSize(buttonSize);
         userNameValidationButton.addActionListener(e -> handleUserNameValidation());
-        gbc.gridx = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userNameValidationButton, gbc);
 
         // 회원가입 버튼
-        JButton signUpButton = new JButton("회원가입");
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setPreferredSize(new Dimension(370,50));
+
+        JButton signUpButton = new RoundedButton("회원가입", NovelColor.DARK_GREEN, Color.WHITE);
+        signUpButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        signUpButton.setPreferredSize(new Dimension(150,50));
         signUpButton.addActionListener(e -> handleSignUp());
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
-        mainPanel.add(signUpButton, gbc);
 
         // 취소 버튼
-        JButton cancelButton = new JButton("취소");
+        RoundedButton cancelButton = new RoundedButton("취소", Color.WHITE, Color.GRAY);
+        cancelButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        cancelButton.setPreferredSize(new Dimension(150,50));
         cancelButton.addActionListener(e -> dispose());
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.WEST;
-        mainPanel.add(cancelButton, gbc);
+
+        buttonPanel.add(signUpButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.insets = new Insets(45, 10, 30, 10);
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(buttonPanel, gbc);
     }
 
     @Override

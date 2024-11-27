@@ -9,10 +9,15 @@ public class RoundedButton extends JButton {
     private int arcHeight = 20; // 모서리의 세로 반경
 
     private Color background;
+    private Color foreground;
 
-    public RoundedButton(String text, Color background) {
+    private Color borderColor = Color.LIGHT_GRAY;
+
+    public RoundedButton(String text, Color background, Color foreground) {
         super(text);
-        this.background = background;
+        this.background = background; // 배경 색
+        this.foreground = foreground; // 글자 색
+        setForeground(foreground);
         setContentAreaFilled(false); // 기본 배경 제거
         setFocusPainted(false);      // 포커스 테두리 제거
         setBorderPainted(false);     // 기본 경계 제거
@@ -49,7 +54,7 @@ public class RoundedButton extends JButton {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // 테두리 색상
-        g2.setColor(getForeground());
+        g2.setColor(borderColor);
         g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, arcWidth, arcHeight);
 
         g2.dispose();
@@ -58,6 +63,11 @@ public class RoundedButton extends JButton {
     public void setCornerRadius(int arcWidth, int arcHeight) {
         this.arcWidth = arcWidth;
         this.arcHeight = arcHeight;
+        repaint();
+    }
+
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
         repaint();
     }
 }

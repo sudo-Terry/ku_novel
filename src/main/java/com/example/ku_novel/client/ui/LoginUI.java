@@ -1,10 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
-import com.example.ku_novel.client.ui.component.CustomizedPasswordField;
-import com.example.ku_novel.client.ui.component.CustomizedTextField;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +26,7 @@ public class LoginUI extends JFrame {
 
         JLabel logoLabel = new JLabel("릴소");
         logoLabel.setFont(FontSetting.getInstance().loadLogoFont(96f));
-        logoLabel.setForeground(new Color(3, 107, 63));
+        logoLabel.setForeground(NovelColor.DARK_GREEN);
 
         JLabel userLabel = new JLabel("아이디");
         userLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
@@ -46,7 +43,7 @@ public class LoginUI extends JFrame {
         passwordText.setPreferredSize(fieldSize);
         passwordText.setFont(FontSetting.getInstance().loadCustomFont(16f));
 
-        JButton loginButton = new RoundedButton("로그인", new Color(3, 107, 63));
+        JButton loginButton = new RoundedButton("로그인", NovelColor.DARK_GREEN, Color.WHITE);
         loginButton.setForeground(Color.WHITE);
         loginButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
         loginButton.setPreferredSize(buttonSize);
