@@ -1,5 +1,6 @@
 package com.example.ku_novel.common;
 
+import com.example.ku_novel.domain.NovelRoom;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -106,5 +107,22 @@ public class Message {
     public static Message fromJson(String json) {
         Gson gson = new GsonBuilder().create();
         return gson.fromJson(json, Message.class);
+    }
+
+    public NovelRoom toNovelRoom() {
+        return new NovelRoom(
+                this.novelRoomId,
+                this.novelRoomTitle,
+                this.novelRoomDescription,
+                this.novelParticipantIds != null ? String.join(",", this.novelParticipantIds) : null,
+                this.maxParticipants,
+                this.novelRoomStatus,
+                null,  // createdAt
+                this.novelContent,
+                this.novelHostUser,
+                null,  // currentVoteId
+                this.votingDuration,
+                this.submissionDuration
+        );
     }
 }
