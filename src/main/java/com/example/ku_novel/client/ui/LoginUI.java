@@ -1,6 +1,10 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.ui.component.CustomizedPasswordField;
+import com.example.ku_novel.client.ui.component.CustomizedTextField;
+import com.example.ku_novel.client.ui.component.FontSetting;
+import com.example.ku_novel.client.ui.component.RoundedButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +14,6 @@ import java.awt.event.ActionListener;
 public class LoginUI extends JFrame {
 
     public LoginUI() {
-
         setTitle("로그인");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -18,25 +21,35 @@ public class LoginUI extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(Color.WHITE);
         add(mainPanel);
 
-        Dimension fieldSize = new Dimension(250, 30);
+        Dimension fieldSize = new Dimension(250, 50);
+        Dimension buttonSize = new Dimension(250, 50);
 
-        // to-do : 이미지 디자인하여 추가
-        ImageIcon icon = new ImageIcon("src/main/resources/sample.jpg");
-        JLabel imageLabel = new JLabel(icon);
+        JLabel logoLabel = new JLabel("릴소");
+        logoLabel.setFont(FontSetting.getInstance().loadLogoFont(96f));
+        logoLabel.setForeground(new Color(3, 107, 63));
 
-        JLabel userLabel = new JLabel("아이디:");
-        JTextField userText = new JTextField();
+        JLabel userLabel = new JLabel("아이디");
+        userLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+
+        JTextField userText = new CustomizedTextField("아이디");
         userText.setPreferredSize(fieldSize);
+        userText.setFont(FontSetting.getInstance().loadCustomFont(16f));
 
-        JLabel passwordLabel = new JLabel("비밀번호:");
-        JPasswordField passwordText = new JPasswordField();
+
+        JLabel passwordLabel = new JLabel("비밀번호");
+        passwordLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+
+        JPasswordField passwordText = new CustomizedPasswordField("비밀번호");
         passwordText.setPreferredSize(fieldSize);
+        passwordText.setFont(FontSetting.getInstance().loadCustomFont(16f));
 
-        JButton loginButton = new JButton("로그인");
-        loginButton.setPreferredSize(new Dimension(100, 30));
+        JButton loginButton = new RoundedButton("로그인", new Color(3, 107, 63));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        loginButton.setPreferredSize(buttonSize);
 
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -51,7 +64,11 @@ public class LoginUI extends JFrame {
         });
 
         JButton registerButton = new JButton("회원가입");
-        registerButton.setPreferredSize(new Dimension(100, 30));
+        registerButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        registerButton.setContentAreaFilled(false);
+        registerButton.setFocusPainted(false);
+        registerButton.setBorderPainted(false);
+        registerButton.setPreferredSize(new Dimension(150, 25));
 
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -61,45 +78,40 @@ public class LoginUI extends JFrame {
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(10, 10, 0, 10);
         gbc.gridwidth = 2;
 
         // 로고 이미지
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        mainPanel.add(imageLabel, gbc);
-
-        gbc.gridwidth = 1;
+        mainPanel.add(logoLabel, gbc);
 
         // 아이디 입력
         gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(userLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         mainPanel.add(userText, gbc);
 
         // 패스워드 입력
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(passwordLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
         mainPanel.add(passwordText, gbc);
 
         // 로그인 버튼
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.CENTER;
         mainPanel.add(loginButton, gbc);
 
         // 회원가입 버튼
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridy = 6;
         mainPanel.add(registerButton, gbc);
 
         setVisible(true);
