@@ -4,16 +4,14 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-public class NovelRoomUI extends JFrame {
-    public NovelRoomUI() {
+public class NovelRoomModalUI extends JDialog {
+    public NovelRoomModalUI() {
         setTitle("개별 소설방");
         setSize(1080, 720);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);    // 크기 조절 비활성화
         setLocationRelativeTo(null);
 
@@ -107,7 +105,7 @@ public class NovelRoomUI extends JFrame {
         buttonPanel.add(writeButton);
 
         writeButton.addActionListener(e-> {
-            UIHandler.getInstance().showNovelInputModal(NovelRoomUI.this);
+            UIHandler.getInstance().showNovelInputModal(NovelRoomModalUI.this);
         });
 
         // 투표 버튼
@@ -118,7 +116,7 @@ public class NovelRoomUI extends JFrame {
         buttonPanel.add(voteButton);
 
         voteButton.addActionListener(e-> {
-            UIHandler.getInstance().showVoteModal(NovelRoomUI.this);
+            UIHandler.getInstance().showVoteModal(NovelRoomModalUI.this);
         });
 
         contentPanel.add(buttonPanel);
@@ -241,10 +239,5 @@ public class NovelRoomUI extends JFrame {
         ImageIcon icon = new ImageIcon(path);
         Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
-    }
-
-    // 추후 삭제`
-    public static void main(String[] args) {
-        new NovelRoomUI();
     }
 }
