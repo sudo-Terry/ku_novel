@@ -13,9 +13,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.List;
 
 public class HomeUI extends JFrame {
     private JPanel mainPanel, topPanel, leftButtonPanel, rightButtonPanel, contentPanel, contentLeftPanel, contentRightPanel;
@@ -24,14 +22,11 @@ public class HomeUI extends JFrame {
     private JLabel changeLabel;
     private static final long DEBOUNCE_TIME = 500; // 500ms
     private long lastRequestTime = 0;
-
-    NovelRoom[] testRooms = {
-        new NovelRoom(0, "소설방1", "소설 내용이 길어지면 어떻게 되는지 궁금해서 적은 텍스트보다 더 길게 적은 텍스트", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser1", null, 5, 3),
-        new NovelRoom(1, "소설방2", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser2", null, 5, 3),
-        new NovelRoom(2, "소설방3", "소설 내용2", "", 0, "ACTIVE", LocalDateTime.now(), "", "hostUser3", null, 5, 3),
-    };
+    private List<NovelRoom> participatingNovelRooms;
+    private List<NovelRoom> activeNovelRooms;
 
     public HomeUI() {
+        initDatas();
         initUI();
     }
 
@@ -199,7 +194,7 @@ public class HomeUI extends JFrame {
         // 참여 중인 소설방 목록 데이터
         // DefaultTableModel 생성
         DefaultTableModel novelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
-        for (NovelRoom novel : testRooms) {
+        for (NovelRoom novel : participatingNovelRooms) {
             novelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
         }
 
@@ -235,7 +230,7 @@ public class HomeUI extends JFrame {
                     int row = novelListTable.rowAtPoint(evt.getPoint());
                     if (row >= 0) {
                         String roomTitle = (String) novelListTable.getValueAt(row, 0);
-                        int roomId = testRooms[row].getId();
+                        int roomId = participatingNovelRooms.get(row).getId();
                         handleNovelRoomClick(roomId, roomTitle);
                     }
                 }
@@ -251,49 +246,49 @@ public class HomeUI extends JFrame {
         participatingPanel.add(scrollPane, BorderLayout.CENTER);
 
         DefaultListModel<String> novelListModel = new DefaultListModel<>();
-        for(int i = 0; i < testRooms.length; i++) {
-            novelListModel.addElement("<html>" + testRooms[i].getTitle() + "<br>" + testRooms[i].getDescription() + "</html>");
+        for (NovelRoom room : activeNovelRooms) {
+            novelListModel.addElement("<html>" + room.getTitle() + "<br>" + room.getDescription() + "</html>");
         }
 
         contentLeftPanel.add(participatingLabelPanel);
         contentLeftPanel.add(participatingPanel);
 
-        //============= 2. "전체 소설방" 섹션
+        //============= 2. "활성화된 소설방" 섹션
         JPanel allRoomsLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel allRoomsLabel = new JLabel("전체 소설방");
+        JLabel allRoomsLabel = new JLabel("활성화된 소설방");
         allRoomsLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
         allRoomsLabelPanel.add(allRoomsLabel);
         allRoomsLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         // 참여 중인 소설방 목록 데이터
         // DefaultTableModel 생성
-        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
-        for (NovelRoom novel : testRooms) {
-            allNovelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
+        DefaultTableModel activeNovelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
+        for (NovelRoom novel : activeNovelRooms) {
+            activeNovelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
         }
 
         // JTable 생성
-        JTable allNovelListTable = new JTable(allNovelListTM){
+        JTable activeNovelListTable = new JTable(activeNovelListTM){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };;
-        allNovelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
-        allNovelListTable.setRowHeight(50);// 각 행의 높이 설정
+        activeNovelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
+        activeNovelListTable.setRowHeight(50);// 각 행의 높이 설정
 
-        allNovelListTable.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
-        allNovelListTable.getTableHeader().setReorderingAllowed(false);
-        allNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        allNovelListTable.setGridColor(Color.LIGHT_GRAY);
+        activeNovelListTable.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
+        activeNovelListTable.getTableHeader().setReorderingAllowed(false);
+        activeNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        activeNovelListTable.setGridColor(Color.LIGHT_GRAY);
 
 
-        column1 = allNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
+        column1 = activeNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
         column1.setMinWidth(120);       // 최소 너비 설정
         column1.setMaxWidth(120);       // 최대 너비 설정
 
-        allNovelListTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        activeNovelListTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
                     long currentTime = System.currentTimeMillis();
@@ -305,14 +300,14 @@ public class HomeUI extends JFrame {
                     int row = novelListTable.rowAtPoint(evt.getPoint());
                     if (row >= 0) {
                         String roomTitle = (String) novelListTable.getValueAt(row, 0);
-                        int roomId = testRooms[row].getId();
+                        int roomId = activeNovelRooms.get(row).getId();
                         handleNovelRoomClick(roomId, roomTitle);
                     }
                 }
             }
         });
 
-        JScrollPane scrollPane2 = new JScrollPane(allNovelListTable);
+        JScrollPane scrollPane2 = new JScrollPane(activeNovelListTable);
         scrollPane2.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         JPanel allRoomsPanel = new JPanel(new BorderLayout());
@@ -391,8 +386,9 @@ public class HomeUI extends JFrame {
         // to-do: 관심 소설방 데이터
         // DefaultTableModel 생성
         DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"Title", "Description"}, 0);
-        for (NovelRoom novel : testRooms) {
-            allNovelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
+        DefaultListModel<String> novelListModel = new DefaultListModel<>();
+        for (NovelRoom room : activeNovelRooms) {
+            novelListModel.addElement("<html>" + room.getTitle() + "<br>" + room.getDescription() + "</html>");
         }
 
         // JTable 생성
@@ -451,6 +447,32 @@ public class HomeUI extends JFrame {
             ClientSenderThread.getInstance().requestRoomJoin(roomId);
         } catch (IllegalStateException ex) {
             JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void initDatas() {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        List<NovelRoom> chatRoomsParticipating = dataModel.getChatRoomsParticipating();
+        if (chatRoomsParticipating != null) {
+            participatingNovelRooms = List.of(chatRoomsParticipating.toArray(new NovelRoom[0]));
+        } else {
+            participatingNovelRooms = List.of(new NovelRoom[0]); // null일 경우 빈 배열
+        }
+        List<NovelRoom> chatRoomsActive = dataModel.getChatRoomsActive();
+        if (chatRoomsActive != null) {
+            activeNovelRooms = List.of(chatRoomsActive.toArray(new NovelRoom[0]));
+        } else {
+            activeNovelRooms = List.of(new NovelRoom[0]);
+        }
+
+        // 테스트용 출력
+        System.out.println("참여중인 소설방:");
+        for (NovelRoom room : participatingNovelRooms) {
+            System.out.println("- " + room.getTitle() + ": " + room.getDescription());
+        }
+        System.out.println("활성화된 소설방:");
+        for (NovelRoom room : activeNovelRooms) {
+            System.out.println("- " + room.getTitle() + ": " + room.getDescription());
         }
     }
 
