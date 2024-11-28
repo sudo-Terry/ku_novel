@@ -1,8 +1,8 @@
 package com.example.ku_novel.service;
 
-
 import com.example.ku_novel.domain.NovelRoom;
 import com.example.ku_novel.domain.Vote;
+import com.example.ku_novel.utils.ParticipantUtils;
 import com.example.ku_novel.repository.NovelRoomRepository;
 import com.example.ku_novel.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class NovelRoomService {
@@ -26,11 +25,15 @@ public class NovelRoomService {
     }
 
     // 소설 방 생성
-    public NovelRoom createNovelRoom(String title, String description, String hostUserId, Integer maxParticipants, Integer submissionDuration, Integer votingDuration) {
+    public NovelRoom createNovelRoom(String title, String description, String hostUserId, Integer maxParticipants,
+            Integer submissionDuration, Integer votingDuration) {
+        // 초기 participantIds JSON 생성 (방장만 포함)
+        String initialParticipants = ParticipantUtils.toParticipantIdsJson(List.of(hostUserId));
+
         NovelRoom novelRoom = NovelRoom.builder()
                 .title(title)
                 .description(description)
-                .participantIds(null)
+                .participantIds(initialParticipants)
                 .maxParticipants(maxParticipants)
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())
@@ -54,6 +57,11 @@ public class NovelRoomService {
         novelRoomRepository.save(newRoom);
 
         return newRoom;
+    }
+
+    // 특정 participantId가 포함된 소설방 조회
+    public List<NovelRoom> getRoomsByParticipantId(String participantId) {
+        return novelRoomRepository.findByParticipantId(participantId);
     }
 
     // 아이디로 소설 방 조회

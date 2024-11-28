@@ -2,6 +2,7 @@ package com.example.ku_novel.domain;
 
 import com.example.ku_novel.LocalDateTimeConverter;
 import com.example.ku_novel.common.Message;
+import com.example.ku_novel.utils.ParticipantUtils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -100,19 +101,14 @@ public class NovelRoom {
     }
 
     public List<String> getParticipantIdsAsList() {
-        if (participantIds == null || participantIds.isEmpty()) {
-            return List.of();
-        }
-        return Arrays.stream(participantIds.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
+        return ParticipantUtils.parseParticipantIds(this.participantIds);
     }
 
-    public void setParticipantIdsFromList(List<String> participantIdsList) {
-        if (participantIdsList == null || participantIdsList.isEmpty()) {
-            this.participantIds = "";
-        } else {
-            this.participantIds = String.join(",", participantIdsList);
-        }
-    }
+//    public void setParticipantIdsFromList(List<String> participantIdsList) {
+//        if (participantIdsList == null || participantIdsList.isEmpty()) {
+//            this.participantIds = "";
+//        } else {
+//            this.participantIds = String.join(",", participantIdsList);
+//        }
+//    }
 }
