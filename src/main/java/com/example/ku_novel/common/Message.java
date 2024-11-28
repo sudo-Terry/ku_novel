@@ -45,6 +45,13 @@ public class Message {
     private int maxParticipants;
 //    private boolean isParticipating; // 안씀
 
+    /// 투표 관련
+    private int voteId;
+    private String contentOptions;
+    private String voteStatus; // WRITER_ENABLED || VOTING_ENABLED || VOTE_COMPLETED
+    private int countDown;
+    private String votes;
+
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
     public Message() {
     }
