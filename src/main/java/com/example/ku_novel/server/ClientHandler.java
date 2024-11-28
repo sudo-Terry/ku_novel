@@ -9,6 +9,7 @@ import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.*;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
+import com.example.ku_novel.service.VoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -22,11 +23,13 @@ class ClientHandler implements Runnable {
 
     private final UserService userService;
     private final NovelRoomService novelRoomService;
+    private final VoteService voteService;
 
-    public ClientHandler(Socket clientSocket, UserService userService, NovelRoomService novelRoomService) {
+    public ClientHandler(Socket clientSocket, UserService userService, NovelRoomService novelRoomService, VoteService voteService) {
         this.socket = clientSocket;
         this.userService = userService;
         this.novelRoomService = novelRoomService;
+        this.voteService = voteService;
         try {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -103,6 +106,30 @@ class ClientHandler implements Runnable {
             // break;
             // 기타 요청 처리...
         }
+    }
+
+    private void handleVote(Message message) {
+        String userId = message.getSender();
+        int voteId = message.getVoteId();
+        Vote vote = voteService.getVoteById(voteId);
+
+        switch (vote.getStatus()) {
+            case "WRITER_ENABLED":
+                // todo
+                break;
+            case "VOTING_ENABLED":
+                // todo
+                break;
+            case "VOTE_COMPLETED":
+                // vote 시작 (synchronized 추후 고려)
+                VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService);
+                voteHandler.start();
+                break;
+            default:
+                break;
+        }
+
+        System.out.println(vote.toMessage());
     }
 
     private void handleSignUp(Message message) {

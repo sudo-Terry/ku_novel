@@ -1,7 +1,9 @@
 package com.example.ku_novel.server;
 
+import com.example.ku_novel.domain.Vote;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
+import com.example.ku_novel.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,11 +18,13 @@ public class ServerMain implements CommandLineRunner {
     private static final int PORT = 10100;
     private final UserService userService;
     private final NovelRoomService novelRoomService;
+    private final VoteService voteService;
 
     @Autowired
-    public ServerMain(UserService userService, NovelRoomService novelRoomService) {
+    public ServerMain(UserService userService, NovelRoomService novelRoomService, VoteService voteService) {
         this.userService = userService;
         this.novelRoomService = novelRoomService;
+        this.voteService = voteService;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ServerMain implements CommandLineRunner {
                 System.out.println("New client connected: " + clientSocket.getInetAddress());
 
                 // ClientHandler에 서비스 주입
-                ClientHandler clientHandler = new ClientHandler(clientSocket, userService, novelRoomService);
+                ClientHandler clientHandler = new ClientHandler(clientSocket, userService, novelRoomService, voteService);
                 Thread clientThread = new Thread(clientHandler);
                 clientThread.start();
             }
