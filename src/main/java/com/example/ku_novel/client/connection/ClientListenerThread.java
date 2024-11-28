@@ -89,7 +89,7 @@ public class ClientListenerThread extends Thread {
         NovelRoom[] rooms = gson.fromJson(content, NovelRoom[].class);
 
         // TODO : UI에 검색 결과 표시 (UIHandler에 구현 필요)
-        uiHandler.showRoomSearchResultsModal(rooms);
+        uiHandler.showRoomSearchResults(rooms);
     }
 
     private void handleRoomFetchByTitleFailed(JsonObject jsonObject, UIHandler uiHandler) {

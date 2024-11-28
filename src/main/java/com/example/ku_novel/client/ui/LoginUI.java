@@ -35,7 +35,6 @@ public class LoginUI extends JFrame {
         userText.setPreferredSize(fieldSize);
         userText.setFont(FontSetting.getInstance().loadCustomFont(16f));
 
-
         JLabel passwordLabel = new JLabel("비밀번호");
         passwordLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
 

@@ -123,15 +123,21 @@ public class UIHandler {
         });
     }
 
-    public void showRoomSearchResultsModal(NovelRoom[] rooms) {
+    public void showRoomSearchModal(JFrame frame) {
         SwingUtilities.invokeLater(() -> {
             if (roomSearchResultsModalUI == null || !roomSearchResultsModalUI.isVisible()) {
-                roomSearchResultsModalUI = new RoomSearchResultsModalUI(null, rooms);
+                roomSearchResultsModalUI = new RoomSearchResultsModalUI(frame);
                 roomSearchResultsModalUI.showModal();
             }else {
-                System.out.println("RoomSearchResultsModal 이미 열려 있음");
+                System.out.println("showRoomSearchModal 이미 열려 있음");
             }
         });
+    }
+
+    public void showRoomSearchResults(NovelRoom[] rooms) {
+        if (roomSearchResultsModalUI != null && roomSearchResultsModalUI.isVisible()) {
+            roomSearchResultsModalUI.showRoomResult(rooms);
+        }
     }
 
     public void showAlertModal(Component parentComponent, String title, String message, int messageType) {
@@ -157,4 +163,6 @@ public class UIHandler {
             }
         });
     }
+
+
 }

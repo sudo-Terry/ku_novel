@@ -2,27 +2,26 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.FontSetting;
+import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class HomeUI extends JFrame {
-    private JPanel mainPanel, topPanel, sidePanel, contentPanel, contentLeftPanel, contentRightPanel;
-    private JButton changeButton;
+    private JPanel mainPanel, topPanel, leftButtonPanel, rightButtonPanel, contentPanel, contentLeftPanel, contentRightPanel;
+    private JButton myButton, searchButton, rankingButton, attendanceButton, downloadButton, createButton, homeButton;
     private JTextField searchField;
+    private JLabel changeLabel;
     private static final long DEBOUNCE_TIME = 500; // 500ms
     private long lastRequestTime = 0;
 
@@ -37,7 +36,7 @@ public class HomeUI extends JFrame {
     }
 
     private void initUI() {
-        setTitle("릴레이 소설방");
+        setTitle("릴소");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);    // 크기 조절 비활성화
@@ -48,126 +47,158 @@ public class HomeUI extends JFrame {
         add(mainPanel);
 
         //============= 상단 패널
-        topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        topPanel = new JPanel(new BorderLayout());
         topPanel.setPreferredSize(new Dimension(1080, 100));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         topPanel.setBackground(Color.WHITE);
 
-        //============= 오른쪽 사이드 패널
-        sidePanel = new JPanel();
-        sidePanel.setPreferredSize(new Dimension(100, 720));
-        sidePanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
-        sidePanel.setBackground(Color.WHITE);
-        sidePanel.setLayout(new GridLayout(7, 1, 0, 15));
-
-        JButton rankingButton = createIconButton("src/main/resources/icon/ranking.png", 45, 45, Color.LIGHT_GRAY);
-        JButton attendanceButton = createIconButton("src/main/resources/icon/calender.png", 45, 45, Color.LIGHT_GRAY);
-        attendanceButton.addActionListener(e-> {
-            JOptionPane.showMessageDialog(null, "출석 완료 처리되었습니다.");
-        });
-        JButton downloadButton = createIconButton("src/main/resources/icon/download.png", 45, 45, Color.LIGHT_GRAY);
-
-        changeButton = createIconButton("src/main/resources/icon/my.png", 45, 45, new Color(255, 165, 0));
-
-        sidePanel.add(rankingButton);
-        sidePanel.add(attendanceButton);
-        sidePanel.add(downloadButton);
-        for(int i=0; i<3; i++) {
-            JPanel jPanel = new JPanel();
-            jPanel.setBackground(Color.WHITE);
-            sidePanel.add(jPanel);
-        }
-
-        sidePanel.add(changeButton);
-
         //============= 콘텐츠 패널
-        contentPanel = new JPanel(new GridLayout(1, 2,10, 0));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 20, 25));
+        contentPanel = new JPanel(new GridLayout(1, 2,5, 0));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPanel.setBackground(Color.WHITE);
 
         // 콘텐츠 좌/우 패널
         contentLeftPanel = new JPanel();
         contentLeftPanel.setLayout(new BoxLayout(contentLeftPanel, BoxLayout.Y_AXIS));
+        contentLeftPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         contentRightPanel = new JPanel();
         contentRightPanel.setLayout(new BoxLayout(contentRightPanel, BoxLayout.Y_AXIS));
+        contentRightPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         contentPanel.add(contentLeftPanel);
         contentPanel.add(contentRightPanel);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
-        mainPanel.add(sidePanel, BorderLayout.EAST);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
         showHome();
         setVisible(true);
     }
 
-    private void showHome() {
-        resetPanels();
+    private void initLeftButtonPanel() {
+        leftButtonPanel = new JPanel(new GridBagLayout());
+        leftButtonPanel.setPreferredSize(new Dimension(250, 90));
+        leftButtonPanel.setBackground(Color.WHITE);
 
-        // 타이틀 변경
-        setTitle("릴레이 소설방");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 15, 0, 0);
 
-        // 상단 패널 변경
-        JLabel titleLabel = new JLabel("릴레이 소설방");
-        titleLabel.setPreferredSize(new Dimension(600, 100));
-        titleLabel.setFont(loadCustomFont(32f));
-        topPanel.add(titleLabel);
+        // 파일 다운 버튼
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        downloadButton = createIconButton("src/main/resources/icon/download.png", Color.LIGHT_GRAY);
+        leftButtonPanel.add(downloadButton, gbc);
 
-        // 검색 필드
-        searchField = new JTextField(20);
-        searchField.setText("여기에 제목을 입력해 주세요");
-        searchField.setForeground(Color.GRAY);
-        searchField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals("여기에 제목을 입력해 주세요")) {
-                    searchField.setText("");
-                    searchField.setForeground(Color.BLACK);
-                }
-            }
+        JLabel downloadLabel = new JLabel("다운로드");
+        downloadLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        leftButtonPanel.add(downloadLabel, gbc);
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (searchField.getText().trim().isEmpty()) {
-                    searchField.setText("여기에 제목을 입력해 주세요");
-                    searchField.setForeground(Color.GRAY);
-                }
-            }
+        // 랭킹 버튼
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        rankingButton = createIconButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
+        leftButtonPanel.add(rankingButton, gbc);
+
+        JLabel rankingLabel = new JLabel("랭킹");
+        rankingLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        leftButtonPanel.add(rankingLabel, gbc);
+
+        // 출석 체크 버튼
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        attendanceButton = createIconButton("src/main/resources/icon/calender.png", Color.LIGHT_GRAY);
+        attendanceButton.addActionListener(e-> {
+            JOptionPane.showMessageDialog(null, "출석 완료 처리되었습니다.");
         });
-        searchField.setPreferredSize(new Dimension(40, 45));
+        leftButtonPanel.add(attendanceButton, gbc);
+
+        JLabel attendanceLabel = new JLabel("출석");
+        attendanceLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        leftButtonPanel.add(attendanceLabel, gbc);
+    }
+
+    private void initRightButtonPanel() {
+        rightButtonPanel = new JPanel(new GridBagLayout());
+        rightButtonPanel.setPreferredSize(new Dimension(250, 90));
+        rightButtonPanel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 0, 0, 15);
 
         // 검색 버튼
-        JButton searchButton = createIconButton("src/main/resources/icon/search.png", 45, 45, Color.LIGHT_GRAY);
-        searchButton.addActionListener(e -> handleSearchAction());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        searchButton = createIconButton("src/main/resources/icon/search.png", NovelColor.DARK_GREEN);
+        searchButton.addActionListener(e -> UIHandler.getInstance().showRoomSearchModal(HomeUI.this));
+        rightButtonPanel.add(searchButton, gbc);
+
+        JLabel searchLabel = new JLabel("검색");
+        searchLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        rightButtonPanel.add(searchLabel, gbc);
 
         // 소설방 만들기 버튼
-        JButton createButton = createIconButton("src/main/resources/icon/plus.png", 70, 65, new Color(255, 165, 0));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        createButton = createIconButton("src/main/resources/icon/plus.png", NovelColor.DARK_GREEN);
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UIHandler.getInstance().showNovelRoomCreateModalUI(HomeUI.this);
             }
         });
+        rightButtonPanel.add(createButton, gbc);
 
-        topPanel.add(searchField);
-        topPanel.add(searchButton);
-        topPanel.add(createButton);
+        JLabel createLabel = new JLabel("방 만들기");
+        createLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        rightButtonPanel.add(createLabel, gbc);
 
-        // my 버튼
-        changeButton.removeActionListener(showHomeListener);
-        changeButton.addActionListener(showMyPageListener);
-        changeButton.setIcon(scaleIcon("src/main/resources/icon/my.png", 45, 45));
+        // my page 버튼
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        myButton = createIconButton("src/main/resources/icon/my.png", NovelColor.DARK_GREEN);
+        myButton.addActionListener(e->showMyPage());
+        rightButtonPanel.add(myButton, gbc);
+
+        changeLabel = new JLabel("마이페이지");
+        changeLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        rightButtonPanel.add(changeLabel, gbc);
+    }
+
+    private void showHome() {
+        resetPanels();
+
+        // 상단 패널 변경
+        JLabel titleLabel = new JLabel("릴소");
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setFont(FontSetting.getInstance().loadLogoFont(54f));
+        titleLabel.setForeground(NovelColor.DARK_GREEN);
+        topPanel.add(titleLabel, BorderLayout.CENTER);
+
+        //============= 버튼 패널
+        initLeftButtonPanel();
+        initRightButtonPanel();
+        topPanel.add(leftButtonPanel, BorderLayout.WEST);
+        topPanel.add(rightButtonPanel, BorderLayout.EAST);
 
         //============= 1. "참여중인 소설방" 섹션
-        JPanel participatingLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel participatingLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel participatingLabel = new JLabel("참여중인 소설방");
         participatingLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
         participatingLabelPanel.add(participatingLabel);
-        participatingLabel.setFont(loadCustomFont(20f));
+        participatingLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
-        // to-do: 참여 중인 소설방 목록 데이터
+        // 참여 중인 소설방 목록 데이터
         // DefaultTableModel 생성
-        DefaultTableModel novelListTM = new DefaultTableModel(new Object[]{"Title", "Description"}, 0);
+        DefaultTableModel novelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
         for (NovelRoom novel : testRooms) {
             novelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
         }
@@ -179,8 +210,13 @@ public class HomeUI extends JFrame {
                 return false;
             }
         };
-        novelListTable.setFont(loadCustomFont(16f)); // 폰트 설정
+        novelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
         novelListTable.setRowHeight(50);// 각 행의 높이 설정
+
+        novelListTable.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
+        novelListTable.getTableHeader().setReorderingAllowed(false);
+        novelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        novelListTable.setGridColor(Color.LIGHT_GRAY);
 
         TableColumn column1 = novelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
@@ -208,7 +244,7 @@ public class HomeUI extends JFrame {
 
         // 스크롤 추가
         JScrollPane scrollPane = new JScrollPane(novelListTable);
-        scrollPane.setBorder(null);
+        scrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         // 패널에 추가
         JPanel participatingPanel = new JPanel(new BorderLayout());
@@ -223,15 +259,15 @@ public class HomeUI extends JFrame {
         contentLeftPanel.add(participatingPanel);
 
         //============= 2. "전체 소설방" 섹션
-        JPanel allRoomsLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel allRoomsLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel allRoomsLabel = new JLabel("전체 소설방");
         allRoomsLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
         allRoomsLabelPanel.add(allRoomsLabel);
-        allRoomsLabel.setFont(loadCustomFont(20f));
+        allRoomsLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
-        // to-do: 참여 중인 소설방 목록 데이터
+        // 참여 중인 소설방 목록 데이터
         // DefaultTableModel 생성
-        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"Title", "Description"}, 0);
+        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
         for (NovelRoom novel : testRooms) {
             allNovelListTM.addRow(new Object[]{novel.getTitle(), novel.getDescription()});
         }
@@ -243,8 +279,14 @@ public class HomeUI extends JFrame {
                 return false;
             }
         };;
-        allNovelListTable.setFont(loadCustomFont(16f)); // 폰트 설정
+        allNovelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
         allNovelListTable.setRowHeight(50);// 각 행의 높이 설정
+
+        allNovelListTable.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
+        allNovelListTable.getTableHeader().setReorderingAllowed(false);
+        allNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        allNovelListTable.setGridColor(Color.LIGHT_GRAY);
+
 
         column1 = allNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
@@ -271,7 +313,7 @@ public class HomeUI extends JFrame {
         });
 
         JScrollPane scrollPane2 = new JScrollPane(allNovelListTable);
-        scrollPane2.setBorder(null);
+        scrollPane2.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         JPanel allRoomsPanel = new JPanel(new BorderLayout());
         allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);
@@ -285,25 +327,17 @@ public class HomeUI extends JFrame {
     private void showMyPage() {
         resetPanels();
 
-        // 타이틀 변경
-        setTitle("마이페이지");
-
         //============= 상단 패널
         JLabel titleLabel = new JLabel("마이페이지");
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setPreferredSize(new Dimension(600, 100));
-        try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(32f);
-            titleLabel.setFont(customFont);
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-            System.out.println("폰트를 로드하는 데 실패했습니다.");
-        }
-        topPanel.add(titleLabel);
+        titleLabel.setFont(FontSetting.getInstance().loadCustomFont(32f));
+        topPanel.add(titleLabel, BorderLayout.CENTER);
 
         //============= 홈 버튼
-        changeButton.removeActionListener(showMyPageListener);
-        changeButton.addActionListener(showHomeListener);
-        changeButton.setIcon(scaleIcon("src/main/resources/icon/home.png", 45, 45));
+        homeButton = createIconButton("src/main/resources/icon/home.png", NovelColor.DARK_GREEN);
+        homeButton.addActionListener(e->showHome());
+        topPanel.add(homeButton, BorderLayout.EAST);
 
         //============= 콘텐츠 패널
         //============= 1. "내 정보" 섹션
@@ -311,7 +345,7 @@ public class HomeUI extends JFrame {
         JLabel infoLabel = new JLabel("내 정보");
         infoLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
         infoLabelPanel.add(infoLabel);
-        infoLabel.setFont(loadCustomFont(20f));
+        infoLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
@@ -327,15 +361,15 @@ public class HomeUI extends JFrame {
         infoListPanel.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
         JLabel idLabel = new JLabel("ID: " + ClientDataModel.getInstance().getUserId());
-        idLabel.setFont(loadCustomFont(20f));
+        idLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         // JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
         JLabel nameLabel = new JLabel("Nickname: 테스트 닉네임");
-        nameLabel.setFont(loadCustomFont(20f));
+        nameLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
         JLabel pointLabel = new JLabel("point: 1000");
-        pointLabel.setFont(loadCustomFont(20f));
+        pointLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         infoListPanel.add(idLabel);
         infoListPanel.add(nameLabel);
@@ -351,7 +385,7 @@ public class HomeUI extends JFrame {
         JPanel interestedLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel interestedLabel = new JLabel("관심 소설방");
         interestedLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
-        interestedLabel.setFont(loadCustomFont(20f));
+        interestedLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
         interestedLabelPanel.add(interestedLabel);
 
         // to-do: 관심 소설방 데이터
@@ -363,7 +397,7 @@ public class HomeUI extends JFrame {
 
         // JTable 생성
         JTable allNovelListTable = new JTable(allNovelListTM);
-        allNovelListTable.setFont(loadCustomFont(16f)); // 폰트 설정
+        allNovelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
         allNovelListTable.setRowHeight(50);// 각 행의 높이 설정
 
         TableColumn column1 = allNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
@@ -383,9 +417,9 @@ public class HomeUI extends JFrame {
         refreshPanels();
     }
 
-    private JButton createIconButton(String iconPath, int width, int height, Color background) {
-        JButton button = new JButton(scaleIcon(iconPath, 45, 45));
-        button.setPreferredSize(new Dimension(width, height));
+    private JButton createIconButton(String iconPath, Color background) {
+        JButton button = new JButton(scaleIcon(iconPath, 35, 35));
+        button.setPreferredSize(new Dimension(60, 50));
         button.setBackground(background);
         button.setBorderPainted(false);
         return button;
@@ -395,16 +429,6 @@ public class HomeUI extends JFrame {
         ImageIcon icon = new ImageIcon(path);
         Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
-    }
-
-    private Font loadCustomFont(float size) {
-        try {
-            return Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(size);
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-            System.out.println("폰트를 로드하는 데 실패했습니다.");
-            return new Font("SansSerif", Font.PLAIN, (int) size);
-        }
     }
 
     private void resetPanels() {
@@ -420,34 +444,6 @@ public class HomeUI extends JFrame {
         contentLeftPanel.repaint();
         contentRightPanel.revalidate();
         contentRightPanel.repaint();
-    }
-
-    ActionListener showHomeListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            showHome();
-        }
-    };
-
-    ActionListener showMyPageListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            showMyPage();
-        }
-    };
-
-    private void handleSearchAction() {
-        String roomTitle = searchField.getText().trim();
-        if (roomTitle.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "방 제목을 입력해주세요.", "오류", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            ClientSenderThread.getInstance().requestRoomFetchByTitle(roomTitle);
-        } catch (IllegalStateException ex) {
-            JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     private void handleNovelRoomClick(int roomId, String roomTitle) {
