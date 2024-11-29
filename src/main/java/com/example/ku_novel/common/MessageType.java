@@ -49,10 +49,8 @@ public enum MessageType {
 
     VOTE("VOTE"),
     VOTE_SUCCESS("VOTE_SUCCESS"),
-    VOTE_FAILED("VOTE_FAILED")
-    ;
-
-
+    VOTE_FAILED("VOTE_FAILED"),
+    VOTE_FETCH_BY_ID("VOTE_FETCH_BY_ID");
 
     private String messageType;
 

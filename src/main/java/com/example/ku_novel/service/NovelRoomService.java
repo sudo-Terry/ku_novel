@@ -49,6 +49,8 @@ public class NovelRoomService {
         // Room 먼저 저장하고 아이디 얻은 다음에 투표 저장
         Vote vote = Vote.builder()
                 .novelRoomId(newRoom.getId())
+                .votingDuration(votingDuration)
+                .submissionDuration(submissionDuration)
                 .build();
         voteRepository.save(vote);
 
