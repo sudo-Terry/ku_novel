@@ -98,4 +98,9 @@ public class NovelRoomService {
             throw new IllegalArgumentException("해당 ID의 소설 방을 찾을 수 없습니다.");
         }
     }
+
+    // 완결 상태의 소설방 조회
+    public List<NovelRoom> getDeactivateRoom() {
+        return novelRoomRepository.findByStatus("DEACTIVATE");
+    }
 }
