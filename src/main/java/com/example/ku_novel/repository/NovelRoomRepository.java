@@ -3,7 +3,8 @@ package com.example.ku_novel.repository;
 import com.example.ku_novel.domain.NovelRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 @Repository
@@ -23,4 +24,7 @@ public interface NovelRoomRepository extends JpaRepository<NovelRoom, Integer> {
 
     // 특정 제목의 소설방 조회
     List<NovelRoom> findByTitleContaining(String title);
+
+    @Query("SELECT nr FROM NovelRoom nr WHERE nr.participantIds LIKE %:participantId%")
+    List<NovelRoom> findByParticipantId(@Param("participantId") String participantId);
 }

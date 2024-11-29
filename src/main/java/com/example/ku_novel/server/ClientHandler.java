@@ -166,7 +166,7 @@ class ClientHandler implements Runnable {
 
             List<NovelRoom> activeNovelRooms = novelRoomService.getActiveNovelRooms();
             // to do: participatingRooms 메소드 구현해야함
-            List<NovelRoom> participatingRooms = novelRoomService.getActiveNovelRooms();
+            List<NovelRoom> participatingRooms = novelRoomService.getRoomsByParticipantId(user.getId());
 
             responseMessage.setActiveNovelRooms(_convertNovelRoomsToMessages(activeNovelRooms));
             responseMessage.setParticipatingNovelRooms(_convertNovelRoomsToMessages(participatingRooms));
