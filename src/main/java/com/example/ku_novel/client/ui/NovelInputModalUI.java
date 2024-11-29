@@ -2,15 +2,13 @@ package com.example.ku_novel.client.ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
 public class NovelInputModalUI extends JDialog {
     private static final int TIME_LIMIT_SECONDS = 10; // 제한 시간 (초 단위)
 
-    public NovelInputModalUI(JFrame parent) {
+    public NovelInputModalUI(NovelRoomModalUI parent) {
         super(parent, "다음 내용 입력", true);
         setLayout(new GridBagLayout());
         setSize(800, 600);

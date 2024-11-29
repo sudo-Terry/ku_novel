@@ -113,4 +113,33 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomListMessage.toJson());
     }
+
+    public void requestAuthorApply(String senderId, int novelRoomId) {
+        Message authorApplyMessage = new Message();
+        authorApplyMessage.setType(MessageType.AUTHOR_APPLY);
+        authorApplyMessage.setSender(senderId);
+        authorApplyMessage.setNovelRoomId(novelRoomId);
+
+        writer.println(authorApplyMessage.toJson());
+    }
+
+    public void requestAuthorWrite(String senderId, int novelRoomId, String content) {
+        Message authorWriteMessage = new Message();
+        authorWriteMessage.setType(MessageType.AUTHOR_WRITE);
+        authorWriteMessage.setSender(senderId);
+        authorWriteMessage.setNovelRoomId(novelRoomId);
+        authorWriteMessage.setContent(content);
+
+        writer.println(authorWriteMessage.toJson());
+    }
+
+    public void requestVote(String senderId, int novelRoomId, int voteChoice) {
+        Message voteMessage = new Message();
+        voteMessage.setType(MessageType.VOTE);
+        voteMessage.setSender(senderId);
+        voteMessage.setNovelRoomId(novelRoomId);
+        voteMessage.setVoteChoice(voteChoice);
+
+        writer.println(voteMessage.toJson());
+    }
 }

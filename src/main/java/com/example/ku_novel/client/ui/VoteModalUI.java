@@ -1,11 +1,8 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.model.VoteTableModel;
-import com.example.ku_novel.domain.NovelRoom;
 
-import javax.persistence.Column;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -16,7 +13,7 @@ import java.io.IOException;
 public class VoteModalUI extends JDialog {
     private static final int TIME_LIMIT_SECONDS = 10; // 제한 시간 (초 단위)
 
-    public VoteModalUI(JFrame parent) {
+    public VoteModalUI(NovelRoomModalUI parent) {
         super(parent, "다음 내용 선택 투표", true);
         setLayout(new GridBagLayout());
         setSize(800, 600);

@@ -43,6 +43,7 @@ public class Message {
     private int votingDuration;
     private int submissionDuration;
     private int maxParticipants;
+    private int voteChoice;
 //    private boolean isParticipating; // 안씀
 
     /// 투표 관련

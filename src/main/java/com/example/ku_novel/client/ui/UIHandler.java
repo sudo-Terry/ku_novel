@@ -7,8 +7,6 @@ import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -20,6 +18,7 @@ public class UIHandler {
     private ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
     private LoginUI loginUI;
     private SignUpModalUI signUpModalUI;
+    private NovelRoomModalUI novelRoomModalUI;
     private NovelRoomCreateModalUI novelRoomCreateModalUI;
     private RoomSearchResultsModalUI roomSearchResultsModalUI;
     private NovelInputModalUI novelInputModalUI;
@@ -146,7 +145,7 @@ public class UIHandler {
         );
     }
 
-    public void showNovelInputModal(JFrame frame) {
+    public void showNovelInputModal(NovelRoomModalUI frame) {
         SwingUtilities.invokeLater(() -> {
             if(novelInputModalUI == null || !novelInputModalUI.isVisible()) {
                 novelInputModalUI = new NovelInputModalUI(frame);
@@ -155,7 +154,7 @@ public class UIHandler {
         });
     }
 
-    public void showVoteModal(JFrame frame) {
+    public void showVoteModal(NovelRoomModalUI frame) {
         SwingUtilities.invokeLater(() -> {
             if(voteModalUI == null || !voteModalUI.isVisible()) {
                 voteModalUI = new VoteModalUI(frame);
@@ -164,5 +163,14 @@ public class UIHandler {
         });
     }
 
-
+    public void showNovelRoomModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomModalUI == null || !novelRoomModalUI.isVisible()) {
+                novelRoomModalUI = new NovelRoomModalUI();
+                novelRoomModalUI.setVisible(true);
+            }else {
+                System.out.println("novelRoomUI 이미 열려 있음");
+            }
+        });
+    }
 }
