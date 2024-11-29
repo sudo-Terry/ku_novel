@@ -2,6 +2,7 @@ package com.example.ku_novel.client.ui.component;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Path;
 
 public class RoundedButton extends JButton {
 

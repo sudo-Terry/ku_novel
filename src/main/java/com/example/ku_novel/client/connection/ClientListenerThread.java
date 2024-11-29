@@ -4,7 +4,6 @@ import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.HomeUI;
 import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
-import com.example.ku_novel.common.MessageType;
 import com.example.ku_novel.domain.NovelRoom;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -53,13 +52,14 @@ public class ClientListenerThread extends Thread {
     private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
         switch (messageType) {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
-            case "LOGIN_FAILED", "SIGNUP_FAILED" -> uiHandler.showAlertModal(
+            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED"-> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_SUCCESS" -> handleRoomFetchByTitleSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_FAILED" -> handleRoomFetchByTitleFailed(jsonObject, uiHandler);
+            case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
     }
@@ -89,13 +89,17 @@ public class ClientListenerThread extends Thread {
         NovelRoom[] rooms = gson.fromJson(content, NovelRoom[].class);
 
         // TODO : UI에 검색 결과 표시 (UIHandler에 구현 필요)
-        uiHandler.showRoomSearchResultsModal(rooms);
+        uiHandler.showRoomSearchResults(rooms);
     }
 
     private void handleRoomFetchByTitleFailed(JsonObject jsonObject, UIHandler uiHandler) {
         String errorMessage = jsonObject.get("content").getAsString();
         uiHandler.showAlertModal(null, "오류", "방 검색 실패: " + errorMessage, JOptionPane.ERROR_MESSAGE);
         System.out.println("검색 실패: " + errorMessage);
+    }
+
+    private void handleRoomJoinSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        uiHandler.showNovelRoomModalUI();
     }
 
     private void enqueueMessage(JsonObject jsonObject) {

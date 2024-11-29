@@ -43,6 +43,7 @@ public class Message {
     private int votingDuration;
     private int submissionDuration;
     private int maxParticipants;
+    private int voteChoice;
 //    private boolean isParticipating; // 안씀
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
