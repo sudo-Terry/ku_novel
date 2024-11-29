@@ -31,5 +31,5 @@ public class User {
 
     @Builder.Default
     @Column(name = "point", nullable = false)
-    private Integer point = 500;
+    private Integer point = 500000000;
 }

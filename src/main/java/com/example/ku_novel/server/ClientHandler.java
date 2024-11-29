@@ -5,8 +5,10 @@ import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.example.ku_novel.GsonConfig;
 import com.example.ku_novel.common.*;
 import com.example.ku_novel.domain.*;
+import com.example.ku_novel.dto.NovelRoomResDto;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.google.gson.Gson;
@@ -210,12 +212,17 @@ class ClientHandler implements Runnable {
             if (room != null) {
                 userService.deductPoints(hostUserId); // 방이 생성되어있으니까 500 차감
                 responseMessage.setType(MessageType.ROOM_CREATE_SUCCESS)
-                        .setContent("소설 방 생성에 성공했습니다.");
+                        .setContent("소설 방 생성에 성공했습니다.")
+                        .setJson(new Gson().toJson(room));
+                broadcastMessageToAll(new Message()
+                        .setType(MessageType.ROOM_CREATED_BROADCAST)
+                        .setContent("새로운 소설 방이 생성되었습니다.")
+                        .setJson(new Gson().toJson(room))
+                );
             }
         } else {
             responseMessage.setContent("포인트 부족으로 방을 생성할 수 없습니다.");
         }
-
         sendMessageToCurrentClient(responseMessage);
     }
 
@@ -243,9 +250,15 @@ class ClientHandler implements Runnable {
             if (rooms.isEmpty()) {
                 throw new IllegalArgumentException("해당 제목의 소설 방이 존재하지 않습니다.");
             }
+            List<NovelRoomResDto> roomResponses = rooms.stream()
+                    .map(NovelRoomResDto::new)
+                    .toList();
+
+            Gson gson = GsonConfig.createGson();
             Message responseMessage = new Message()
                     .setType(MessageType.ROOM_FETCH_BY_TITLE_SUCCESS)
-                    .setContent("소설 방 조회 성공").setJson(new Gson().toJson(rooms));
+                    .setContent("소설 방 조회 성공")
+                    .setJson(gson.toJson(roomResponses));
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             Message responseMessage = new Message()
@@ -299,7 +312,6 @@ class ClientHandler implements Runnable {
     private void handleJoinRoom(Message message) {
         Integer roomId = message.getNovelRoomId();
         String participantId = message.getSender();
-
         Message responseMessage = new Message();
         try {
             novelRoomService.joinNovelRoom(roomId, participantId);
@@ -319,6 +331,7 @@ class ClientHandler implements Runnable {
         String id = message.getSender();
         userService.attendanceCheck(id);
         Message responseMessage = new Message();
+
         try {
             responseMessage.setType(MessageType.ATTENDANCE_CHECK_SUCCESS)
                     .setContent("출석 체크 성공");

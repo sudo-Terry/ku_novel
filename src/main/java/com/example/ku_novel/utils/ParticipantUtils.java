@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ParticipantUtils {
@@ -17,9 +18,18 @@ public class ParticipantUtils {
             return new ArrayList<>();
         }
         try {
+            // JSON 배열 처리
             return gson.fromJson(participantIdsJson, listType);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse participant IDs", e);
+            // 쉼표로 구분된 문자열 처리
+            if (participantIdsJson.startsWith("\"") && participantIdsJson.endsWith("\"")) {
+                participantIdsJson = participantIdsJson.substring(1, participantIdsJson.length() - 1); // 양 끝 따옴표 제거
+            }
+            if (participantIdsJson.contains(",")) {
+                return Arrays.asList(participantIdsJson.split(","));
+            }
+            // 하나의 ID만 포함된 경우
+            return List.of(participantIdsJson);
         }
     }
 
