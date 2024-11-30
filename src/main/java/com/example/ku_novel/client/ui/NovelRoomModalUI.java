@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -116,6 +118,18 @@ public class NovelRoomModalUI extends JDialog {
         topPanel.add(settingButton);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
+
+        // 방장만 소설방 설정 변경
+        if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())){
+            settingButton.setEnabled(false);
+        }
+
+        settingButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIHandler.getInstance().showNovelRoomSettingsModalUI(NovelRoomModalUI.this);
+            }
+        });
 
         //============= 콘텐츠 패널
         JPanel contentPanel = new JPanel();

@@ -28,6 +28,10 @@ public class ClientDataModel {
     // NovelRoomModalUI 데이터
     private String novelRoomTitle;
     private String novelRoomDescription;
+    private String hostUserId;
+    private String novelRoomStatus;
+    private String[] novelParticipantIds; // 소설가 아이디 배열
+    private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
 
     private static volatile ClientDataModel instance;
 
@@ -56,6 +60,10 @@ public class ClientDataModel {
             this.novelRoomTitle = novelRoomObject.get("novelRoomTitle").getAsString();
             this.novelRoomDescription = novelRoomObject.get("novelRoomDescription").getAsString();
             this.currentRoomId = novelRoomObject.get("novelRoomId").getAsInt();
+            this.hostUserId = novelRoomObject.get("novelHostUser").getAsString();
+            this.novelRoomStatus = novelRoomObject.get("novelRoomStatus").getAsString();
+            this.novelParticipantIds = novelRoomObject.get("novelParticipantIds").getAsString().split(",");
+            this.novelMaxParticipants = novelRoomObject.get("maxParticipants").getAsInt();
 
             System.out.println("setChatRoomFromJson: 소설방 데이터 갱신 완료");
         } catch (Exception e) {
