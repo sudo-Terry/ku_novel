@@ -119,7 +119,9 @@ public class HomeUI extends JFrame {
         gbc.gridy = 0;
         attendanceButton = createIconButton("src/main/resources/icon/calender.png", Color.LIGHT_GRAY);
         attendanceButton.addActionListener(e-> {
-            JOptionPane.showMessageDialog(null, "출석 완료 처리되었습니다.");
+            ClientSenderThread.getInstance().requestAttendanceCheck(
+                ClientDataModel.getInstance().getUserId()
+            );
         });
         leftButtonPanel.add(attendanceButton, gbc);
 

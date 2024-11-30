@@ -173,4 +173,12 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomStatusUpdateMessage.toJson());
     }
+
+    public void requestAttendanceCheck(String senderId) {
+        Message attendanceCheckMessage = new Message();
+        attendanceCheckMessage.setType(MessageType.ATTENDANCE_CHECK);
+        attendanceCheckMessage.setSender(senderId);
+
+        writer.println(attendanceCheckMessage.toJson());
+    }
 }
