@@ -1,5 +1,6 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public class NovelRoomModalUI extends JDialog {
     private int roomId;
     private String roomTitle;
     private String roomDescription;
+    JTextArea chatTextArea;
 
     private NovelRoomModalUI() {
         setTitle("개별 소설방");
@@ -227,7 +229,7 @@ public class NovelRoomModalUI extends JDialog {
 //        bestChatTextArea.append("user: 인기 채팅test채팅test채팅test채팅test채팅test채팅test채팅test");
 
         // 채팅
-        JTextArea chatTextArea = new JTextArea(20, 40);
+        chatTextArea = new JTextArea(20, 40);
         chatTextArea.setFont(loadCustomFont(20f));
         chatTextArea.setEditable(false);
         chatTextArea.setLineWrap(true); // 줄바꿈 활성화
@@ -241,14 +243,23 @@ public class NovelRoomModalUI extends JDialog {
         DefaultCaret chatCaret = (DefaultCaret) chatTextArea.getCaret();
         chatCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        // 테스트 메시지 추가
-        for (int i = 0; i < 50; i++) {
-            chatTextArea.append("user" + i + ": testtesttesttesttesttesttesttesttesttesttesttesttest \n");
-        }
-
         // 채팅 입력
         JTextField inputField = new JTextField();
         JButton sendButton = new JButton("전송");
+        sendButton.addActionListener(e -> {
+            String inputText = inputField.getText().trim();
+            if (!inputText.isEmpty()) {
+                ClientSenderThread.getInstance().requestNovelRoomMessageSend(
+                        ClientDataModel.getInstance().getUserId(),
+                        ClientDataModel.getInstance().getCurrentRoomId(),
+                        inputText
+                );
+                inputField.setText(""); // 입력 필드 초기화
+            }
+        });
+
+        // 엔터키 입력해도 채팅 입력되게
+        inputField.addActionListener(e -> sendButton.doClick());
 
         // 하단 패널
         JPanel inputPanel = new JPanel(new BorderLayout());
@@ -280,5 +291,9 @@ public class NovelRoomModalUI extends JDialog {
         ImageIcon icon = new ImageIcon(path);
         Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
+    }
+
+    public void updateChatArea(String formattedChat){
+        chatTextArea.append(formattedChat + '\n');
     }
 }

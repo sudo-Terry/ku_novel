@@ -2,6 +2,7 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -176,5 +177,12 @@ public class UIHandler {
 
     public void repaintMainUI() {
         HomeUI.getInstance().repaintHomeUI();
+    }
+
+    public void updateNovelRoomChat(int roomId, String formattedMessage) {
+        if(novelRoomModalUI.getRoomId() == ClientDataModel.getInstance().getCurrentRoomId())
+            novelRoomModalUI.updateChatArea(formattedMessage);
+        else
+            System.out.println("novelRoomId 불일치로 채팅 업데이트 불가");
     }
 }
