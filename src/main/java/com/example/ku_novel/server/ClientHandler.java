@@ -15,6 +15,7 @@ import com.google.gson.GsonBuilder;
 
 class ClientHandler implements Runnable {
     private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
+    private static final Map<Integer, Set<String>> roomUsers = new HashMap<>(); // 소설방별 접속중인 유저 아이디 관리
 
     private final Socket socket;
     private BufferedReader in;
