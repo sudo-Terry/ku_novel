@@ -37,7 +37,7 @@ public class Vote {
 
     @Builder.Default
     @Column(name = "WRITER_ENABLED", nullable = false)
-    private String status = "WRITER_ENABLED";
+    private String status = "VOTE_COMPLETED";
 
     @Column(name = "submission_duration", nullable = false)
     private Integer submissionDuration; // 소설가 입력 시간 (분 단위)
