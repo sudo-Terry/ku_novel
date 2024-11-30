@@ -25,7 +25,7 @@ public class Message {
     private String nickname;
     private int point;
 
-//    private String json;
+    private String json;
 
     private Message novelRoom;
     private List<Message> allNovelRooms;
