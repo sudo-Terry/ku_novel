@@ -27,6 +27,7 @@ public class Message {
 
     private String json;
 
+    private Message novelRoom;
     private List<Message> allNovelRooms;
     private List<Message> activeNovelRooms;
     private List<Message> participatingNovelRooms;
