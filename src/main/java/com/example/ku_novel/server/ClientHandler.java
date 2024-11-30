@@ -99,6 +99,12 @@ class ClientHandler implements Runnable {
             case ROOM_JOIN:
                 handleJoinRoom(message);
                 break;
+            case ROOM_LEAVE:
+                handleLeaveRoom(message);
+                break;
+            case SEND_MESSAGE:
+                handleChatMessage(message);
+                break;
             // case ROOM_STATUS_UPDATE:
             // handleUpdateRoomStatus(message);
             // break;
@@ -212,6 +218,12 @@ class ClientHandler implements Runnable {
         synchronized (activeClients) {
             activeClients.remove(id);
         }
+
+        // 유저가 속한 모든 소설방에서 제거
+        synchronized (roomUsers) {
+            roomUsers.values().forEach(users -> users.remove(id));
+        }
+
         id = null;
     }
 
@@ -327,6 +339,13 @@ class ClientHandler implements Runnable {
         try {
             Optional<NovelRoom> novelRoom = novelRoomService.getNovelRoomById(roomId);
             novelRoom.ifPresent(room -> responseMessage.setType(MessageType.ROOM_JOIN_SUCCESS).setContent("소설 방 참가에 성공했습니다.").setNovelRoom(room.toMessage()));
+
+            // 소설방 사용자 관리
+            synchronized (roomUsers) {
+                roomUsers.putIfAbsent(roomId, new HashSet<>());
+                roomUsers.get(roomId).add(message.getSender());
+            }
+            
         } catch (Exception e) {
             responseMessage.setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
         }
@@ -334,22 +353,67 @@ class ClientHandler implements Runnable {
         sendMessageToCurrentClient(responseMessage);
     }
 
-    private void handleChatMessage(String messageJson) {
-        // 채팅 메시지 처리 로직
-        System.out.println("Chat message received.");
-        // Broadcast message to all clients
+    // 소설방 나가기 로직
+    private void handleLeaveRoom(Message message) {
+        Integer roomId = message.getNovelRoomId();
+        String sender = message.getSender();
+
+        try {
+            // 소설방에서 사용자 제거
+            synchronized (roomUsers) {
+                if (roomUsers.containsKey(roomId)) {
+                    roomUsers.get(roomId).remove(sender);
+                    // 소설방에 아무도 없으면 roomUsers에서 소설방 삭제
+                    if (roomUsers.get(roomId).isEmpty()) {
+                        roomUsers.remove(roomId);
+                    }
+                } else {
+                    throw new IllegalArgumentException("소설 방에 참가하지 않았습니다.");
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        // 나가기를 다른 사용자에게 응답할 필요가 없으면 굳이 클라이언트 응답 필요 없음.
     }
 
-    private void broadcastMessageToAll(Message message) {
-        synchronized (activeClients) {
-            Collection<PrintWriter> collection = activeClients.values();
-            Iterator<PrintWriter> iterator = collection.iterator();
-            while (iterator.hasNext()) {
-                PrintWriter writer = iterator.next();
-                sendMessageToWriter(writer, message);
+    private void handleChatMessage(Message message) {
+        // 채팅 메시지 처리 로직
+        System.out.println("Chat message received.");
+
+        int roomId = message.getNovelRoomId();
+        String sender = message.getSender();
+        String content = message.getContent();
+
+        synchronized (roomUsers) {
+            if (!roomUsers.containsKey(roomId)) return;
+
+            Set<String> usersInRoom = roomUsers.get(roomId);
+            synchronized (activeClients) {
+                for (String userId : usersInRoom) {
+                    PrintWriter writer = activeClients.get(userId);
+                    if (writer != null) {
+                        Message responseMessage = new Message().setType(MessageType.RECEIVED_MESSAGE).setContent(content).setSender(sender);
+                        responseMessage.setNovelRoomId(roomId);
+                        sendMessageToWriter(writer, responseMessage);
+                    }
+                }
             }
         }
     }
+
+
+// 안씀
+//    private void broadcastMessageToAll(Message message) {
+//        synchronized (activeClients) {
+//            Collection<PrintWriter> collection = activeClients.values();
+//            Iterator<PrintWriter> iterator = collection.iterator();
+//            while (iterator.hasNext()) {
+//                PrintWriter writer = iterator.next();
+//                sendMessageToWriter(writer, message);
+//            }
+//        }
+//    }
 
     private void sendMessageToWriter(PrintWriter writer, Message message) {
         writer.println(message.toJson());
@@ -362,8 +426,13 @@ class ClientHandler implements Runnable {
 
     private void closeConnection() {
         try {
-            synchronized (activeClients) {
-                activeClients.remove(id);
+            if (id != null) {
+                synchronized (activeClients) {
+                    activeClients.remove(id);
+                }
+                synchronized (roomUsers) {
+                    roomUsers.values().forEach(users -> users.remove(id));
+                }
             }
             if (in != null)
                 in.close();
