@@ -81,6 +81,9 @@ class ClientHandler implements Runnable {
             case NICKNAME_CHECK:
                 checkNickname(message);
                 break;
+            case REFRESH_HOME:
+                handleRefreshHome(message);
+                break;
             case ROOM_CREATE:
                 handleCreateRoom(message);
                 break;
@@ -170,6 +173,31 @@ class ClientHandler implements Runnable {
         Message responseMessage = new Message()
                 .setType(isDuplicate ? MessageType.NICKNAME_INVALID : MessageType.NICKNAME_VALID)
                 .setContent(isDuplicate ? "닉네임이 이미 존재합니다." : "사용 가능한 닉네임입니다.");
+        sendMessageToCurrentClient(responseMessage);
+    }
+
+    private void handleRefreshHome(Message message) {
+        String userId = message.getSender();
+
+        Message responseMessage = new Message();
+        try{
+            User user = userService.findById(userId);
+            responseMessage.setPoint(user.getPoint());
+            responseMessage.setNickname(user.getNickname());
+            responseMessage.setType(MessageType.REFRESH_HOME_SUCCESS);
+            responseMessage.setContent("새로고침 데이터 응답");
+            responseMessage.setSender(user.getId());
+            responseMessage.setPassword(user.getPassword());
+
+            List<NovelRoom> activeNovelRooms = novelRoomService.getActiveNovelRooms();
+            List<NovelRoom> participatingRooms = novelRoomService.getRoomsByParticipantId(user.getId());
+
+            responseMessage.setActiveNovelRooms(_convertNovelRoomsToMessages(activeNovelRooms));
+            responseMessage.setParticipatingNovelRooms(_convertNovelRoomsToMessages(participatingRooms));
+        } catch (Exception e){
+            responseMessage.setType(MessageType.REFRESH_HOME_SUCCESS);
+            responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
+        }
         sendMessageToCurrentClient(responseMessage);
     }
 

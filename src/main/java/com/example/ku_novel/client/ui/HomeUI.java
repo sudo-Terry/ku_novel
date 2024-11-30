@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class HomeUI extends JFrame {
+    private static HomeUI instance;
     private JPanel mainPanel, topPanel, leftButtonPanel, rightButtonPanel, contentPanel, contentLeftPanel, contentRightPanel;
     private JButton myButton, searchButton, rankingButton, attendanceButton, downloadButton, createButton, homeButton;
     private JTextField searchField;
@@ -28,6 +29,17 @@ public class HomeUI extends JFrame {
     public HomeUI() {
         initDatas();
         initUI();
+    }
+
+    public static HomeUI getInstance() {
+        if (instance == null) {
+            synchronized (HomeUI.class) {
+                if (instance == null) {
+                    instance = new HomeUI();
+                }
+            }
+        }
+        return instance;
     }
 
     private void initUI() {
@@ -119,7 +131,7 @@ public class HomeUI extends JFrame {
 
     private void initRightButtonPanel() {
         rightButtonPanel = new JPanel(new GridBagLayout());
-        rightButtonPanel.setPreferredSize(new Dimension(250, 90));
+        rightButtonPanel.setPreferredSize(new Dimension(340, 90));
         rightButtonPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -166,6 +178,25 @@ public class HomeUI extends JFrame {
         changeLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
         gbc.gridy = 1;
         rightButtonPanel.add(changeLabel, gbc);
+
+
+        // 새로고침 버튼
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        createButton = createIconButton("src/main/resources/icon/plus.png", NovelColor.DARK_GREEN);
+        createButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String userId = ClientDataModel.getInstance().getUserId();
+                ClientSenderThread.getInstance().requestRefreshHome(userId);
+            }
+        });
+        rightButtonPanel.add(createButton, gbc);
+
+        JLabel refreshLabel = new JLabel("새로고침");
+        refreshLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        gbc.gridy = 1;
+        rightButtonPanel.add(refreshLabel, gbc);
     }
 
     private void showHome() {
@@ -474,6 +505,11 @@ public class HomeUI extends JFrame {
         for (NovelRoom room : activeNovelRooms) {
             System.out.println("- " + room.getTitle() + ": " + room.getDescription());
         }
+    }
+
+    public void repaintHomeUI() {
+        initDatas();
+        showHome();
     }
 
     public static void main(String[] args) {
