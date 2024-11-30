@@ -54,8 +54,8 @@ public enum MessageType {
     VOTE_FETCH_BY_ID("VOTE_FETCH_BY_ID"),
 
     /// 메시지 관련
-    SEND_MESSAGE("SEND_MESSAGE"),
-    RECEIVED_MESSAGE("RECEIVED_MESSAGE");
+    MESSAGE_SEND("MESSAGE_SEND"),
+    MESSAGE_RECEIVE("MESSAGE_RECEIVE");
 
     private String messageType;
 
