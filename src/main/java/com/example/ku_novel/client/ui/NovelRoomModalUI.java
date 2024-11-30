@@ -155,6 +155,19 @@ public class NovelRoomModalUI extends JDialog {
         applyAuthorButton.setBackground(Color.WHITE);
         applyAuthorButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         buttonPanel.add(applyAuthorButton);
+        applyAuthorButton.addActionListener(e -> ClientSenderThread.getInstance().requestAuthorApply(
+                ClientDataModel.getInstance().getUserId(),
+                ClientDataModel.getInstance().getCurrentRoomId()
+        ));
+        applyAuthorButton.setEnabled(true);
+
+        // 소설가는 소설가 신청 버튼 비활성화
+        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
+            if (str.equals(ClientDataModel.getInstance().getUserId())) {
+                applyAuthorButton.setEnabled(false);
+            }
+        }
+
 
         // 소설 작성 버튼
         JButton writeButton = new JButton("(소설가) 소설 작성");
