@@ -8,12 +8,47 @@ import java.io.File;
 import java.io.IOException;
 
 public class NovelRoomModalUI extends JDialog {
-    public NovelRoomModalUI() {
+    private static NovelRoomModalUI instance;
+    private int roomId;
+
+    private NovelRoomModalUI() {
         setTitle("개별 소설방");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setResizable(false);    // 크기 조절 비활성화
+        setResizable(false);
         setLocationRelativeTo(null);
+    }
+
+    public static NovelRoomModalUI getInstance() {
+        if (instance == null) {
+            synchronized (NovelRoomModalUI.class) {
+                if (instance == null) {
+                    instance = new NovelRoomModalUI();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void openModalWithRoomId(int roomId) {
+        this.roomId = roomId;
+        initUI();
+        this.setVisible(true);
+    }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    private void initDatas(){
+        //
+    }
+
+    // UI 초기화
+    private void initUI() {
+        getContentPane().removeAll(); // 기존 UI 제거
+        repaint();
+        revalidate();
 
         //============= 메인 패널
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -145,7 +180,7 @@ public class NovelRoomModalUI extends JDialog {
         novelCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // 소설 내용
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
+        novelTextArea.append(roomId + "\n");
         novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
         novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
         novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");

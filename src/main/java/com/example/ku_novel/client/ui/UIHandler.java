@@ -163,11 +163,15 @@ public class UIHandler {
         });
     }
 
-    public void showNovelRoomModalUI() {
+    public void showNovelRoomModalUI(int roomId) {
         SwingUtilities.invokeLater(() -> {
             if (novelRoomModalUI == null || !novelRoomModalUI.isVisible()) {
-                novelRoomModalUI = new NovelRoomModalUI();
-                novelRoomModalUI.setVisible(true);
+                novelRoomModalUI = NovelRoomModalUI.getInstance();
+                if(novelRoomModalUI.getRoomId() == roomId) {
+                    novelRoomModalUI.setVisible(true);
+                }else{
+                    novelRoomModalUI.openModalWithRoomId(roomId);
+                }
             }else {
                 System.out.println("novelRoomUI 이미 열려 있음");
             }
