@@ -321,17 +321,15 @@ class ClientHandler implements Runnable {
     // 소설방 참가 로직
     private void handleJoinRoom(Message message) {
         Integer roomId = message.getNovelRoomId();
-        String participantId = message.getSender();
+        Message responseMessage = new Message().setType(MessageType.ROOM_JOIN_FAILED);
 
-        Message responseMessage = new Message();
         try {
-            novelRoomService.joinNovelRoom(roomId, participantId);
-            responseMessage.setType(MessageType.ROOM_JOIN_SUCCESS)
-                    .setContent("소설 방 참가에 성공했습니다.");
+            Optional<NovelRoom> novelRoom = novelRoomService.getNovelRoomById(roomId);
+            novelRoom.ifPresent(room -> responseMessage.setType(MessageType.ROOM_JOIN_SUCCESS).setContent("소설 방 참가에 성공했습니다.").setNovelRoom(room.toMessage()));
         } catch (Exception e) {
-            responseMessage.setType(MessageType.ROOM_JOIN_FAILED)
-                    .setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
+            responseMessage.setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
         }
+
         sendMessageToCurrentClient(responseMessage);
     }
 
@@ -377,3 +375,4 @@ class ClientHandler implements Runnable {
         }
     }
 }
+
