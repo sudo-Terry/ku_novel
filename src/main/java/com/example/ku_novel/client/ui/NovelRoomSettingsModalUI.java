@@ -118,9 +118,9 @@ public class NovelRoomSettingsModalUI extends JDialog {
         boolean isNovelEnded = endNovelCheckbox.isSelected();
 
         // 서버로 요청
-//        ClientSenderThread.getInstance().requestUpdateNovelRoomSettings(
-//                Integer.parseInt(novelAuthorCount), novelRoomTitle, novelRoomDescription, isNovelEnded
-//        );
+        ClientSenderThread.getInstance().requestRoomStatusUpdate(
+            Integer.parseInt(novelAuthorCount), novelRoomTitle, novelRoomDescription, isNovelEnded
+        );
 
         this.dispose();
     }

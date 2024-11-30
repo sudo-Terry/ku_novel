@@ -45,6 +45,7 @@ public class Message {
     private int submissionDuration;
     private int maxParticipants;
     private int voteChoice;
+    private String novelEnded; // Lombok에서 is 접두사가 붙은 이름을 boolean getter로 간주해서 네이밍을 이렇게 하였음
 //    private boolean isParticipating; // 안씀
 
     /// 투표 관련

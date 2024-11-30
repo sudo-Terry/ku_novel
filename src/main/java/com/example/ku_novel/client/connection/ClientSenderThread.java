@@ -160,4 +160,17 @@ public class ClientSenderThread extends Thread{
 
         writer.println(novelRoomChatMessage.toJson());
     }
+
+    public void requestRoomStatusUpdate(int maxParticipant, String novelRoomTitle, String novelRoomDescription, boolean isNovelEnded) {
+        Message roomStatusUpdateMessage = new Message();
+        roomStatusUpdateMessage.setType(MessageType.ROOM_STATUS_UPDATE);
+        roomStatusUpdateMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
+        roomStatusUpdateMessage.setSender(ClientDataModel.getInstance().getUserId());
+        roomStatusUpdateMessage.setNovelRoomTitle(novelRoomTitle);
+        roomStatusUpdateMessage.setNovelRoomDescription(novelRoomDescription);
+        roomStatusUpdateMessage.setMaxParticipants(maxParticipant);
+        roomStatusUpdateMessage.setNovelEnded(isNovelEnded ? "Y" : "N");
+
+        writer.println(roomStatusUpdateMessage.toJson());
+    }
 }
