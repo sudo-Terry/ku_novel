@@ -25,6 +25,6 @@ public interface NovelRoomRepository extends JpaRepository<NovelRoom, Integer> {
     // 특정 제목의 소설방 조회
     List<NovelRoom> findByTitleContaining(String title);
 
-    @Query("SELECT nr FROM NovelRoom nr WHERE nr.participantIds LIKE %:participantId%")
-    List<NovelRoom> findByParticipantId(@Param("participantId") String participantId);
+    @Query("SELECT nr FROM NovelRoom nr WHERE nr.participantIds LIKE :escapedId")
+    List<NovelRoom> findByParticipantId(@Param("escapedId") String escapedId);
 }

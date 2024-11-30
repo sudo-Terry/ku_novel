@@ -63,7 +63,8 @@ public class NovelRoomService {
 
     // 특정 participantId가 포함된 소설방 조회
     public List<NovelRoom> getRoomsByParticipantId(String participantId) {
-        return novelRoomRepository.findByParticipantId(participantId);
+        String escapedId = "%\"" + participantId + "\"%";
+        return novelRoomRepository.findByParticipantId(escapedId);
     }
 
     // 아이디로 소설 방 조회
