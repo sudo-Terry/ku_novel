@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class NovelRoomModalUI extends JDialog {
     private static NovelRoomModalUI instance;
@@ -160,6 +162,14 @@ public class NovelRoomModalUI extends JDialog {
         writeButton.setBackground(Color.WHITE);
         writeButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         buttonPanel.add(writeButton);
+        writeButton.setEnabled(false);
+
+        // 소설가만 소설작성 버튼 활성화
+        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
+            if (str.equals(ClientDataModel.getInstance().getUserId())) {
+                writeButton.setEnabled(true);
+            }
+        }
 
         writeButton.addActionListener(e-> {
             UIHandler.getInstance().showNovelInputModal(NovelRoomModalUI.this);
