@@ -118,8 +118,9 @@ public class ClientListenerThread extends Thread {
             if (novelRoomObject == null) {
                 throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
             }
-            int novelRoomId = novelRoomObject.get("novelRoomId").getAsInt();
-            uiHandler.showNovelRoomModalUI(novelRoomId);
+            ClientDataModel dataModel = ClientDataModel.getInstance();
+            dataModel.setChatRoomFromJson(jsonObject);
+            uiHandler.showNovelRoomModalUI(dataModel.getCurrentRoomId());
         } catch (Exception e) {
             System.err.println("handleRoomJoinSuccess 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();

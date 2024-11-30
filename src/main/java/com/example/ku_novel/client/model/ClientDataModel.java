@@ -13,16 +13,21 @@ import java.util.List;
 @Getter
 @Setter
 public class ClientDataModel {
+    // HomeUI 데이터
     private String userId;
     private String password;
     private String userName;
     private String userPoint;
-    private long currentRoomId;
+    private int currentRoomId;
     private List<NovelRoom> chatRoomsAll;
     private List<NovelRoom> chatRoomsActive;
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private Gson gson;
+
+    // NovelRoomModalUI 데이터
+    private String novelRoomTitle;
+    private String novelRoomDescription;
 
     private static volatile ClientDataModel instance;
 
@@ -39,6 +44,24 @@ public class ClientDataModel {
             }
         }
         return instance;
+    }
+
+    public void setChatRoomFromJson(JsonObject jsonObject) {
+        try {
+            JsonObject novelRoomObject = jsonObject.getAsJsonObject("novelRoom");
+            if (novelRoomObject == null) {
+                throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
+            }
+
+            this.novelRoomTitle = novelRoomObject.get("novelRoomTitle").getAsString();
+            this.novelRoomDescription = novelRoomObject.get("novelRoomDescription").getAsString();
+            this.currentRoomId = novelRoomObject.get("novelRoomId").getAsInt();
+
+            System.out.println("setChatRoomFromJson: 소설방 데이터 갱신 완료");
+        } catch (Exception e) {
+            System.err.println("setChatRoomFromJson 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setChatRoomsFromJson(JsonObject jsonObject) {
