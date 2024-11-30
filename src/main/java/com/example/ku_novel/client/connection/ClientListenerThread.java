@@ -98,6 +98,7 @@ public class ClientListenerThread extends Thread {
         dataModel.setUserPoint(jsonObject.get("point").getAsString());
         dataModel.setChatRoomsFromJson(jsonObject);
 
+        uiHandler.disposeLoginUI();
         uiHandler.repaintMainUI();
     }
 

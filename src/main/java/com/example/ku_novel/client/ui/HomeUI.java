@@ -390,11 +390,11 @@ public class HomeUI extends JFrame {
         idLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         // JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
-        JLabel nameLabel = new JLabel("Nickname: 테스트 닉네임");
+        JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
         nameLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
-        JLabel pointLabel = new JLabel("point: 1000");
+        JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
         pointLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
 
         infoListPanel.add(idLabel);
