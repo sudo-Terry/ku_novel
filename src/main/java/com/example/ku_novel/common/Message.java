@@ -25,7 +25,7 @@ public class Message {
     private String nickname;
     private int point;
 
-    private String json;
+//    private String json;
 
     private List<Message> allNovelRooms;
     private List<Message> activeNovelRooms;
@@ -82,10 +82,10 @@ public class Message {
         return this;
     }
 
-    public Message setJson(String json) {
-        this.json = json;
-        return this;
-    }
+//    public Message setJson(String json) {
+//        this.json = json;
+//        return this;
+//    }
 
     public Message setContent(String content) {
         this.content = content;
