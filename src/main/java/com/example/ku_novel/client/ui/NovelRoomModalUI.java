@@ -148,6 +148,11 @@ public class NovelRoomModalUI extends JDialog {
         authorButton.setBackground(Color.WHITE);
         authorButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         buttonPanel.add(authorButton);
+        authorButton.addActionListener(e -> {
+            String participantIds = Arrays.toString(ClientDataModel.getInstance().getNovelParticipantIds());
+            UIHandler.getInstance().showAlertModal(
+                    this, "정보", "현재 소설가는 " + participantIds + " 입니다.", JOptionPane.INFORMATION_MESSAGE);
+        });
 
         // 소설가 신청 버튼
         JButton applyAuthorButton = new JButton("소설가 신청");
