@@ -297,9 +297,9 @@ public class HomeUI extends JFrame {
                     }
                     lastRequestTime = currentTime;
 
-                    int row = novelListTable.rowAtPoint(evt.getPoint());
+                    int row = activeNovelListTable.rowAtPoint(evt.getPoint());
                     if (row >= 0) {
-                        String roomTitle = (String) novelListTable.getValueAt(row, 0);
+                        String roomTitle = (String) activeNovelListTable.getValueAt(row, 0);
                         int roomId = activeNovelRooms.get(row).getId();
                         handleNovelRoomClick(roomId, roomTitle);
                     }
