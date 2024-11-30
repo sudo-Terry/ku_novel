@@ -54,15 +54,22 @@ public class ClientListenerThread extends Thread {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
             case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED", "ROOM_CREATE_FAILED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
-            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "ROOM_CREATE_SUCCESS"-> uiHandler.showAlertModal(
+            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID"-> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_SUCCESS" -> handleRoomFetchByTitleSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_FAILED" -> handleRoomFetchByTitleFailed(jsonObject, uiHandler);
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
+            case "ROOM_CREATE_SUCCESS" -> handleRoomCreateSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleRoomCreateSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+        ClientSenderThread.getInstance().requestRefreshHome(ClientDataModel.getInstance().getUserId());
     }
 
     private void handleRefreshHomeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
