@@ -52,9 +52,9 @@ public class ClientListenerThread extends Thread {
     private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
         switch (messageType) {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
-            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED"-> uiHandler.showAlertModal(
+            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED", "ROOM_CREATE_FAILED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
-            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID" -> uiHandler.showAlertModal(
+            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "ROOM_CREATE_SUCCESS"-> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
