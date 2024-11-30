@@ -1,11 +1,15 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
 public class NovelInputModalUI extends JDialog {
+    private JTextArea novelInputTextArea;
     private static final int TIME_LIMIT_SECONDS = 10; // 제한 시간 (초 단위)
 
     public NovelInputModalUI(NovelRoomModalUI parent) {
@@ -62,7 +66,7 @@ public class NovelInputModalUI extends JDialog {
         gbc.weighty = 2.0;
         gbc.fill = GridBagConstraints.BOTH;
 
-        JTextArea novelInputTextArea = new JTextArea(10, 20);
+        novelInputTextArea = new JTextArea(10, 20);
         novelInputTextArea.setFont(loadCustomFont(16f));
         novelInputTextArea.append("소설 입력창입니다.");
         add(new JScrollPane(novelInputTextArea), gbc);
@@ -79,8 +83,7 @@ public class NovelInputModalUI extends JDialog {
 
         // 확인 버튼 동작
         okButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "등록 완료");
-            dispose();
+            handleSubmitClicked();
         });
 
         // 취소 버튼 동작
@@ -109,6 +112,26 @@ public class NovelInputModalUI extends JDialog {
             e.printStackTrace();
             System.out.println("폰트를 로드하는 데 실패했습니다.");
             return new Font("SansSerif", Font.PLAIN, (int) size);
+        }
+    }
+
+    private void handleSubmitClicked() {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        String userId = dataModel.getUserId();
+        int novelRoomId = dataModel.getCurrentRoomId();
+        String content = novelInputTextArea.getText();
+
+        if (content.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            ClientSenderThread.getInstance().requestAuthorWrite(userId, novelRoomId, content);
+            dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "제출 중 오류가 발생하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
 }
