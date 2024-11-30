@@ -167,11 +167,7 @@ public class UIHandler {
         SwingUtilities.invokeLater(() -> {
             if (novelRoomModalUI == null || !novelRoomModalUI.isVisible()) {
                 novelRoomModalUI = NovelRoomModalUI.getInstance();
-                if(novelRoomModalUI.getRoomId() == roomId) {
-                    novelRoomModalUI.setVisible(true);
-                }else{
-                    novelRoomModalUI.openModalWithRoomId(roomId);
-                }
+                novelRoomModalUI.openModalWithRoomId(roomId);
             }else {
                 System.out.println("novelRoomUI 이미 열려 있음");
             }

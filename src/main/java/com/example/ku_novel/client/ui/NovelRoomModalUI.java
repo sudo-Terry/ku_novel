@@ -1,5 +1,8 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.model.ClientDataModel;
+import lombok.Getter;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
@@ -9,7 +12,10 @@ import java.io.IOException;
 
 public class NovelRoomModalUI extends JDialog {
     private static NovelRoomModalUI instance;
+    @Getter
     private int roomId;
+    private String roomTitle;
+    private String roomDescription;
 
     private NovelRoomModalUI() {
         setTitle("개별 소설방");
@@ -32,16 +38,16 @@ public class NovelRoomModalUI extends JDialog {
 
     public void openModalWithRoomId(int roomId) {
         this.roomId = roomId;
+        initDatas();
         initUI();
         this.setVisible(true);
     }
 
-    public int getRoomId() {
-        return roomId;
-    }
-
     private void initDatas(){
-        //
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        this.roomTitle = dataModel.getNovelRoomTitle();
+        this.roomDescription = dataModel.getNovelRoomDescription();
     }
 
     // UI 초기화
@@ -67,12 +73,12 @@ public class NovelRoomModalUI extends JDialog {
         novelInfoPanel.setOpaque(false);
 
         // 소설 제목
-        JLabel titleLabel = new JLabel("소설 제목");
+        JLabel titleLabel = new JLabel(roomTitle);
         titleLabel.setFont(loadCustomFont(32f));
         novelInfoPanel.add(titleLabel);
 
         // 소설 설명
-        JLabel descriptionLabel = new JLabel(": 소설 설명");
+        JLabel descriptionLabel = new JLabel(": " + roomDescription);
         descriptionLabel.setFont(loadCustomFont(20f));
         novelInfoPanel.add(descriptionLabel);
 
