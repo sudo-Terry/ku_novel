@@ -113,7 +113,17 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleRoomJoinSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        uiHandler.showNovelRoomModalUI();
+        try {
+            JsonObject novelRoomObject = jsonObject.getAsJsonObject("novelRoom");
+            if (novelRoomObject == null) {
+                throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
+            }
+            int novelRoomId = novelRoomObject.get("novelRoomId").getAsInt();
+            uiHandler.showNovelRoomModalUI(novelRoomId);
+        } catch (Exception e) {
+            System.err.println("handleRoomJoinSuccess 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void enqueueMessage(JsonObject jsonObject) {
