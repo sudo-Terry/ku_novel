@@ -62,6 +62,7 @@ public class ClientListenerThread extends Thread {
             case "ROOM_FETCH_BY_TITLE_FAILED" -> handleRoomFetchByTitleFailed(jsonObject, uiHandler);
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
             case "ROOM_CREATE_SUCCESS" -> handleRoomCreateSuccess(jsonObject, uiHandler);
+            case "MESSAGE_RECEIVE" -> handleChatMessageReceive(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
     }
@@ -130,6 +131,22 @@ public class ClientListenerThread extends Thread {
             uiHandler.showNovelRoomModalUI(dataModel.getCurrentRoomId());
         } catch (Exception e) {
             System.err.println("handleRoomJoinSuccess 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleChatMessageReceive(JsonObject jsonObject, UIHandler uiHandler) {
+        try {
+            int roomId = jsonObject.get("novelRoomId").getAsInt();
+            // String userId = jsonObject.get("sender").getAsString(); // 필요한가? 일단 보류
+            String nickname = jsonObject.get("nickname").getAsString();
+            String content = jsonObject.get("content").getAsString();
+
+            String formattedChat = "[" + nickname + "] : " + content;
+            uiHandler.updateNovelRoomChat(roomId, formattedChat);
+            System.out.println("Chat message processed: " + formattedChat);
+        } catch (Exception e) {
+            System.err.println("handleChatMessage 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -150,4 +150,14 @@ public class ClientSenderThread extends Thread{
 
         writer.println(refreshHomeMessage.toJson());
     }
+
+    public void requestNovelRoomMessageSend(String SenderId, int novelRoomId, String content) {
+        Message novelRoomChatMessage = new Message();
+        novelRoomChatMessage.setType(MessageType.MESSAGE_SEND);
+        novelRoomChatMessage.setSender(SenderId);
+        novelRoomChatMessage.setNovelRoomId(novelRoomId);
+        novelRoomChatMessage.setContent(content);
+
+        writer.println(novelRoomChatMessage.toJson());
+    }
 }
