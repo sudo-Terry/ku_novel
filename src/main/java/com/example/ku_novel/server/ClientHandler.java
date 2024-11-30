@@ -345,7 +345,7 @@ class ClientHandler implements Runnable {
                 roomUsers.putIfAbsent(roomId, new HashSet<>());
                 roomUsers.get(roomId).add(message.getSender());
             }
-            
+
         } catch (Exception e) {
             responseMessage.setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
         }
@@ -378,27 +378,34 @@ class ClientHandler implements Runnable {
     }
 
     private void handleChatMessage(Message message) {
-        // 채팅 메시지 처리 로직
-        System.out.println("Chat message received.");
+        try {
+            // 채팅 메시지 처리 로직
+            System.out.println("Chat message received.");
 
-        int roomId = message.getNovelRoomId();
-        String sender = message.getSender();
-        String content = message.getContent();
+            int roomId = message.getNovelRoomId();
+            String sender = message.getSender();
 
-        synchronized (roomUsers) {
-            if (!roomUsers.containsKey(roomId)) return;
+            User user = userService.findById(sender);
+            String nickname = user.getNickname();
+            String content = message.getContent();
 
-            Set<String> usersInRoom = roomUsers.get(roomId);
-            synchronized (activeClients) {
-                for (String userId : usersInRoom) {
-                    PrintWriter writer = activeClients.get(userId);
-                    if (writer != null) {
-                        Message responseMessage = new Message().setType(MessageType.RECEIVED_MESSAGE).setContent(content).setSender(sender);
-                        responseMessage.setNovelRoomId(roomId);
-                        sendMessageToWriter(writer, responseMessage);
+            synchronized (roomUsers) {
+                if (!roomUsers.containsKey(roomId)) return;
+
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                synchronized (activeClients) {
+                    for (String userId : usersInRoom) {
+                        PrintWriter writer = activeClients.get(userId);
+                        if (writer != null) {
+                            Message responseMessage = new Message().setType(MessageType.RECEIVED_MESSAGE).setContent(content).setSender(sender);
+                            responseMessage.setNovelRoomId(roomId);
+                            responseMessage.setNickname(nickname);
+                            sendMessageToWriter(writer, responseMessage);
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
         }
     }
 
