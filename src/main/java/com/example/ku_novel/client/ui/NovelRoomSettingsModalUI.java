@@ -16,8 +16,9 @@ public class NovelRoomSettingsModalUI extends JDialog {
     private JTextArea descriptionArea;
     private JCheckBox endNovelCheckbox;
 
-    public NovelRoomSettingsModalUI() {
-        setTitle("소설방 설정");
+    public NovelRoomSettingsModalUI(JDialog parent) {
+        super(parent, "설정", true);
+        setLocationRelativeTo(parent);
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setModal(true);
