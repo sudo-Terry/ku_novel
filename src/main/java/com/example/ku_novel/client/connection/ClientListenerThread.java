@@ -52,16 +52,31 @@ public class ClientListenerThread extends Thread {
     private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
         switch (messageType) {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
-            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED"-> uiHandler.showAlertModal(
+            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED"-> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
+            case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_SUCCESS" -> handleRoomFetchByTitleSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_FAILED" -> handleRoomFetchByTitleFailed(jsonObject, uiHandler);
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleRefreshHomeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        System.out.println("새로고침 실행");
+
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        dataModel.setUserId(jsonObject.get("sender").getAsString());
+        dataModel.setPassword(jsonObject.get("password").getAsString());
+        dataModel.setUserName(jsonObject.get("nickname").getAsString());
+        dataModel.setUserPoint(jsonObject.get("point").getAsString());
+        dataModel.setChatRoomsFromJson(jsonObject);
+
+        uiHandler.repaintMainUI();
     }
 
     private void handleLoginSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -75,8 +90,7 @@ public class ClientListenerThread extends Thread {
         dataModel.setUserPoint(jsonObject.get("point").getAsString());
         dataModel.setChatRoomsFromJson(jsonObject);
 
-        new HomeUI();
-        uiHandler.disposeLoginUI();
+        uiHandler.repaintMainUI();
     }
 
     private void handleSignupSuccess(JsonObject jsonObject, UIHandler uiHandler) {

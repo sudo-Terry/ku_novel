@@ -142,4 +142,12 @@ public class ClientSenderThread extends Thread{
 
         writer.println(voteMessage.toJson());
     }
+
+    public void requestRefreshHome(String senderId) {
+        Message refreshHomeMessage = new Message();
+        refreshHomeMessage.setType(MessageType.REFRESH_HOME);
+        refreshHomeMessage.setSender(senderId);
+
+        writer.println(refreshHomeMessage.toJson());
+    }
 }

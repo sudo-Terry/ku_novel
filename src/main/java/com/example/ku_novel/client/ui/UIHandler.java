@@ -173,4 +173,8 @@ public class UIHandler {
             }
         });
     }
+
+    public void repaintMainUI() {
+        HomeUI.getInstance().repaintHomeUI();
+    }
 }
