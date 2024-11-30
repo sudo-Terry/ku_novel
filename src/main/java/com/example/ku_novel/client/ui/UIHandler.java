@@ -24,6 +24,7 @@ public class UIHandler {
     private RoomSearchResultsModalUI roomSearchResultsModalUI;
     private NovelInputModalUI novelInputModalUI;
     private VoteModalUI voteModalUI;
+    private NovelRoomSettingsModalUI novelRoomSettingsModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -184,5 +185,28 @@ public class UIHandler {
             novelRoomModalUI.updateChatArea(formattedMessage);
         else
             System.out.println("novelRoomId 불일치로 채팅 업데이트 불가");
+    }
+
+    public void showNovelRoomSettingsModalUI(NovelRoomModalUI frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomSettingsModalUI == null || !novelRoomSettingsModalUI.isVisible()) {
+                novelRoomSettingsModalUI = new NovelRoomSettingsModalUI();
+                novelRoomSettingsModalUI.setLocationRelativeTo(frame);
+                novelRoomSettingsModalUI.setVisible(true);
+            }else {
+                System.out.println("NovelRoomSettingsModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void disposeNovelRoomSettingsModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomSettingsModalUI != null) {
+                novelRoomSettingsModalUI.dispose();
+                novelRoomSettingsModalUI = null;
+            }else{
+                System.out.println("NovelRoomSettingsModalUI가 null입니다.");
+            }
+        });
     }
 }
