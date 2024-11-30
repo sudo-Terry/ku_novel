@@ -105,7 +105,7 @@ class ClientHandler implements Runnable {
             case ROOM_LEAVE:
                 handleLeaveRoom(message);
                 break;
-            case SEND_MESSAGE:
+            case MESSAGE_SEND:
                 handleChatMessage(message);
                 break;
             // case ROOM_STATUS_UPDATE:
@@ -407,7 +407,7 @@ class ClientHandler implements Runnable {
                     for (String userId : usersInRoom) {
                         PrintWriter writer = activeClients.get(userId);
                         if (writer != null) {
-                            Message responseMessage = new Message().setType(MessageType.RECEIVED_MESSAGE).setContent(content).setSender(sender);
+                            Message responseMessage = new Message().setType(MessageType.MESSAGE_RECEIVE).setContent(content).setSender(sender);
                             responseMessage.setNovelRoomId(roomId);
                             responseMessage.setNickname(nickname);
                             sendMessageToWriter(writer, responseMessage);
