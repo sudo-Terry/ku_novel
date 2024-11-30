@@ -187,11 +187,10 @@ public class UIHandler {
             System.out.println("novelRoomId 불일치로 채팅 업데이트 불가");
     }
 
-    public void showNovelRoomSettingsModalUI(NovelRoomModalUI frame) {
+    public void showNovelRoomSettingsModalUI(NovelRoomModalUI dialog) {
         SwingUtilities.invokeLater(() -> {
             if (novelRoomSettingsModalUI == null || !novelRoomSettingsModalUI.isVisible()) {
-                novelRoomSettingsModalUI = new NovelRoomSettingsModalUI();
-                novelRoomSettingsModalUI.setLocationRelativeTo(frame);
+                novelRoomSettingsModalUI = new NovelRoomSettingsModalUI(dialog);
                 novelRoomSettingsModalUI.setVisible(true);
             }else {
                 System.out.println("NovelRoomSettingsModalUI 이미 열려 있음");
