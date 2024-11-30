@@ -72,5 +72,21 @@ public class UserService {
             user.setPoint(user.getPoint() - 500);
             userRepository.save(user); 
             return true;
+    }
+
+    public void attendanceCheck(String id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. : " + id));
+
+        LocalDateTime lastAttendance = user.getLastAttendance();
+        LocalDateTime today = LocalDateTime.now();
+
+        if (lastAttendance != null && lastAttendance.toLocalDate().isEqual(today.toLocalDate())) {
+            throw new IllegalStateException("이미 오늘 출석 체크를 완료했습니다.");
         }
+
+        user.setPoint(user.getPoint() + 100);
+        user.setLastAttendance(today);
+        userRepository.save(user);
+    }
 }
