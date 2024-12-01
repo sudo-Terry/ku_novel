@@ -45,6 +45,7 @@ public class Message {
     private int submissionDuration;
     private int maxParticipants;
     private int voteChoice;
+    private int participantsCount;
 //    private boolean isParticipating; // 안씀
 
     /// 투표 관련
@@ -93,6 +94,7 @@ public class Message {
         return this;
     }
 
+
     public Message setPassword(String password) {
         this.password = password;
         return this;
@@ -106,6 +108,11 @@ public class Message {
     public String toJson() {
         Gson gson = new GsonBuilder().create();
         return gson.toJson(this);
+    }
+
+    public Message setParticipantsCount(int participantsCount) {
+        this.participantsCount = participantsCount;
+        return this;
     }
 
     @Override

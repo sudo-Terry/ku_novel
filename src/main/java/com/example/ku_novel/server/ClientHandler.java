@@ -11,7 +11,6 @@ import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.example.ku_novel.service.VoteService;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 class ClientHandler implements Runnable {
@@ -102,8 +101,8 @@ class ClientHandler implements Runnable {
                 break;
             case ATTENDANCE_CHECK:
                 handleAttendance(message);
-            case DOWNLOAD_FETCH:
-                handleDownload();
+            case ROOM_FETCH_DEACTIVATE:
+                handleDeactivateRoom();
             case ROOM_JOIN:
                 handleJoinRoom(message);
                 handleGetRoomById(message);
@@ -114,6 +113,8 @@ class ClientHandler implements Runnable {
             case MESSAGE_SEND:
                 handleChatMessage(message);
                 break;
+            case ROOM_MODIFY_SETTING:
+                handleModifyRoomSetting(message);
             // case ROOM_STATUS_UPDATE:
             // handleUpdateRoomStatus(message);
             // break;
@@ -297,7 +298,7 @@ class ClientHandler implements Runnable {
             NovelRoom room = novelRoomService.getNovelRoomById(message.getNovelRoomId())
                     .orElseThrow(() -> new IllegalArgumentException("소설 방을 찾을 수 없습니다."));
             JsonObject roomJson = new Gson().toJsonTree(room).getAsJsonObject();
-            roomJson.addProperty("currentParticipants", room.getCurrentParticipantCount());
+
             responseMessage.setType(MessageType.ROOM_FETCH_BY_ID_SUCCESS);
             responseMessage.setContent("소설 방 조회에 성공하였습니다.");
             responseMessage.setJson(roomJson.toString());
@@ -358,24 +359,49 @@ class ClientHandler implements Runnable {
     // 소설방 참가 로직
     private void handleJoinRoom(Message message) {
         Integer roomId = message.getNovelRoomId();
-        Message responseMessage = new Message().setType(MessageType.ROOM_JOIN_FAILED);
+        String sender = message.getSender();
+
+        // 기본 실패 응답 메시지
+        Message responseMessage = new Message()
+                .setType(MessageType.ROOM_JOIN_FAILED)
+                .setContent("소설 방 참가에 실패했습니다.");
 
         try {
-            Optional<NovelRoom> novelRoom = novelRoomService.getNovelRoomById(roomId);
-            novelRoom.ifPresent(room -> responseMessage.setType(MessageType.ROOM_JOIN_SUCCESS).setContent("소설 방 참가에 성공했습니다.").setNovelRoom(room.toMessage()));
+            // 소설방 정보 확인
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
 
-            // 소설방 사용자 관리
-            synchronized (roomUsers) {
-                roomUsers.putIfAbsent(roomId, new HashSet<>());
-                roomUsers.get(roomId).add(message.getSender());
+            if (novelRoomOpt.isPresent()) {
+                // 소설방 사용자 관리
+                synchronized (roomUsers) {
+                    roomUsers.putIfAbsent(roomId, new HashSet<>());
+                    roomUsers.get(roomId).add(sender);
+                }
+
+                // 현재 참여자 수 계산
+                int participantCount;
+                synchronized (roomUsers) {
+                    participantCount = roomUsers.get(roomId).size();
+                }
+
+                // 성공 응답 메시지 생성
+                responseMessage = new Message()
+                        .setType(MessageType.ROOM_JOIN_SUCCESS)
+                        .setContent("소설 방 참가에 성공했습니다.")
+                        .setParticipantsCount(participantCount); // 현재 참여자 수 설정
+
+                System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
+            } else {
+                responseMessage.setContent("소설 방을 찾을 수 없습니다.");
             }
-
         } catch (Exception e) {
-            responseMessage.setContent("소설 방 참가에 실패했습니다: " + e.getMessage());
+            responseMessage.setContent("소설 방 참가 처리 중 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace();
         }
 
+        // 클라이언트에 응답 전송
         sendMessageToCurrentClient(responseMessage);
     }
+
 
     /* 출석 로직 */
     private void handleAttendance(Message message) {
@@ -396,19 +422,27 @@ class ClientHandler implements Runnable {
 
     /* 완결 상태 소설방 목록 조회 로직 */
 
-    private void handleDownload() {
+    private void handleDeactivateRoom() {
 
         List<NovelRoom> deactivateRooms = novelRoomService.getDeactivateRoom();
         Message responseMessage = new Message();
         try {
-            responseMessage.setType(MessageType.DOWNLOAD_FETCH_SUCCESS)
+            responseMessage.setType(MessageType.ROOM_FETCH_DEACTIVATE_SUCCESS)
                     .setContent("완결 상태 소설 목록 조회 성공")
                     .setJson(new Gson().toJson(deactivateRooms));
         } catch (Exception e) {
-            responseMessage.setType(MessageType.DOWNLOAD_FETCH_FAILED)
+            responseMessage.setType(MessageType.ROOM_FETCH_DEACTIVATE_FAILED)
                     .setContent("완결 상태 소설 목록 조회 실패");
         }
         sendMessageToCurrentClient(responseMessage);
+    }
+
+    /* 소설방 설정 변경 로직 */
+
+    private void handleModifyRoomSetting(Message message) {
+
+        Message responseMessage = new Message();
+
     }
 
     // 소설방 나가기 로직
