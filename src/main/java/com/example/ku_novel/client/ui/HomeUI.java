@@ -2,10 +2,7 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
-import com.example.ku_novel.client.ui.component.CircularImage;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.NovelColor;
-import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.ui.component.*;
 import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
@@ -98,7 +95,7 @@ public class HomeUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        downloadButton = createIconButton("src/main/resources/icon/download.png", Color.LIGHT_GRAY);
+        downloadButton = new ImageButton("src/main/resources/icon/download.png", Color.LIGHT_GRAY);
         downloadButton.addActionListener(e -> UIHandler.getInstance().showDownloadModal(HomeUI.this));
         leftButtonPanel.add(downloadButton, gbc);
 
@@ -110,7 +107,7 @@ public class HomeUI extends JFrame {
         // 랭킹 버튼
         gbc.gridx = 1;
         gbc.gridy = 0;
-        rankingButton = createIconButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
+        rankingButton = new ImageButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
         leftButtonPanel.add(rankingButton, gbc);
 
         JLabel rankingLabel = new JLabel("랭킹");
@@ -121,7 +118,7 @@ public class HomeUI extends JFrame {
         // 출석 체크 버튼
         gbc.gridx = 2;
         gbc.gridy = 0;
-        attendanceButton = createIconButton("src/main/resources/icon/calender.png", Color.LIGHT_GRAY);
+        attendanceButton = new ImageButton("src/main/resources/icon/calender.png", Color.LIGHT_GRAY);
         attendanceButton.addActionListener(e-> {
             ClientSenderThread.getInstance().requestAttendanceCheck(
                 ClientDataModel.getInstance().getUserId()
@@ -147,7 +144,7 @@ public class HomeUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        searchButton = createIconButton("src/main/resources/icon/search.png", NovelColor.DARK_GREEN);
+        searchButton = new ImageButton("src/main/resources/icon/search.png", NovelColor.DARK_GREEN);
         searchButton.addActionListener(e -> UIHandler.getInstance().showRoomSearchModal(HomeUI.this));
         rightButtonPanel.add(searchButton, gbc);
 
@@ -159,7 +156,7 @@ public class HomeUI extends JFrame {
         // 소설방 만들기 버튼
         gbc.gridx = 1;
         gbc.gridy = 0;
-        createButton = createIconButton("src/main/resources/icon/plus.png", NovelColor.DARK_GREEN);
+        createButton = new ImageButton("src/main/resources/icon/plus.png", NovelColor.DARK_GREEN);
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -176,7 +173,7 @@ public class HomeUI extends JFrame {
         // my page 버튼
         gbc.gridx = 2;
         gbc.gridy = 0;
-        myButton = createIconButton("src/main/resources/icon/my.png", NovelColor.DARK_GREEN);
+        myButton = new ImageButton("src/main/resources/icon/my.png", NovelColor.DARK_GREEN);
         myButton.addActionListener(e->showMyPage());
         rightButtonPanel.add(myButton, gbc);
 
@@ -189,7 +186,7 @@ public class HomeUI extends JFrame {
         // 새로고침 버튼
         gbc.gridx = 3;
         gbc.gridy = 0;
-        createButton = createIconButton("src/main/resources/icon/refresh.png", NovelColor.DARK_GREEN);
+        createButton = new ImageButton("src/main/resources/icon/refresh.png", NovelColor.DARK_GREEN);
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -379,7 +376,7 @@ public class HomeUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        homeButton = createIconButton("src/main/resources/icon/home.png", NovelColor.DARK_GREEN);
+        homeButton = new ImageButton("src/main/resources/icon/home.png", NovelColor.DARK_GREEN);
         homeButton.addActionListener(e->showHome());
         homeButtonPanel.add(homeButton, gbc);
 
@@ -546,20 +543,6 @@ public class HomeUI extends JFrame {
         contentRightPanel.add(allRoomsPanel);
 
         refreshPanels();
-    }
-
-    private JButton createIconButton(String iconPath, Color background) {
-        JButton button = new JButton(scaleIcon(iconPath, 35, 35));
-        button.setPreferredSize(new Dimension(60, 50));
-        button.setBackground(background);
-        button.setBorderPainted(false);
-        return button;
-    }
-
-    private ImageIcon scaleIcon(String path, int width, int height) {
-        ImageIcon icon = new ImageIcon(path);
-        Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        return new ImageIcon(scaledImage);
     }
 
     private void resetPanels() {

@@ -2,13 +2,15 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.NovelColor;
+import com.example.ku_novel.client.ui.component.*;
 import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +30,8 @@ public class NovelRoomModalUI extends JDialog {
 
     JButton interestButton;
     JLabel interestLabel;
+
+    JPanel mainPanel, topPanel, bottomButtonPanel;
 
     JTextArea chatTextArea;
 
@@ -72,18 +76,18 @@ public class NovelRoomModalUI extends JDialog {
         revalidate();
 
         //============= 메인 패널
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel = new JPanel(new BorderLayout());
         add(mainPanel);
 
         //============= 상단 패널
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         topPanel.setPreferredSize(new Dimension(1080, 100));
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
         topPanel.setBackground(Color.WHITE);
 
         JPanel novelInfoPanel = new JPanel();
         novelInfoPanel.setLayout(new BoxLayout(novelInfoPanel, BoxLayout.Y_AXIS));
-        novelInfoPanel.setPreferredSize(new Dimension(300, 100));
+        novelInfoPanel.setPreferredSize(new Dimension(820, 100));
         novelInfoPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         novelInfoPanel.setOpaque(false);
 
@@ -99,194 +103,100 @@ public class NovelRoomModalUI extends JDialog {
         topPanel.add(novelInfoPanel);
 
         // 소설 참여 인원 수
-        JButton participantButton = new JButton("1,000", scaleIcon("src/main/resources/icon/eyes.png", 20, 20));
-        participantButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        participantButton.setPreferredSize(new Dimension(100, 40));
+        JButton participantButton = new JButton("  1,000", scaleIcon("src/main/resources/icon/eyes.png", 20, 20));
+        participantButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        participantButton.setPreferredSize(new Dimension(120, 40));
         participantButton.setBackground(Color.WHITE);
-        participantButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
+        participantButton.setBorder(new LineBorder(NovelColor.DARK_GREEN, 2));
         topPanel.add(participantButton);
-
-        // 상단 버튼 패널
-        JPanel topButtonPanel = new JPanel(new GridBagLayout());
-        topButtonPanel.setPreferredSize(new Dimension(250, 90));
-        topButtonPanel.setBackground(Color.WHITE);
-
-        GridBagConstraints topGbc = new GridBagConstraints();
-        topGbc.insets = new Insets(5, 15, 0, 0);
-
-        // 소설 저장 버튼
-        topGbc.gridx = 0;
-        topGbc.gridy = 0;
-        topGbc.anchor = GridBagConstraints.CENTER;
-        JButton saveButton = createIconButton("src/main/resources/icon/download.png", NovelColor.DARK_GREEN);
-        topButtonPanel.add(saveButton, topGbc);
-
-        JLabel saveLabel = new JLabel("다운로드");
-        saveLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        topGbc.gridy = 1;
-        topButtonPanel.add(saveLabel, topGbc);
-
-        // 관심 소설 버튼
-        topGbc.gridx = 1;
-        topGbc.gridy = 0;
-        interestButton = createIconButton("src/main/resources/icon/ranking.png", NovelColor.DARK_GREEN);
-        interestButton.addActionListener(e->clickInterestNovel());
-        topButtonPanel.add(interestButton, topGbc);
-
-        interestLabel = new JLabel("관심 소설 등록");
-        interestLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        topGbc.gridy = 1;
-        topButtonPanel.add(interestLabel, topGbc);
-
-        setInterestButton(isInterested);
-
-        // 소설방 설정 버튼
-        JButton settingButton = createIconButton("src/main/resources/icon/calender.png", NovelColor.DARK_GREEN);
-        topGbc.gridx = 2;
-        topGbc.gridy = 0;
-        topButtonPanel.add(settingButton, topGbc);
-
-        // 방장만 소설방 설정 변경
-        if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())){
-            settingButton.setEnabled(false);
-        }
-
-        settingButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UIHandler.getInstance().showNovelRoomSettingsModalUI(NovelRoomModalUI.this);
-            }
-        });
-
-        JLabel settingLabel = new JLabel("설정");
-        settingLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        topGbc.gridy = 1;
-        topButtonPanel.add(settingLabel, topGbc);
-
-        topPanel.add(topButtonPanel);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-
         //============= 콘텐츠 패널
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 25, 25));
-
-        // 소설방 버튼 섹션
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setPreferredSize(new Dimension(1000, 80));
-
-        // 현재 소설가 버튼
-        JButton authorButton = new JButton("현재 소설가 목록");
-        authorButton.setPreferredSize(new Dimension(120, 40));
-        authorButton.setBackground(Color.WHITE);
-        authorButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        buttonPanel.add(authorButton);
-        authorButton.addActionListener(e -> {
-            String participantIds = Arrays.toString(ClientDataModel.getInstance().getNovelParticipantIds());
-            UIHandler.getInstance().showAlertModal(
-                    this, "정보", "현재 소설가는 " + participantIds + " 입니다.", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        // 소설가 신청 버튼
-        JButton applyAuthorButton = new JButton("소설가 신청");
-        applyAuthorButton.setPreferredSize(new Dimension(120, 40));
-        applyAuthorButton.setBackground(Color.WHITE);
-        applyAuthorButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        buttonPanel.add(applyAuthorButton);
-        applyAuthorButton.addActionListener(e -> ClientSenderThread.getInstance().requestAuthorApply(
-                ClientDataModel.getInstance().getUserId(),
-                ClientDataModel.getInstance().getCurrentRoomId()
-        ));
-        applyAuthorButton.setEnabled(true);
-
-        // 소설가는 소설가 신청 버튼 비활성화
-        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
-            if (str.equals(ClientDataModel.getInstance().getUserId())) {
-                applyAuthorButton.setEnabled(false);
-            }
-        }
-
-
-        // 소설 작성 버튼
-        JButton writeButton = new JButton("(소설가) 소설 작성");
-        writeButton.setPreferredSize(new Dimension(120, 40));
-        writeButton.setBackground(Color.WHITE);
-        writeButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        buttonPanel.add(writeButton);
-        writeButton.setEnabled(false);
-
-        // 소설가만 소설작성 버튼 활성화
-        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
-            if (str.equals(ClientDataModel.getInstance().getUserId())) {
-                writeButton.setEnabled(true);
-            }
-        }
-
-        writeButton.addActionListener(e-> {
-            UIHandler.getInstance().showNovelInputModal(NovelRoomModalUI.this);
-        });
-
-        // 투표 버튼
-        JButton voteButton = new JButton("(일반) 투표");
-        voteButton.setPreferredSize(new Dimension(120, 40));
-        voteButton.setBackground(Color.WHITE);
-        voteButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        buttonPanel.add(voteButton);
-
-        voteButton.addActionListener(e-> {
-            UIHandler.getInstance().showVoteModal(NovelRoomModalUI.this);
-        });
-
-        contentPanel.add(buttonPanel);
+        JPanel contentPanel = new JPanel(new GridLayout(1, 2));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 25, 25, 25));
+        contentPanel.setBackground(Color.WHITE);
 
         //============= 1. "소설" 섹션
-        JPanel scrollPanel = new JPanel(new GridLayout(1, 2));
-
         JPanel novelPanel = new JPanel();
         novelPanel.setLayout(new BoxLayout(novelPanel, BoxLayout.Y_AXIS));
+        novelPanel.setBackground(Color.WHITE);
+
+        JPanel novelTitlePanel = new JPanel();
+        novelTitlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        novelTitlePanel.setMaximumSize(new Dimension(120, 30));
+        novelTitlePanel.setBackground(Color.WHITE);
+        JLabel novelTitleLabel = new JLabel("소설");
+        novelTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        novelTitlePanel.add(novelTitleLabel);
+        novelPanel.add(novelTitlePanel);
 
         // 소설 내용
-        JTextArea novelTextArea = new JTextArea();
-        novelTextArea.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        novelTextArea.setBorder(null);
-        novelTextArea.setEditable(false);
-        novelTextArea.setLineWrap(true); // 줄바꿈 활성화
-        novelTextArea.setWrapStyleWord(true); // 단어 단위로 줄바꿈
+        JTextPane novelTextPane = new JTextPane();
+        novelTextPane.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        novelTextPane.setBorder(null);
+        novelTextPane.setEditable(false);
+
+        // 텍스트 여백 설정
+        novelTextPane.setMargin(new Insets(10, 10, 10, 10)); // 상, 좌, 하, 우 여백
+
+        // 텍스트 스타일 설정
+        StyledDocument doc = novelTextPane.getStyledDocument();
+        SimpleAttributeSet paragraphAttributes = new SimpleAttributeSet();
+        StyleConstants.setLineSpacing(paragraphAttributes, 0.2f); // 줄 간격
+        StyleConstants.setLeftIndent(paragraphAttributes, 10);    // 왼쪽 들여쓰기
+        StyleConstants.setRightIndent(paragraphAttributes, 10);   // 오른쪽 들여쓰기
+        StyleConstants.setSpaceAbove(paragraphAttributes, 10);    // 문단 위 간격
+        StyleConstants.setSpaceBelow(paragraphAttributes, 10);    // 문단 아래 간격
+        doc.setParagraphAttributes(0, doc.getLength(), paragraphAttributes, false);
 
         // 스크롤 추가
-        JScrollPane novelScrollPane = new JScrollPane(novelTextArea);
+        JScrollPane novelScrollPane = new JScrollPane(novelTextPane);
         novelScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        novelScrollPane.setBorder(null);
+        novelScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        novelScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
+
+        // 스크롤 뷰포트 여백 (옵션)
+        // 뷰포트에 여백을 적용하기 위해 JTextPane 자체에 EmptyBorder를 추가
+        novelTextPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 상, 좌, 하, 우 여백
 
         // 자동 스크롤 활성화
-        DefaultCaret novelCaret = (DefaultCaret) novelTextArea.getCaret();
+        DefaultCaret novelCaret = (DefaultCaret) novelTextPane.getCaret();
         novelCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        // 소설 내용
-        novelTextArea.append(roomId + "\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
-        novelTextArea.append("옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n");
-        novelTextArea.append("그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n");
+        // 소설 내용 추가
+        try {
+            doc.insertString(doc.getLength(), roomId + "\n", null);
+            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
+            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        // 패널에 추가
         novelPanel.add(novelScrollPane);
 
-        scrollPanel.add(novelPanel);
+        contentPanel.add(novelPanel);
 
         //============= 2. "관심 소설방" 섹션
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+
+        JPanel chatTitlePanel = new JPanel();
+        chatTitlePanel.setBackground(Color.WHITE);
+        chatTitlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JLabel chatTitleLabel = new JLabel("채팅");
+        chatTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        chatTitlePanel.add(chatTitleLabel);
+        chatPanel.add(chatTitlePanel);
 
 //        // 인기 채팅
 //        JTextArea bestChatTextArea = new JTextArea(2, 40);
@@ -310,19 +220,26 @@ public class NovelRoomModalUI extends JDialog {
         chatTextArea.setFont(FontSetting.getInstance().loadCustomFont(20f));
         chatTextArea.setEditable(false);
         chatTextArea.setLineWrap(true); // 줄바꿈 활성화
+        chatTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 상, 좌, 하, 우 여백
 
         // 스크롤을 추가
         JScrollPane chatScrollPane = new JScrollPane(chatTextArea);
         novelScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        chatScrollPane.setBorder(null);
+        chatScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        chatScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 
         // 자동 스크롤 활성화
         DefaultCaret chatCaret = (DefaultCaret) chatTextArea.getCaret();
         chatCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // 채팅 입력
-        JTextField inputField = new JTextField();
-        JButton sendButton = new JButton("전송");
+        JTextField inputField = new CustomizedTextField("");
+        inputField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        inputField.setPreferredSize(new Dimension(120, 45));
+
+        JButton sendButton = new RoundedButton("전송", NovelColor.DARK_GREEN, Color.WHITE);
+        sendButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        sendButton.setPreferredSize(new Dimension(70, 45));
         sendButton.addActionListener(e -> {
             String inputText = inputField.getText().trim();
             if (!inputText.isEmpty()) {
@@ -340,6 +257,7 @@ public class NovelRoomModalUI extends JDialog {
 
         // 하단 패널
         JPanel inputPanel = new JPanel(new BorderLayout());
+        inputPanel.setBackground(Color.WHITE);
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
 
@@ -347,11 +265,170 @@ public class NovelRoomModalUI extends JDialog {
         chatPanel.add(chatScrollPane);
         chatPanel.add(inputPanel);
 
-        scrollPanel.add(chatPanel);
-        contentPanel.add(scrollPanel);
+        contentPanel.add(chatPanel);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
+        //=========== 하단 버튼 패널
+        initBottomPanel();
+        topPanel.add(bottomButtonPanel);
+        mainPanel.add(bottomButtonPanel,BorderLayout.SOUTH);
+
         setVisible(true);
+    }
+
+    private void initBottomPanel() {
+        bottomButtonPanel = new JPanel(new GridBagLayout());
+        bottomButtonPanel.setPreferredSize(new Dimension(250, 90));
+        bottomButtonPanel.setBackground(NovelColor.BLACK_GREEN);
+
+        GridBagConstraints bottomGbc = new GridBagConstraints();
+        bottomGbc.insets = new Insets(5, 15, 0, 15);
+
+        // 소설방 설정 버튼
+        JButton settingButton = new ImageButton("src/main/resources/icon/setting.png", Color.WHITE);
+
+        JLabel settingLabel = new JLabel("설정");
+        settingLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        settingLabel.setForeground(Color.WHITE);
+
+        // 방장만 소설방 설정 변경
+        if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())){
+            settingButton.setBackground(NovelColor.BLACK_GREEN);
+            settingButton.setEnabled(false);
+            settingLabel.setForeground(NovelColor.BLACK_GREEN);
+        }
+
+        settingButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIHandler.getInstance().showNovelRoomSettingsModalUI(NovelRoomModalUI.this);
+            }
+        });
+
+        bottomGbc.gridx = 0;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(settingButton, bottomGbc);
+
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(settingLabel, bottomGbc);
+
+        // 소설가 신청 버튼
+        ImageButton applyAuthorButton = new ImageButton("src/main/resources/icon/hand.png", Color.WHITE);
+        applyAuthorButton.addActionListener(e -> ClientSenderThread.getInstance().requestAuthorApply(
+                ClientDataModel.getInstance().getUserId(),
+                ClientDataModel.getInstance().getCurrentRoomId()
+        ));
+        applyAuthorButton.setEnabled(true);
+
+        JLabel applyAuthorLabel = new JLabel("소설가 신청");
+        applyAuthorLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        applyAuthorLabel.setForeground(Color.WHITE);
+
+        // 소설가는 소설가 신청 버튼 비활성화
+        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
+            if (str.equals(ClientDataModel.getInstance().getUserId())) {
+                applyAuthorLabel.setForeground(NovelColor.BLACK_GREEN);
+                applyAuthorButton.setBackground(NovelColor.BLACK_GREEN);
+                applyAuthorButton.setEnabled(false);
+            }
+        }
+
+        bottomGbc.gridx = 1;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(applyAuthorButton, bottomGbc);
+
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(applyAuthorLabel, bottomGbc);
+
+        // 현재 소설가 버튼
+        JButton authorButton = new ImageButton("src/main/resources/icon/people.png", Color.WHITE);
+        authorButton.addActionListener(e -> {
+            String participantIds = Arrays.toString(ClientDataModel.getInstance().getNovelParticipantIds());
+            UIHandler.getInstance().showAlertModal(
+                    this, "정보", "현재 소설가는 " + participantIds + " 입니다.", JOptionPane.INFORMATION_MESSAGE);
+        });
+        bottomGbc.gridx = 2;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(authorButton, bottomGbc);
+
+        JLabel authorLabel = new JLabel("소설가 목록");
+        authorLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        authorLabel.setForeground(Color.WHITE);
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(authorLabel, bottomGbc);
+
+        // 투표 버튼
+        JButton voteButton = new ImageButton("src/main/resources/icon/vote.png", Color.WHITE);
+        voteButton.addActionListener(e-> {
+            UIHandler.getInstance().showVoteModal(NovelRoomModalUI.this);
+        });
+
+        bottomGbc.gridx = 3;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(voteButton, bottomGbc);
+
+        JLabel voteLabel = new JLabel("투표");
+        voteLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        voteLabel.setForeground(Color.WHITE);
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(voteLabel, bottomGbc);
+
+        // 관심 소설 버튼
+        interestButton = new ImageButton("src/main/resources/icon/heart.png", Color.WHITE);
+        interestButton.addActionListener(e->clickInterestNovel());
+        bottomGbc.gridx = 4;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(interestButton, bottomGbc);
+
+        interestLabel = new JLabel("관심 등록");
+        interestLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        interestLabel.setForeground(Color.WHITE);
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(interestLabel, bottomGbc);
+
+        setInterestButton(isInterested);
+
+        // 소설 저장 버튼
+        bottomGbc.gridx = 5;
+        bottomGbc.gridy = 0;
+        bottomGbc.anchor = GridBagConstraints.CENTER;
+        JButton saveButton = new ImageButton("src/main/resources/icon/download.png", NovelColor.BLACK_GREEN);
+        saveButton.setEnabled(false);
+        bottomButtonPanel.add(saveButton, bottomGbc);
+
+        JLabel saveLabel = new JLabel("다운로드");
+        saveLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        saveLabel.setForeground(NovelColor.BLACK_GREEN);
+        bottomGbc.gridy = 1;
+        bottomButtonPanel.add(saveLabel, bottomGbc);
+
+        // 소설 작성 버튼
+        ImageButton writeButton = new ImageButton("src/main/resources/icon/writing.png", NovelColor.BLACK_GREEN);
+        writeButton.setEnabled(false);
+
+        bottomGbc.gridx = 6;
+        bottomGbc.gridy = 0;
+        bottomButtonPanel.add(writeButton, bottomGbc);
+
+        JLabel writeLabel = new JLabel("소설 작성");
+        writeLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        bottomGbc.gridy = 1;
+        writeLabel.setForeground(NovelColor.BLACK_GREEN);
+
+        // 소설가만 소설작성 버튼 활성화
+        for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
+            if (str.equals(ClientDataModel.getInstance().getUserId())) {
+                writeButton.setBackground(Color.WHITE);
+                writeButton.setEnabled(true);
+                writeLabel.setForeground(Color.WHITE);
+            }
+        }
+
+        writeButton.addActionListener(e-> {
+            UIHandler.getInstance().showNovelInputModal(NovelRoomModalUI.this);
+        });
+        bottomButtonPanel.add(writeLabel, bottomGbc);
+
     }
 
     private void clickInterestNovel() {
@@ -366,20 +443,12 @@ public class NovelRoomModalUI extends JDialog {
 
     private void setInterestButton(boolean isInterested) {
         if(isInterested) {
-            interestButton.setBackground(NovelColor.DARK_GREEN);
-            interestLabel.setText("관심 소설 해제");
+            interestButton.setIcon(scaleIcon("src/main/resources/icon/heart.png", 35, 35));
+            interestLabel.setText("관심 해제");
         } else {
-            interestButton.setBackground(Color.LIGHT_GRAY);
-            interestLabel.setText("관심 소설 등록");
+            interestButton.setIcon(scaleIcon("src/main/resources/icon/emptyheart.png", 35, 35));
+            interestLabel.setText("관심 등록");
         }
-    }
-
-    private JButton createIconButton(String iconPath, Color background) {
-        JButton button = new JButton(scaleIcon(iconPath, 35, 35));
-        button.setPreferredSize(new Dimension(60, 50));
-        button.setBackground(background);
-        button.setBorderPainted(false);
-        return button;
     }
 
     private ImageIcon scaleIcon(String path, int width, int height) {
