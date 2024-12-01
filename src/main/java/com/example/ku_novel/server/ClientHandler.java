@@ -128,7 +128,7 @@ class ClientHandler implements Runnable {
         }
 
         // vote 테스트
-//        message.setVoteId(5);
+//        message.setNovelVoteId(5);
 //        handleVote(message);
     }
 
@@ -137,7 +137,7 @@ class ClientHandler implements Runnable {
 
         try {
             String userId = message.getSender();
-            int voteId = message.getVoteId();
+            int voteId = message.getNovelVoteId();
             Vote vote = voteService.getVoteById(voteId);
 //            System.out.println(vote.toMessage());
 

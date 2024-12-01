@@ -51,8 +51,6 @@ public class Message {
 
     /// 투표 관련
     private Message vote; // 투표 정보
-
-    private int voteId;
     private String contentOptions;
     private String voteStatus; // WRITER_ENABLED || VOTING_ENABLED || VOTE_COMPLETED
     private int countDown;
