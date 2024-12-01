@@ -129,6 +129,7 @@ class ClientHandler implements Runnable {
 
         // vote 테스트
 //        message.setNovelVoteId(5);
+//        message.setNovelRoomId(5);
 //        handleVote(message);
     }
 
@@ -157,6 +158,11 @@ class ClientHandler implements Runnable {
                 default:
                     break;
             }
+
+            // 이전 소설 내용도 응답.
+            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(message.getNovelRoomId());
+            room.ifPresent(novelRoom -> responseMessage.setNovelContent(novelRoom.getNovelContent()));
+
             responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_SUCCESS).setVote(vote.toMessage());
         } catch (Exception e){
             responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_FAILED);
