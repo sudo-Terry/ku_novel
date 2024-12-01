@@ -2,6 +2,8 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.FontSetting;
+import com.example.ku_novel.client.ui.component.NovelColor;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -21,6 +23,12 @@ public class NovelRoomModalUI extends JDialog {
     private int roomId;
     private String roomTitle;
     private String roomDescription;
+
+    private Boolean isInterested = true; // 수정 필요
+
+    JButton interestButton;
+    JLabel interestLabel;
+
     JTextArea chatTextArea;
 
     private NovelRoomModalUI() {
@@ -53,6 +61,7 @@ public class NovelRoomModalUI extends JDialog {
         ClientDataModel dataModel = ClientDataModel.getInstance();
 
         this.roomTitle = dataModel.getNovelRoomTitle();
+        setTitle(roomTitle);
         this.roomDescription = dataModel.getNovelRoomDescription();
     }
 
@@ -74,52 +83,68 @@ public class NovelRoomModalUI extends JDialog {
 
         JPanel novelInfoPanel = new JPanel();
         novelInfoPanel.setLayout(new BoxLayout(novelInfoPanel, BoxLayout.Y_AXIS));
-        novelInfoPanel.setPreferredSize(new Dimension(600, 100));
+        novelInfoPanel.setPreferredSize(new Dimension(300, 100));
         novelInfoPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         novelInfoPanel.setOpaque(false);
 
         // 소설 제목
         JLabel titleLabel = new JLabel(roomTitle);
-        titleLabel.setFont(loadCustomFont(32f));
+        titleLabel.setFont(FontSetting.getInstance().loadCustomFont(32f));
         novelInfoPanel.add(titleLabel);
 
         // 소설 설명
         JLabel descriptionLabel = new JLabel(": " + roomDescription);
-        descriptionLabel.setFont(loadCustomFont(20f));
+        descriptionLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
         novelInfoPanel.add(descriptionLabel);
-
         topPanel.add(novelInfoPanel);
 
         // 소설 참여 인원 수
         JButton participantButton = new JButton("1,000", scaleIcon("src/main/resources/icon/eyes.png", 20, 20));
-        participantButton.setFont(loadCustomFont(16f));
+        participantButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         participantButton.setPreferredSize(new Dimension(100, 40));
         participantButton.setBackground(Color.WHITE);
         participantButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
         topPanel.add(participantButton);
 
+        // 상단 버튼 패널
+        JPanel topButtonPanel = new JPanel(new GridBagLayout());
+        topButtonPanel.setPreferredSize(new Dimension(250, 90));
+        topButtonPanel.setBackground(Color.WHITE);
+
+        GridBagConstraints topGbc = new GridBagConstraints();
+        topGbc.insets = new Insets(5, 15, 0, 0);
+
         // 소설 저장 버튼
-        JButton saveButton = new JButton("<html>소설<br>저장</html>");
-        saveButton.setPreferredSize(new Dimension(65, 65));
-        saveButton.setBackground(Color.WHITE);
-        saveButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        topPanel.add(saveButton);
+        topGbc.gridx = 0;
+        topGbc.gridy = 0;
+        topGbc.anchor = GridBagConstraints.CENTER;
+        JButton saveButton = createIconButton("src/main/resources/icon/download.png", NovelColor.DARK_GREEN);
+        topButtonPanel.add(saveButton, topGbc);
+
+        JLabel saveLabel = new JLabel("다운로드");
+        saveLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        topGbc.gridy = 1;
+        topButtonPanel.add(saveLabel, topGbc);
 
         // 관심 소설 버튼
-        JButton interestButton = new JButton("<html>관심<br>소설</html>");
-        interestButton.setPreferredSize(new Dimension(65, 65));
-        interestButton.setBackground(Color.WHITE);
-        interestButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        topPanel.add(interestButton);
+        topGbc.gridx = 1;
+        topGbc.gridy = 0;
+        interestButton = createIconButton("src/main/resources/icon/ranking.png", NovelColor.DARK_GREEN);
+        interestButton.addActionListener(e->clickInterestNovel());
+        topButtonPanel.add(interestButton, topGbc);
+
+        interestLabel = new JLabel("관심 소설 등록");
+        interestLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        topGbc.gridy = 1;
+        topButtonPanel.add(interestLabel, topGbc);
+
+        setInterestButton(isInterested);
 
         // 소설방 설정 버튼
-        JButton settingButton = new JButton("설정");
-        settingButton.setPreferredSize(new Dimension(65, 65));
-        settingButton.setBackground(Color.WHITE);
-        settingButton.setBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-        topPanel.add(settingButton);
-
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        JButton settingButton = createIconButton("src/main/resources/icon/calender.png", NovelColor.DARK_GREEN);
+        topGbc.gridx = 2;
+        topGbc.gridy = 0;
+        topButtonPanel.add(settingButton, topGbc);
 
         // 방장만 소설방 설정 변경
         if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())){
@@ -132,6 +157,16 @@ public class NovelRoomModalUI extends JDialog {
                 UIHandler.getInstance().showNovelRoomSettingsModalUI(NovelRoomModalUI.this);
             }
         });
+
+        JLabel settingLabel = new JLabel("설정");
+        settingLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        topGbc.gridy = 1;
+        topButtonPanel.add(settingLabel, topGbc);
+
+        topPanel.add(topButtonPanel);
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+
 
         //============= 콘텐츠 패널
         JPanel contentPanel = new JPanel();
@@ -214,7 +249,7 @@ public class NovelRoomModalUI extends JDialog {
 
         // 소설 내용
         JTextArea novelTextArea = new JTextArea();
-        novelTextArea.setFont(loadCustomFont(20f));
+        novelTextArea.setFont(FontSetting.getInstance().loadCustomFont(20f));
         novelTextArea.setBorder(null);
         novelTextArea.setEditable(false);
         novelTextArea.setLineWrap(true); // 줄바꿈 활성화
@@ -272,7 +307,7 @@ public class NovelRoomModalUI extends JDialog {
 
         // 채팅
         chatTextArea = new JTextArea(20, 40);
-        chatTextArea.setFont(loadCustomFont(20f));
+        chatTextArea.setFont(FontSetting.getInstance().loadCustomFont(20f));
         chatTextArea.setEditable(false);
         chatTextArea.setLineWrap(true); // 줄바꿈 활성화
 
@@ -319,14 +354,32 @@ public class NovelRoomModalUI extends JDialog {
         setVisible(true);
     }
 
-    private Font loadCustomFont(float size) {
-        try {
-            return Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/font/Pretendard-Medium.otf")).deriveFont(size);
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-            System.out.println("폰트를 로드하는 데 실패했습니다.");
-            return new Font("SansSerif", Font.PLAIN, (int) size);
+    private void clickInterestNovel() {
+        if(isInterested) {
+            isInterested = false;
+            setInterestButton(false);
+        } else {
+            isInterested = true;
+            setInterestButton(true);
         }
+    }
+
+    private void setInterestButton(boolean isInterested) {
+        if(isInterested) {
+            interestButton.setBackground(NovelColor.DARK_GREEN);
+            interestLabel.setText("관심 소설 해제");
+        } else {
+            interestButton.setBackground(Color.LIGHT_GRAY);
+            interestLabel.setText("관심 소설 등록");
+        }
+    }
+
+    private JButton createIconButton(String iconPath, Color background) {
+        JButton button = new JButton(scaleIcon(iconPath, 35, 35));
+        button.setPreferredSize(new Dimension(60, 50));
+        button.setBackground(background);
+        button.setBorderPainted(false);
+        return button;
     }
 
     private ImageIcon scaleIcon(String path, int width, int height) {
