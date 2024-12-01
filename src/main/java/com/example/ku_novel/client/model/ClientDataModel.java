@@ -13,16 +13,25 @@ import java.util.List;
 @Getter
 @Setter
 public class ClientDataModel {
+    // HomeUI 데이터
     private String userId;
     private String password;
     private String userName;
     private String userPoint;
-    private long currentRoomId;
+    private int currentRoomId;
     private List<NovelRoom> chatRoomsAll;
     private List<NovelRoom> chatRoomsActive;
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private Gson gson;
+
+    // NovelRoomModalUI 데이터
+    private String novelRoomTitle;
+    private String novelRoomDescription;
+    private String hostUserId;
+    private String novelRoomStatus;
+    private String[] novelParticipantIds; // 소설가 아이디 배열
+    private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
 
     private static volatile ClientDataModel instance;
 
@@ -39,6 +48,28 @@ public class ClientDataModel {
             }
         }
         return instance;
+    }
+
+    public void setChatRoomFromJson(JsonObject jsonObject) {
+        try {
+            JsonObject novelRoomObject = jsonObject.getAsJsonObject("novelRoom");
+            if (novelRoomObject == null) {
+                throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
+            }
+
+            this.novelRoomTitle = novelRoomObject.get("novelRoomTitle").getAsString();
+            this.novelRoomDescription = novelRoomObject.get("novelRoomDescription").getAsString();
+            this.currentRoomId = novelRoomObject.get("novelRoomId").getAsInt();
+            this.hostUserId = novelRoomObject.get("novelHostUser").getAsString();
+            this.novelRoomStatus = novelRoomObject.get("novelRoomStatus").getAsString();
+            this.novelParticipantIds = novelRoomObject.get("novelParticipantIds").getAsString().split(",");
+            this.novelMaxParticipants = novelRoomObject.get("maxParticipants").getAsInt();
+
+            System.out.println("setChatRoomFromJson: 소설방 데이터 갱신 완료");
+        } catch (Exception e) {
+            System.err.println("setChatRoomFromJson 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setChatRoomsFromJson(JsonObject jsonObject) {

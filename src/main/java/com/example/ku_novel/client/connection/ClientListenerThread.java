@@ -52,17 +52,25 @@ public class ClientListenerThread extends Thread {
     private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
         switch (messageType) {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
-            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED"-> uiHandler.showAlertModal(
+            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED", "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
-            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID" -> uiHandler.showAlertModal(
+            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS", "ATTENDANCE_CHECK_SUCCESS" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_SUCCESS" -> handleRoomFetchByTitleSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_TITLE_FAILED" -> handleRoomFetchByTitleFailed(jsonObject, uiHandler);
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
+            case "ROOM_CREATE_SUCCESS" -> handleRoomCreateSuccess(jsonObject, uiHandler);
+            case "MESSAGE_RECEIVE" -> handleChatMessageReceive(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleRoomCreateSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+        ClientSenderThread.getInstance().requestRefreshHome(ClientDataModel.getInstance().getUserId());
     }
 
     private void handleRefreshHomeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -90,6 +98,7 @@ public class ClientListenerThread extends Thread {
         dataModel.setUserPoint(jsonObject.get("point").getAsString());
         dataModel.setChatRoomsFromJson(jsonObject);
 
+        uiHandler.disposeLoginUI();
         uiHandler.repaintMainUI();
     }
 
@@ -113,7 +122,34 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleRoomJoinSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        uiHandler.showNovelRoomModalUI();
+        try {
+            JsonObject novelRoomObject = jsonObject.getAsJsonObject("novelRoom");
+            if (novelRoomObject == null) {
+                throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
+            }
+            ClientDataModel dataModel = ClientDataModel.getInstance();
+            dataModel.setChatRoomFromJson(jsonObject);
+            uiHandler.showNovelRoomModalUI(dataModel.getCurrentRoomId());
+        } catch (Exception e) {
+            System.err.println("handleRoomJoinSuccess 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleChatMessageReceive(JsonObject jsonObject, UIHandler uiHandler) {
+        try {
+            int roomId = jsonObject.get("novelRoomId").getAsInt();
+            // String userId = jsonObject.get("sender").getAsString(); // 필요한가? 일단 보류
+            String nickname = jsonObject.get("nickname").getAsString();
+            String content = jsonObject.get("content").getAsString();
+
+            String formattedChat = "[" + nickname + "] : " + content;
+            uiHandler.updateNovelRoomChat(roomId, formattedChat);
+            System.out.println("Chat message processed: " + formattedChat);
+        } catch (Exception e) {
+            System.err.println("handleChatMessage 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void enqueueMessage(JsonObject jsonObject) {

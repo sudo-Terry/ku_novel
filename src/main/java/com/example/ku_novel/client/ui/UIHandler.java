@@ -2,6 +2,7 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -23,6 +24,7 @@ public class UIHandler {
     private RoomSearchResultsModalUI roomSearchResultsModalUI;
     private NovelInputModalUI novelInputModalUI;
     private VoteModalUI voteModalUI;
+    private NovelRoomSettingsModalUI novelRoomSettingsModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -163,11 +165,11 @@ public class UIHandler {
         });
     }
 
-    public void showNovelRoomModalUI() {
+    public void showNovelRoomModalUI(int roomId) {
         SwingUtilities.invokeLater(() -> {
             if (novelRoomModalUI == null || !novelRoomModalUI.isVisible()) {
-                novelRoomModalUI = new NovelRoomModalUI();
-                novelRoomModalUI.setVisible(true);
+                novelRoomModalUI = NovelRoomModalUI.getInstance();
+                novelRoomModalUI.openModalWithRoomId(roomId);
             }else {
                 System.out.println("novelRoomUI 이미 열려 있음");
             }
@@ -176,5 +178,34 @@ public class UIHandler {
 
     public void repaintMainUI() {
         HomeUI.getInstance().repaintHomeUI();
+    }
+
+    public void updateNovelRoomChat(int roomId, String formattedMessage) {
+        if(novelRoomModalUI.getRoomId() == ClientDataModel.getInstance().getCurrentRoomId())
+            novelRoomModalUI.updateChatArea(formattedMessage);
+        else
+            System.out.println("novelRoomId 불일치로 채팅 업데이트 불가");
+    }
+
+    public void showNovelRoomSettingsModalUI(NovelRoomModalUI dialog) {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomSettingsModalUI == null || !novelRoomSettingsModalUI.isVisible()) {
+                novelRoomSettingsModalUI = new NovelRoomSettingsModalUI(dialog);
+                novelRoomSettingsModalUI.setVisible(true);
+            }else {
+                System.out.println("NovelRoomSettingsModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void disposeNovelRoomSettingsModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            if (novelRoomSettingsModalUI != null) {
+                novelRoomSettingsModalUI.dispose();
+                novelRoomSettingsModalUI = null;
+            }else{
+                System.out.println("NovelRoomSettingsModalUI가 null입니다.");
+            }
+        });
     }
 }

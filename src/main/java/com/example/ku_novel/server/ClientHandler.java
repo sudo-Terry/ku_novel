@@ -101,8 +101,10 @@ class ClientHandler implements Runnable {
                 break;
             case ATTENDANCE_CHECK:
                 handleAttendance(message);
+                break;
             case ROOM_FETCH_DEACTIVATE:
                 handleDeactivateRoom();
+                break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
                 handleGetRoomById(message);
@@ -301,7 +303,7 @@ class ClientHandler implements Runnable {
 
             responseMessage.setType(MessageType.ROOM_FETCH_BY_ID_SUCCESS);
             responseMessage.setContent("소설 방 조회에 성공하였습니다.");
-            responseMessage.setJson(roomJson.toString());
+            responseMessage.setNovelRoom(room.toMessage());
             sendMessageToCurrentClient(responseMessage);
         } catch (Exception e) {
             responseMessage = new Message()
@@ -405,17 +407,17 @@ class ClientHandler implements Runnable {
 
     /* 출석 로직 */
     private void handleAttendance(Message message) {
-
-        String id = message.getSender();
-        userService.attendanceCheck(id);
         Message responseMessage = new Message();
 
         try {
+            String id = message.getSender();
+            userService.attendanceCheck(id);
+
             responseMessage.setType(MessageType.ATTENDANCE_CHECK_SUCCESS)
                     .setContent("출석 체크 성공");
         } catch (Exception e) {
             responseMessage.setType(MessageType.ATTENDANCE_CHECK_FAILED)
-                    .setContent("출석 체크 실패" + e.getMessage());
+                    .setContent("출석 체크 실패: " + e.getMessage());
         }
         sendMessageToCurrentClient(responseMessage);
     }
