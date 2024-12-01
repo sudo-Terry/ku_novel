@@ -102,8 +102,10 @@ class ClientHandler implements Runnable {
                 break;
             case ATTENDANCE_CHECK:
                 handleAttendance(message);
+                break;
             case DOWNLOAD_FETCH:
                 handleDownload();
+                break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
                 handleGetRoomById(message);
