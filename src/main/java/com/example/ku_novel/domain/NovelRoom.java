@@ -100,14 +100,6 @@ public class NovelRoom {
         return message;
     }
 
-    public int getCurrentParticipantCount() {
-        if (participantIds == null || participantIds.isEmpty()) {
-            return 0;
-        }
-        List<String> participants = ParticipantUtils.parseParticipantIds(participantIds);
-        return participants.size();
-    }
-
     public List<String> getParticipantIdsAsList() {
         return ParticipantUtils.parseParticipantIds(this.participantIds);
     }

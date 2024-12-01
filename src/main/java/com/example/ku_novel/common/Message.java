@@ -106,6 +106,11 @@ public class Message {
         return this;
     }
 
+    public Message setNovelRoomId(Integer novelRoomId) {
+        this.novelRoomId = novelRoomId;
+        return this;
+    }
+
     public String toJson() {
         Gson gson = new GsonBuilder().create();
         return gson.toJson(this);
@@ -113,6 +118,11 @@ public class Message {
 
     public Message setParticipantsCount(int participantsCount) {
         this.participantsCount = participantsCount;
+        return this;
+    }
+
+    public Message setNovelRoom(Message novelRoom) {
+        this.novelRoom = novelRoom;
         return this;
     }
 
