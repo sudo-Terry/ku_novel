@@ -48,6 +48,8 @@ public class Vote {
     public Message toMessage() {
         Message message = new Message();
         message.setVoteId(this.id);
+        message.setVotingDuration(this.votingDuration);
+        message.setSubmissionDuration(this.submissionDuration);
         message.setNovelRoomId(this.novelRoomId);
         message.setContentOptions(this.contentOptions);
         message.setVotes(this.votes);
