@@ -25,6 +25,7 @@ public class UIHandler {
     private NovelInputModalUI novelInputModalUI;
     private VoteModalUI voteModalUI;
     private NovelRoomSettingsModalUI novelRoomSettingsModalUI;
+    private DownloadModalUI downloadModalUI;
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -205,6 +206,17 @@ public class UIHandler {
                 novelRoomSettingsModalUI = null;
             }else{
                 System.out.println("NovelRoomSettingsModalUI가 null입니다.");
+            }
+        });
+    }
+
+    public void showDownloadModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (downloadModalUI == null || !downloadModalUI.isVisible()) {
+                downloadModalUI = new DownloadModalUI(frame);
+                downloadModalUI.showModal();
+            }else {
+                System.out.println("downloadModalUI 이미 열려 있음");
             }
         });
     }

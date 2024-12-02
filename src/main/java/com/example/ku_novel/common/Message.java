@@ -1,6 +1,7 @@
 package com.example.ku_novel.common;
 
 import com.example.ku_novel.domain.NovelRoom;
+import com.example.ku_novel.domain.Vote;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class Message {
 //    private boolean isParticipating; // 안씀
 
     /// 투표 관련
-    private int voteId;
+    private Message vote; // 투표 정보
     private String contentOptions;
     private String voteStatus; // WRITER_ENABLED || VOTING_ENABLED || VOTE_COMPLETED
     private int countDown;
