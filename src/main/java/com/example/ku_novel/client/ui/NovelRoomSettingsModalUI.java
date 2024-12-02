@@ -55,7 +55,7 @@ public class NovelRoomSettingsModalUI extends JDialog {
         signLabel.setForeground(Color.WHITE);
         topPanel.add(signLabel);
 
-        topPanel.setBackground(NovelColor.BLACK_GREEN);
+        topPanel.setBackground(NovelColor.DARK_GREEN);
         add(topPanel, BorderLayout.NORTH);
 
         // 소설가 수
