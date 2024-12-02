@@ -41,7 +41,7 @@ public class VoteUtils {
         }
 
         // 현재 시간이 작성 시간 이후, 투표 시간 내라면 투표 종료까지 남은 초 반환
-        return (int) Duration.between(authorEndTime, votingEndTime).getSeconds();
+        return (int) Duration.between(now, votingEndTime).getSeconds();
     }
 
 //    public static String getVoteStatus(LocalDateTime createdAt, int authorWriteMinutes, int votingMinutes) {

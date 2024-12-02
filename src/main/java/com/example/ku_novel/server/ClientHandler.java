@@ -115,6 +115,9 @@ class ClientHandler implements Runnable {
             case MESSAGE_SEND:
                 handleChatMessage(message);
                 break;
+            case VOTE_FETCH_BY_ID:
+                handleVote(message);
+                break;
             // case ROOM_STATUS_UPDATE:
             // handleUpdateRoomStatus(message);
             // break;
@@ -123,30 +126,49 @@ class ClientHandler implements Runnable {
             // break;
             // 기타 요청 처리...
         }
+
+        // vote 테스트
+//        message.setNovelVoteId(5);
+//        message.setNovelRoomId(5);
+//        handleVote(message);
     }
 
     private void handleVote(Message message) {
-        String userId = message.getSender();
-        int voteId = message.getVoteId();
-        Vote vote = voteService.getVoteById(voteId);
+        Message responseMessage = new Message();
 
-        switch (vote.getStatus()) {
-            case "WRITER_ENABLED":
-                // todo
-                break;
-            case "VOTING_ENABLED":
-                // todo
-                break;
-            case "VOTE_COMPLETED":
-                // vote 시작 (synchronized 추후 고려)
-                VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService);
-                voteHandler.start();
-                break;
-            default:
-                break;
+        try {
+            String userId = message.getSender();
+            int voteId = message.getNovelVoteId();
+            Vote vote = voteService.getVoteById(voteId);
+//            System.out.println(vote.toMessage());
+
+            switch (vote.getStatus()) {
+                case "WRITER_ENABLED":
+                    // todo
+                    break;
+                case "VOTING_ENABLED":
+                    // todo
+                    break;
+                case "VOTE_COMPLETED":
+                    // vote 시작 (synchronized 추후 고려)
+                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService);
+                    voteHandler.start();
+                    vote = voteService.getVoteById(voteId); // vote 상태 업데이트
+                    break;
+                default:
+                    break;
+            }
+
+            // 이전 소설 내용도 응답.
+            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(message.getNovelRoomId());
+            room.ifPresent(novelRoom -> responseMessage.setNovelContent(novelRoom.getNovelContent()));
+
+            responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_SUCCESS).setVote(vote.toMessage());
+        } catch (Exception e){
+            responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_FAILED);
+            responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
         }
-
-        System.out.println(vote.toMessage());
+        sendMessageToCurrentClient(responseMessage);
     }
 
     private void handleSignUp(Message message) {
