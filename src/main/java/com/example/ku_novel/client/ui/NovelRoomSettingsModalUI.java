@@ -2,6 +2,7 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.*;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -11,116 +12,159 @@ import java.util.function.Consumer;
 
 @Getter
 public class NovelRoomSettingsModalUI extends JDialog {
-    private JTextField authorCountField;
-    private JTextField titleField;
-    private JTextArea descriptionArea;
-    private JCheckBox endNovelCheckbox;
+    private JTextField titleField, descriptionField;
+
+    private Boolean isNovelEnded;
+
+    private JSpinner authorCountSpinner;
+
+    private RoundedButton endNovelButton;
 
     public NovelRoomSettingsModalUI(JDialog parent) {
         super(parent, "설정", true);
         setLocationRelativeTo(parent);
-        setSize(500, 400);
+        setSize(550, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setModal(true);
         setResizable(false);
         setLocationRelativeTo(null);
         initUI();
-        initDatas();
+        initData();
     }
 
     private void initUI() {
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.WHITE);
+        add(mainPanel);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 20, 10);
+
+        Dimension fieldSize = new Dimension(250, 40);
+        Dimension buttonSize = new Dimension(100, 40);
+        Dimension spinnerSize = new Dimension(70, 30);
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+        topPanel.setBackground(Color.WHITE);
+        topPanel.setPreferredSize(new Dimension(300, 100));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 0, 0));
 
         // 상단 제목
-        JLabel titleLabel = new JLabel("소설방 설정 변경");
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        JLabel signLabel = new JLabel("설정");
+        signLabel.setFont(FontSetting.getInstance().loadCustomFont(40f));
+        signLabel.setForeground(Color.WHITE);
+        topPanel.add(signLabel);
 
-        // 중앙 내용
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contentPanel.setBackground(Color.WHITE);
+        topPanel.setBackground(NovelColor.BLACK_GREEN);
+        add(topPanel, BorderLayout.NORTH);
 
         // 소설가 수
-        JPanel authorPanel = createFieldPanel("소설가 수:", (field) -> authorCountField = field);
+        JLabel authorLabel = new JLabel("소설가 수");
+        authorLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        mainPanel.add(authorLabel, gbc);
+
+        authorCountSpinner = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
+        authorCountSpinner.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        authorCountSpinner.setPreferredSize(spinnerSize);
+        authorCountSpinner.setFont(FontSetting.getInstance().loadCustomFont(16f));
+
+        gbc.gridx = 2;
+        mainPanel.add(authorCountSpinner, gbc);
 
         // 소설 제목
-        JPanel titlePanel = createFieldPanel("소설 제목:", (field) -> titleField = field);
+        JLabel titleLabel = new JLabel("소설 제목");
+        titleLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        mainPanel.add(titleLabel, gbc);
+
+        titleField = new CustomizedTextField("");
+        titleField.setPreferredSize(fieldSize);
+        titleField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        mainPanel.add(titleField, gbc);
 
         // 소설 설명
-        JPanel descriptionPanel = new JPanel(new BorderLayout());
-        descriptionPanel.setBackground(Color.WHITE);
-        JLabel descriptionLabel = new JLabel("소설 설명:");
-        descriptionArea = new JTextArea(4, 20);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
-        descriptionScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);
-        descriptionPanel.add(descriptionScroll, BorderLayout.CENTER);
+        JLabel descriptionLabel = new JLabel("소설 설명");
+        descriptionLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        mainPanel.add(descriptionLabel, gbc);
 
-        // 소설 종료
-        JPanel endNovelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        endNovelPanel.setBackground(Color.WHITE);
-        JLabel endNovelLabel = new JLabel("소설 종료:");
-        endNovelCheckbox = new JCheckBox();
-        endNovelCheckbox.setBackground(Color.WHITE);
-        endNovelPanel.add(endNovelLabel);
-        endNovelPanel.add(endNovelCheckbox);
-
-        contentPanel.add(authorPanel);
-        contentPanel.add(Box.createVerticalStrut(10));
-        contentPanel.add(titlePanel);
-        contentPanel.add(Box.createVerticalStrut(10));
-        contentPanel.add(descriptionPanel);
-        contentPanel.add(Box.createVerticalStrut(10));
-        contentPanel.add(endNovelPanel);
-
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        descriptionField = new CustomizedTextField("");
+        descriptionField.setPreferredSize(fieldSize);
+        descriptionField.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        mainPanel.add(descriptionField, gbc);
 
         // 하단 버튼
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         buttonPanel.setBackground(Color.WHITE);
-        JButton saveButton = new JButton("저장");
+
+        JButton saveButton = new RoundedButton("저장", NovelColor.DARK_GREEN, Color.WHITE);
+        saveButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        saveButton.setPreferredSize(buttonSize);
         saveButton.addActionListener(e -> saveSettings());
         buttonPanel.add(saveButton);
 
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // 소설 종료 버튼
+        endNovelButton = new RoundedButton("소설 종료", Color.WHITE, Color.RED, Color.RED);
+        endNovelButton.setPreferredSize(buttonSize);
+        endNovelButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        endNovelButton.addActionListener(e-> {
+            isNovelEnded = !isNovelEnded;
+            setEndButton();
+        });
+        buttonPanel.add(endNovelButton);
 
-        setContentPane(mainPanel);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(buttonPanel, gbc);
     }
 
-    private JPanel createFieldPanel(String labelText, Consumer<JTextField> fieldConsumer) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.setBackground(Color.WHITE);
-        JLabel label = new JLabel(labelText);
-        JTextField textField = new JTextField(15);
-        fieldConsumer.accept(textField);
-        panel.add(label);
-        panel.add(textField);
-        return panel;
-    }
-
-    private void initDatas() {
+    private void initData() {
         ClientDataModel dataModel = ClientDataModel.getInstance();
-        authorCountField.setText(String.valueOf(dataModel.getNovelMaxParticipants()));
+        authorCountSpinner.setValue(dataModel.getNovelMaxParticipants());
         titleField.setText(dataModel.getNovelRoomTitle());
-        descriptionArea.setText(dataModel.getNovelRoomDescription());
+        descriptionField.setText(dataModel.getNovelRoomDescription());
+        isNovelEnded = !dataModel.getNovelRoomStatus().equals("ACTIVE");
+        setEndButton();
+    }
+
+    private void setEndButton() {
+        if(isNovelEnded) {
+            endNovelButton.setBorderColor(Color.LIGHT_GRAY);
+            endNovelButton.setBackground(Color.RED);
+            endNovelButton.setForeground(Color.WHITE);
+        } else {
+            endNovelButton.setBorderColor(Color.RED);
+            endNovelButton.setBackground(Color.WHITE);
+            endNovelButton.setForeground(Color.RED);
+        }
+        repaint();
     }
 
     private void saveSettings() {
-        String novelAuthorCount = authorCountField.getText();
+        int novelAuthorCount = (Integer)authorCountSpinner.getValue();
         String novelRoomTitle = titleField.getText();
-        String novelRoomDescription = descriptionArea.getText();
-        boolean isNovelEnded = endNovelCheckbox.isSelected();
+        String novelRoomDescription = descriptionField.getText();
+        boolean isNovelEnded = !endNovelButton.isEnabled();
 
         // 서버로 요청
         ClientSenderThread.getInstance().requestRoomStatusUpdate(
-            Integer.parseInt(novelAuthorCount), novelRoomTitle, novelRoomDescription, isNovelEnded
+            novelAuthorCount, novelRoomTitle, novelRoomDescription, isNovelEnded
         );
 
         this.dispose();
