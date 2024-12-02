@@ -520,10 +520,22 @@ class ClientHandler implements Runnable {
                         participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {}.getType());
                     }
 
+                    // 최대 소설가 가능 인원 체크
+                    if (participantIds.size() >= novelRoom.getMaxParticipants()) {
+                        // 신청 거절 메시지 전송
+                        Message response = new Message()
+                                .setType(MessageType.AUTHOR_REJECTED)
+                                .setNovelRoomId(roomId)
+                                .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다.");
+                        sendMessageToUser(applicant, response);
+
+                        // 신청자 목록에서 제거
+                        roomApplicants.get(roomId).remove(applicant);
+                        return;
+                    }
+
                     // 신청자를 소설가로 추가
                     participantIds.add(applicant);
-
-                    // List를 JSON 문자열로 변환 후 저장
                     novelRoom.setParticipantIds(gson.toJson(participantIds));
                     novelRoomService.save(novelRoom);
 
@@ -534,19 +546,12 @@ class ClientHandler implements Runnable {
                             .setContent("소설가로 승인되었습니다.");
                     sendMessageToUser(applicant, response);
                 }
-            } else {
-                // 거절 메시지 전송
-                Message response = new Message()
-                        .setType(MessageType.AUTHOR_REJECTED)
-                        .setNovelRoomId(roomId)
-                        .setContent("소설가 신청이 거절되었습니다.");
-                sendMessageToUser(applicant, response);
             }
-
-            // 메모리에서 신청자 제거
+            // 신청자 제거
             roomApplicants.get(roomId).remove(applicant);
         }
     }
+
 
     private void handleWriteNovel(Message message) {
         Integer roomId = message.getNovelRoomId();
@@ -568,7 +573,7 @@ class ClientHandler implements Runnable {
 
         NovelRoom novelRoom = novelRoomOpt.get();
 
-        // 소설가 권한 확인
+        // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
         String participantIdsJson = novelRoom.getParticipantIds();
         List<String> participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {}.getType());
 
