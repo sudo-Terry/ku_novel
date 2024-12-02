@@ -108,6 +108,9 @@ class ClientHandler implements Runnable {
                 break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
+                //소설가 요청 테스트
+//                message.setNovelVoteId(6);
+//                handleAuthorApply(message);;
                 break;
             case ROOM_LEAVE:
                 handleLeaveRoom(message);
@@ -117,6 +120,9 @@ class ClientHandler implements Runnable {
                 break;
             case VOTE_FETCH_BY_ID:
                 handleVote(message);
+                break;
+            case AUTHOR_APPLY:
+                handleAuthorApply(message);
                 break;
             // case ROOM_STATUS_UPDATE:
             // handleUpdateRoomStatus(message);
@@ -128,9 +134,38 @@ class ClientHandler implements Runnable {
         }
 
         // vote 테스트
-//        message.setNovelVoteId(5);
-//        message.setNovelRoomId(5);
-//        handleVote(message);
+        //        message.setNovelVoteId(5);
+        //        message.setNovelRoomId(5);
+        //        handleVote(message);
+    }
+
+    private void handleAuthorApply(Message message) {
+        Message responseMessage = new Message();
+        try {
+            String userId = message.getSender();
+            int novelRoomId = message.getNovelRoomId();
+            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(novelRoomId);
+
+            if (room.isPresent()) {
+                String hostUserId = room.get().getHostUserId();
+
+                synchronized (roomUsers) {
+                    if (roomUsers.containsKey(novelRoomId)) {
+                        if (roomUsers.get(novelRoomId).contains(hostUserId)) {
+                            synchronized (activeClients) {
+                                if (activeClients.containsKey(hostUserId)) {
+                                    PrintWriter writer = activeClients.get(hostUserId);
+                                    responseMessage.setType(MessageType.AUTHOR_APPLY_RECEIVED).setSender(userId).setNovelRoomId(novelRoomId); // 방장에게 소설가 요청한 유저아이디와 방번호 보냄.
+                                    sendMessageToWriter(writer, responseMessage);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        // 클라이언트에게 따로 응답하지 않음.
     }
 
     private void handleVote(Message message) {
@@ -164,7 +199,7 @@ class ClientHandler implements Runnable {
             room.ifPresent(novelRoom -> responseMessage.setNovelContent(novelRoom.getNovelContent()));
 
             responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_SUCCESS).setVote(vote.toMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_FAILED);
             responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
         }
@@ -209,7 +244,7 @@ class ClientHandler implements Runnable {
         String userId = message.getSender();
 
         Message responseMessage = new Message();
-        try{
+        try {
             User user = userService.findById(userId);
             responseMessage.setPoint(user.getPoint());
             responseMessage.setNickname(user.getNickname());
@@ -223,7 +258,7 @@ class ClientHandler implements Runnable {
 
             responseMessage.setActiveNovelRooms(_convertNovelRoomsToMessages(activeNovelRooms));
             responseMessage.setParticipatingNovelRooms(_convertNovelRoomsToMessages(participatingRooms));
-        } catch (Exception e){
+        } catch (Exception e) {
             responseMessage.setType(MessageType.REFRESH_HOME_SUCCESS);
             responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
         }
@@ -270,16 +305,15 @@ class ClientHandler implements Runnable {
 
     private void handleLogout(String messageJson) {
         System.out.println("Logout request received.");
-        // 로그아웃 로직
-        synchronized (activeClients) {
-            activeClients.remove(id);
-        }
-
         // 유저가 속한 모든 소설방에서 제거
         synchronized (roomUsers) {
             roomUsers.values().forEach(users -> users.remove(id));
         }
 
+        // 로그아웃 로직
+        synchronized (activeClients) {
+            activeClients.remove(id);
+        }
         id = null;
     }
 
@@ -518,11 +552,11 @@ class ClientHandler implements Runnable {
     private void closeConnection() {
         try {
             if (id != null) {
-                synchronized (activeClients) {
-                    activeClients.remove(id);
-                }
                 synchronized (roomUsers) {
                     roomUsers.values().forEach(users -> users.remove(id));
+                }
+                synchronized (activeClients) {
+                    activeClients.remove(id);
                 }
             }
             if (in != null)
