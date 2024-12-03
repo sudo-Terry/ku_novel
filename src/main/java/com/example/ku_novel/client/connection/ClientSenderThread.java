@@ -217,4 +217,14 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomLeaveMessage.toJson());
     }
+
+    public void requestRoomAddFavourite(String senderId, int novelRoomId, String content) {
+        Message roomAddFavouriteMessage = new Message();
+        roomAddFavouriteMessage.setType(MessageType.FAVOURITE_ADD);
+        roomAddFavouriteMessage.setSender(senderId);
+        roomAddFavouriteMessage.setNovelRoomId(novelRoomId);
+        roomAddFavouriteMessage.setContent(content);
+
+        writer.println(roomAddFavouriteMessage.toJson());
+    }
 }
