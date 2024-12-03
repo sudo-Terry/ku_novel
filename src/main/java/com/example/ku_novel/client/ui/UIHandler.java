@@ -136,9 +136,9 @@ public class UIHandler {
         });
     }
 
-    public void showRoomSearchResults(NovelRoom[] rooms) {
+    public void showRoomSearchResults() {
         if (roomSearchResultsModalUI != null && roomSearchResultsModalUI.isVisible()) {
-            roomSearchResultsModalUI.showRoomResult(rooms);
+            roomSearchResultsModalUI.showRoomResult();
         }
     }
 

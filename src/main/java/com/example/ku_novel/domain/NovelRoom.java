@@ -104,8 +104,19 @@ public class NovelRoom {
         if (participantIds == null || participantIds.isEmpty()) {
             return 0;
         }
-        List<String> participants = ParticipantUtils.parseParticipantIds(participantIds);
-        return participants.size();
+
+        // Array
+        if (participantIds.contains(",")) {
+            List<String> participants = List.of(participantIds.split(","));
+            return participants.size();
+        }
+
+        // String
+        return 1;
+
+        // JSON
+        // List<String> participants = ParticipantUtils.parseParticipantIds(participantIds);
+        // return participants.size();
     }
 
     public List<String> getParticipantIdsAsList() {

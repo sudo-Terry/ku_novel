@@ -121,11 +121,10 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleRoomFetchByTitleSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        String content = jsonObject.get("content").getAsString();
-        NovelRoom[] rooms = gson.fromJson(content, NovelRoom[].class);
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setChatRoomsSearchResultFromJson(jsonObject);
 
-        // TODO : UI에 검색 결과 표시 (UIHandler에 구현 필요)
-        uiHandler.showRoomSearchResults(rooms);
+        uiHandler.showRoomSearchResults();
     }
 
     private void handleRoomFetchByTitleFailed(JsonObject jsonObject, UIHandler uiHandler) {

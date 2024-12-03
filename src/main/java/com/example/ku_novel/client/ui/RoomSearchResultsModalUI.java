@@ -1,6 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.CustomizedTextField;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
@@ -12,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Arrays;
 
 public class RoomSearchResultsModalUI extends JDialog {
     private NovelRoom[] rooms;
@@ -20,7 +22,7 @@ public class RoomSearchResultsModalUI extends JDialog {
 
     private JTable table;
 
-    private String[] columnNames = {"제목", "설명", "현재 인원", "최대 인원"};
+    private String[] columnNames = {"제목", "설명", "현재 소설가 수", "최대 소설가 수"};
 
     public RoomSearchResultsModalUI(Frame parent) {
         super(parent, "검색", true);
@@ -50,7 +52,7 @@ public class RoomSearchResultsModalUI extends JDialog {
         // DefaultTableModel 생성
         DefaultTableModel model = new DefaultTableModel(null, columnNames);
 
-        JTable table = new JTable(model);
+        this.table = new JTable(model);
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
         table.setFont(FontSetting.getInstance().loadCustomFont(14f));
@@ -113,22 +115,18 @@ public class RoomSearchResultsModalUI extends JDialog {
         setVisible(true);
     }
 
-    public void showRoomResult(NovelRoom[] rooms) {
-        this.rooms = rooms;
+    public void showRoomResult() {
+        this.rooms = ClientDataModel.getInstance().getChatRoomsSearchResult().toArray(new NovelRoom[0]);
 
-        // 테이블 모델 가져오기
+        System.out.println(Arrays.toString(rooms));
+
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-        // 기존 데이터 모두 제거
         model.setRowCount(0);
-
-        // 새로운 데이터 추가
         for (NovelRoom room : rooms) {
             model.addRow(new Object[]{
                     room.getTitle(),
                     room.getDescription(),
-                    // TODO : 서버 쪽에서 현재 방에 있는 인원수를 반환하면 주석해제
-                    // room.getCurrentParticipants(),
+                    room.getCurrentParticipantCount(),
                     room.getMaxParticipants()
             });
         }
