@@ -182,6 +182,15 @@ public class ClientSenderThread extends Thread{
         writer.println(attendanceCheckMessage.toJson());
     }
 
+    public void requestVoteFetchByID(String senderId, int novelRoomId) {
+        Message voteFetchByIDMessage = new Message();
+        voteFetchByIDMessage.setType(MessageType.VOTE_FETCH_BY_ID);
+        voteFetchByIDMessage.setSender(senderId);
+        voteFetchByIDMessage.setNovelRoomId(novelRoomId);
+
+        writer.println(voteFetchByIDMessage.toJson());
+    }
+
     public void requestAuthorRejected() {
         Message authorRejectedMessage = new Message();
         // authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
