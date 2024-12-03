@@ -134,9 +134,6 @@ class ClientHandler implements Runnable {
             case VOTE_FETCH_BY_ID:
                 handleVote(message);
                 break;
-            case AUTHOR_APPLY:
-                handleAuthorApply(message);
-                break;
             // case ROOM_STATUS_UPDATE:
             // handleUpdateRoomStatus(message);
             // break;
