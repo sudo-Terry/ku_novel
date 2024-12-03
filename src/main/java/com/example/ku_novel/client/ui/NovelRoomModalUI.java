@@ -360,7 +360,10 @@ public class NovelRoomModalUI extends JDialog {
         // 투표 버튼
         JButton voteButton = new ImageButton("src/main/resources/icon/vote.png", Color.WHITE);
         voteButton.addActionListener(e-> {
-            UIHandler.getInstance().showVoteModal(NovelRoomModalUI.this);
+            ClientSenderThread.getInstance().requestVoteFetchByID(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getCurrentRoomId()
+            );
         });
 
         bottomGbc.gridx = 3;
@@ -425,7 +428,11 @@ public class NovelRoomModalUI extends JDialog {
         }
 
         writeButton.addActionListener(e-> {
-            UIHandler.getInstance().showNovelInputModal(NovelRoomModalUI.this);
+            ClientSenderThread.getInstance().requestVoteFetchByID(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getCurrentRoomId()
+            );
+            UIHandler.getInstance().showNovelInputModal();
         });
         bottomButtonPanel.add(writeLabel, bottomGbc);
 

@@ -148,19 +148,19 @@ public class UIHandler {
         );
     }
 
-    public void showNovelInputModal(NovelRoomModalUI frame) {
+    public void showNovelInputModal() {
         SwingUtilities.invokeLater(() -> {
             if(novelInputModalUI == null || !novelInputModalUI.isVisible()) {
-                novelInputModalUI = new NovelInputModalUI(frame);
+                novelInputModalUI = new NovelInputModalUI(novelRoomModalUI);
                 novelInputModalUI.setVisible(true);
             }
         });
     }
 
-    public void showVoteModal(NovelRoomModalUI frame) {
+    public void showVoteModal() {
         SwingUtilities.invokeLater(() -> {
             if(voteModalUI == null || !voteModalUI.isVisible()) {
-                voteModalUI = new VoteModalUI(frame);
+                voteModalUI = new VoteModalUI(novelRoomModalUI);
                 voteModalUI.setVisible(true);
             }
         });
@@ -226,5 +226,10 @@ public class UIHandler {
             AuthorAcceptModalUI modal = new AuthorAcceptModalUI(null, "nickname");
             modal.setVisible(true);
         });
+    }
+
+    public void repaintVoteModalUI(){
+        // TODO : VoteFetch 응답에 대해서 VoteModal을 Re-Render 하는것 구현 필요
+        // Listener에서 응답을 받으면 데이터를 갱신하고 repaint를 수행한다.
     }
 }
