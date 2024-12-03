@@ -452,9 +452,19 @@ public class NovelRoomModalUI extends JDialog {
     private void clickInterestNovel() {
         if(isInterested) {
             isInterested = false;
+            ClientSenderThread.getInstance().requestRoomAddFavourite(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getCurrentRoomId(),
+                    "false"
+            );
             setInterestButton(false);
         } else {
             isInterested = true;
+            ClientSenderThread.getInstance().requestRoomAddFavourite(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getCurrentRoomId(),
+                    "true"
+            );
             setInterestButton(true);
         }
     }
