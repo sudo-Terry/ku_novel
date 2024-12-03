@@ -208,4 +208,13 @@ public class ClientSenderThread extends Thread{
 
         writer.println(authorApprovedMessage.toJson());
     }
+
+    public void requestRoomLeave(String senderId, int novelRoomId) {
+        Message roomLeaveMessage = new Message();
+        roomLeaveMessage.setType(MessageType.ROOM_LEAVE);
+        roomLeaveMessage.setSender(senderId);
+        roomLeaveMessage.setNovelRoomId(novelRoomId);
+
+        writer.println(roomLeaveMessage.toJson());
+    }
 }
