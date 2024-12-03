@@ -220,4 +220,11 @@ public class UIHandler {
             }
         });
     }
+
+    public void showAuthorAcceptModalUI(String nickname) {
+        SwingUtilities.invokeLater(() -> {
+            AuthorAcceptModalUI modal = new AuthorAcceptModalUI(null, "nickname");
+            modal.setVisible(true);
+        });
+    }
 }

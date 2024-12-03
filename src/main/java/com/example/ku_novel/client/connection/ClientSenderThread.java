@@ -181,4 +181,22 @@ public class ClientSenderThread extends Thread{
 
         writer.println(attendanceCheckMessage.toJson());
     }
+
+    public void requestAuthorRejected() {
+        Message authorRejectedMessage = new Message();
+        // authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
+        authorRejectedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorRejectedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
+
+        writer.println(authorRejectedMessage.toJson());
+    }
+
+    public void requestAuthorApproved() {
+        Message authorApprovedMessage = new Message();
+        // authorApprovedMessage.setType(MessageType.AUTHOR_APPROVED);
+        authorApprovedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorApprovedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
+
+        writer.println(authorApprovedMessage.toJson());
+    }
 }

@@ -63,6 +63,7 @@ public class ClientListenerThread extends Thread {
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
             case "ROOM_CREATE_SUCCESS" -> handleRoomCreateSuccess(jsonObject, uiHandler);
             case "MESSAGE_RECEIVE" -> handleChatMessageReceive(jsonObject, uiHandler);
+            case "AUTHOR_APPLY_RECEIVED" -> handleAuthorApplyReceiverd(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
     }
@@ -150,6 +151,12 @@ public class ClientListenerThread extends Thread {
             System.err.println("handleChatMessage 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void handleAuthorApplyReceiverd(JsonObject jsonObject, UIHandler uiHandler) {
+        String nickname = jsonObject.get("nickname").getAsString();
+
+        uiHandler.showAuthorAcceptModalUI(nickname);
     }
 
     private void enqueueMessage(JsonObject jsonObject) {
