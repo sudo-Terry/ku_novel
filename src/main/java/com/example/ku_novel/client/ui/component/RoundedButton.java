@@ -24,6 +24,17 @@ public class RoundedButton extends JButton {
         setBorderPainted(false);     // 기본 경계 제거
     }
 
+    public RoundedButton(String text, Color background, Color foreground, Color borderColor) {
+        super(text);
+        this.background = background; // 배경 색
+        this.foreground = foreground; // 글자 색
+        this.borderColor = borderColor;
+        setForeground(foreground);
+        setContentAreaFilled(false); // 기본 배경 제거
+        setFocusPainted(false);      // 포커스 테두리 제거
+        setBorderPainted(false);     // 기본 경계 제거
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -69,6 +80,11 @@ public class RoundedButton extends JButton {
 
     public void setBorderColor(Color borderColor) {
         this.borderColor = borderColor;
+        repaint();
+    }
+
+    public void setBackground(Color background) {
+        this.background = background;
         repaint();
     }
 }
