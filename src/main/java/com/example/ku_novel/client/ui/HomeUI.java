@@ -108,6 +108,7 @@ public class HomeUI extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         rankingButton = new ImageButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
+        rankingButton.addActionListener(e -> UIHandler.getInstance().showRankingModal(HomeUI.this));
         leftButtonPanel.add(rankingButton, gbc);
 
         JLabel rankingLabel = new JLabel("랭킹");
@@ -405,7 +406,7 @@ public class HomeUI extends JFrame {
         infoContentPanel.setBackground(NovelColor.BLACK_GREEN);
         GridBagConstraints mainGbc = new GridBagConstraints();
 
-        JPanel profileImage = new CircularImage("src/main/resources/sample.jpg");
+        JPanel profileImage = new CircularImage("src/main/resources/image/image1.png");
         profileImage.setPreferredSize(new Dimension(245, 245));
         mainGbc.insets = new Insets(0, 0, 10, 0);
         mainGbc.gridx = 0;
@@ -448,21 +449,10 @@ public class HomeUI extends JFrame {
         contentLeftPanel.add(infoContentPanel);
 
         // 포인트 패널
-        JPanel pointPanel = new JPanel(new GridBagLayout());
+        JPanel pointPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pointPanel.setMaximumSize(new Dimension(200, 100));
         pointPanel.setBackground(NovelColor.BLACK_GREEN);
         pointPanel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
-        GridBagConstraints pointGbc = new GridBagConstraints();
-        pointGbc.insets = new Insets(3, 0, 0, 0);
-
-        JLabel pointTitleLabel = new JLabel("POINT");
-        pointTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        pointTitleLabel.setForeground(Color.WHITE);
-
-        pointGbc.gridx = 0;
-        pointGbc.gridy = 0;
-        pointGbc.anchor = GridBagConstraints.CENTER;
-        pointPanel.add(pointTitleLabel, pointGbc);
 
         // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
         JLabel pointLabel;
@@ -473,9 +463,12 @@ public class HomeUI extends JFrame {
         }
         pointLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
         pointLabel.setForeground(Color.WHITE);
+        pointPanel.add(pointLabel);
 
-        pointGbc.gridy = 1;
-        pointPanel.add(pointLabel, pointGbc);
+        JLabel pointTitleLabel = new JLabel("POINT");
+        pointTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        pointTitleLabel.setForeground(Color.WHITE);
+        pointPanel.add(pointTitleLabel);
 
         contentLeftPanel.add(pointPanel);
 
@@ -490,9 +483,11 @@ public class HomeUI extends JFrame {
         JButton imageEditButton = new RoundedButton("프로필 변경", NovelColor.BLACK_GREEN, Color.WHITE);
         imageEditButton.setPreferredSize(buttonSize);
         imageEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        imageEditButton.addActionListener(e->UIHandler.getInstance().showImageEditModal(this));
         buttonPanel.add(imageEditButton);
 
         JButton pwEditButton = new RoundedButton("비밀번호 변경", NovelColor.BLACK_GREEN, Color.WHITE);
+        pwEditButton.addActionListener(e->UIHandler.getInstance().showPwEditModal(this));
         pwEditButton.setPreferredSize(buttonSize);
         pwEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         buttonPanel.add(pwEditButton);
@@ -500,6 +495,7 @@ public class HomeUI extends JFrame {
         JButton nameEditButton = new RoundedButton("닉네임 변경", NovelColor.BLACK_GREEN, Color.WHITE);
         nameEditButton.setPreferredSize(buttonSize);
         nameEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        nameEditButton.addActionListener(e->UIHandler.getInstance().showNameEditModal(this));
         buttonPanel.add(nameEditButton);
 
         contentLeftPanel.add(buttonPanel);
@@ -513,7 +509,7 @@ public class HomeUI extends JFrame {
 
         // 관심 소설방 데이터
         // DefaultTableModel 생성
-        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"소설", "설명"}, 0);
+        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
         DefaultListModel<String> novelListModel = new DefaultListModel<>();
         for (NovelRoom room : activeNovelRooms) {
             novelListModel.addElement("<html>" + room.getTitle() + "<br>" + room.getDescription() + "</html>");
@@ -564,7 +560,8 @@ public class HomeUI extends JFrame {
         try {
             ClientSenderThread.getInstance().requestRoomJoin(roomId);
         } catch (IllegalStateException ex) {
-            JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "서버와 연결이 되어 있지 않습니다.", null);
+            //JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
 

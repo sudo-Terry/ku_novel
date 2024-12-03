@@ -1,6 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.model.VoteTableModel;
+import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.client.ui.component.RoundedButton;
@@ -80,7 +81,7 @@ public class VoteModalUI extends JDialog {
 
         // 확인 버튼 동작
         okButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "등록 완료");
+            CustomAlert.showAlert(this, "정보", "등록 완료", null);
             dispose();
         });
 

@@ -103,12 +103,18 @@ public class NovelRoomModalUI extends JDialog {
         topPanel.add(novelInfoPanel);
 
         // 소설 참여 인원 수
-        JButton participantButton = new JButton("  1,000", scaleIcon("src/main/resources/icon/eyes.png", 20, 20));
+        JPanel participantPanel = new JPanel(new BorderLayout());
+        participantPanel.setBackground(Color.WHITE);
+        JLabel image = new JLabel("현재 독자 수", scaleIcon("src/main/resources/icon/eyes.png", 20, 20), JLabel.CENTER);
+        image.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        RoundedButton participantButton = new RoundedButton("1,000", NovelColor.LIGHT_GREEN, Color.WHITE);
+        participantButton.setColorChangeEnabled(false);
         participantButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        participantButton.setPreferredSize(new Dimension(120, 40));
-        participantButton.setBackground(Color.WHITE);
-        participantButton.setBorder(new LineBorder(NovelColor.DARK_GREEN, 2));
-        topPanel.add(participantButton);
+        participantButton.setPreferredSize(new Dimension(110, 40));
+        participantPanel.add(image, BorderLayout.SOUTH);
+        participantPanel.add(participantButton, BorderLayout.CENTER);
+
+        topPanel.add(participantPanel);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -197,23 +203,6 @@ public class NovelRoomModalUI extends JDialog {
         chatTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
         chatTitlePanel.add(chatTitleLabel);
         chatPanel.add(chatTitlePanel);
-
-//        // 인기 채팅
-//        JTextArea bestChatTextArea = new JTextArea(2, 40);
-//        bestChatTextArea.setFont(loadCustomFont(20f));
-//        bestChatTextArea.setEditable(false);
-//        bestChatTextArea.setLineWrap(true);
-//
-//        JScrollPane bestChatScrollPane = new JScrollPane(bestChatTextArea);
-//        bestChatScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-//        bestChatScrollPane.setBorder(null);
-//
-//        // 자동 스크롤 활성화
-//        DefaultCaret bestChatCaret = (DefaultCaret) bestChatTextArea.getCaret();
-//        bestChatCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-//
-//        // 인기 채팅 내용
-//        bestChatTextArea.append("user: 인기 채팅test채팅test채팅test채팅test채팅test채팅test채팅test");
 
         // 채팅
         chatTextArea = new JTextArea(20, 40);

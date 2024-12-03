@@ -146,14 +146,16 @@ public class SignUpModalUI extends JDialog {
 
         // 유효성 검사
         if (userId.isEmpty() || password.isEmpty() || userName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "모든 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             ClientSenderThread.getInstance().requestSignUp(userId, password, userName);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "회원가입 중 오류가 발생했습니다.", null);
+            //JOptionPane.showMessageDialog(this, "", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -162,14 +164,16 @@ public class SignUpModalUI extends JDialog {
         String userId = userIdField.getText();
 
         if (userId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "아이디 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "아이디 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "아이디 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             ClientSenderThread.getInstance().requestIdValidation(userId);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "회원가입 중 오류가 발생했습니다.", null);
+            //JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -178,14 +182,16 @@ public class SignUpModalUI extends JDialog {
         String userName = userNameField.getText();
 
         if (userName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "닉네임 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "닉네임 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "닉네임 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             ClientSenderThread.getInstance().requestNicknameValidation(userName);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "회원가입 중 오류가 발생했습니다.", null);
+            //JOptionPane.showMessageDialog(this, "회원가입 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
