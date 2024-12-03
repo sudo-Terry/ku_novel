@@ -14,6 +14,8 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +41,15 @@ public class NovelRoomModalUI extends JDialog {
         setTitle("개별 소설방");
         setSize(1080, 720);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                ClientSenderThread.getInstance().requestRoomLeave(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getCurrentRoomId()
+                );
+            }
+        });
         setResizable(false);
         setLocationRelativeTo(null);
     }
