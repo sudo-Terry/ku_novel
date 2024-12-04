@@ -52,11 +52,11 @@ public class AuthorAcceptModalUI extends JDialog {
 
     private void approveUser() {
         System.out.println(requestUserNickname + " 님이 소설가로 승인되었습니다.");
-        // ClientSenderThread.getInstance().requestAuthorApproved();
+         ClientSenderThread.getInstance().requestAuthorApproved();
     }
 
     private void rejectUser() {
         System.out.println(requestUserNickname + " 님의 소설가 요청이 거부되었습니다.");
-        // ClientSenderThread.getInstance().requestAuthorRejected();
+         ClientSenderThread.getInstance().requestAuthorRejected();
     }
 }
