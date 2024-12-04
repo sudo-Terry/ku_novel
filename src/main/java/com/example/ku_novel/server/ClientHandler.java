@@ -10,6 +10,7 @@ import com.example.ku_novel.domain.*;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.UserService;
 import com.example.ku_novel.service.VoteService;
+import com.example.ku_novel.utils.ParticipantUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -17,7 +18,6 @@ class ClientHandler implements Runnable {
     private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
     private static final Map<Integer, Set<String>> roomUsers = new HashMap<>(); // 소설방별 접속중인 유저 아이디 관리
     private static final Map<Integer, Set<String>> roomApplicants = new HashMap<>(); // 방별 소설가 신청자
-    private static final Map<Integer, List<Map<String, String>>> novelSubmissions = new HashMap<>(); // NovelRoom ID를 키로, 제출된 소설 리스트를 값으로 저장
 
     private final Socket socket;
     private BufferedReader in;
@@ -142,6 +142,13 @@ class ClientHandler implements Runnable {
             // break;
             // 기타 요청 처리...
         }
+
+        // handleVoteSummision test
+//        message.setNovelVoteId(1);
+//        message.setSender("aa");
+//        message.setContent("추가한 내용");
+//        handleWriteNovel(message);
+
 
         // vote 테스트
         //        message.setNovelVoteId(5);
@@ -499,7 +506,6 @@ class ClientHandler implements Runnable {
                 try {
                     // 방장 ID 조회
                     String hostId = novelRoomService.getHostUserId(roomId);
-                    System.out.println("Host ID for room " + roomId + ": " + hostId);
 
                     synchronized (roomUsers) {
                         if (roomUsers.get(roomId).contains(hostId)) {
@@ -555,7 +561,8 @@ class ClientHandler implements Runnable {
                     if (participantIdsJson == null || participantIdsJson.isEmpty()) {
                         participantIds = new ArrayList<>();
                     } else {
-                        participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {}.getType());
+                        participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {
+                        }.getType());
                     }
 
                     // 최대 소설가 가능 인원 체크
@@ -592,30 +599,63 @@ class ClientHandler implements Runnable {
 
 
     private void handleWriteNovel(Message message) {
-        Integer roomId = message.getNovelRoomId();
         String sender = message.getSender();
-        String content = message.getContent();
 
         try {
-            voteService.submitNovel(roomId, sender, content);
+            int voteId = message.getNovelVoteId();
+            NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
+
+            int roomId = room.getId();
+            String content = message.getContent();
+
+            // 소설방 정보 확인
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+            if (novelRoomOpt.isEmpty()) {
+                Message response = new Message()
+                        .setType(MessageType.ERROR)
+                        .setContent("소설 방을 찾을 수 없습니다.")
+                        .setNovelRoomId(roomId);
+                sendMessageToUser(sender, response);
+                return;
+            }
+
+            NovelRoom novelRoom = novelRoomOpt.get();
+
+            // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
+            String participantIdsJson = novelRoom.getParticipantIds();
+            List<String> participantIds = ParticipantUtils.parseParticipantIds(participantIdsJson);
+
+            if (participantIds == null || !participantIds.contains(sender)) {
+                Message response = new Message()
+                        .setType(MessageType.ERROR)
+                        .setContent("소설 작성 권한이 없습니다.")
+                        .setNovelRoomId(roomId);
+                sendMessageToUser(sender, response);
+                return;
+            }
+
+            // DB에 저장
+            voteService.addContentOption(voteId, content);
 
             // 모든 사용자에게 알림 전송
             synchronized (roomUsers) {
                 Set<String> usersInRoom = roomUsers.get(roomId);
-                for (String userId : usersInRoom) {
-                    Message response = new Message()
-                            .setType(MessageType.NOVEL_SUBMITTED)
-                            .setNovelRoomId(roomId)
-                            .setContent("새 소설이 제출되었습니다.")
-                            .setSender(sender);
-                    sendMessageToUser(userId, response);
+                if (usersInRoom != null) {
+                    Message voteMessage = voteService.getVoteById(voteId).toMessage();
+                    for (String userId : usersInRoom) {
+                        Message response = new Message()
+                                .setType(MessageType.NOVEL_SUBMITTED)
+                                .setContent("새 소설이 제출되었습니다.");
+                        response.setVote(voteMessage);
+                        response.setSender(sender);
+                        sendMessageToUser(userId, response);
+                    }
                 }
             }
-        } catch (Exception e) {
+        }catch (Exception e){
             Message response = new Message()
                     .setType(MessageType.ERROR)
-                    .setContent("알 수 없는 오류가 발생했습니다.")
-                    .setNovelRoomId(roomId);
+                    .setContent("에러가 발생했습니다");
             sendMessageToUser(sender, response);
         }
     }

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 
 @Getter
@@ -52,10 +53,10 @@ public class Message {
 
     /// 투표 관련
     private Message vote; // 투표 정보
-    private String contentOptions;
+    private List<String> contentOptions;
     private String voteStatus; // WRITER_ENABLED || VOTING_ENABLED || VOTE_COMPLETED
     private int countDown;
-    private String votes;
+    private HashMap<String, Object> votes;
 
     // GSON 라이브러리 사용을 위해 빈 생성자가 필요함
     public Message() {

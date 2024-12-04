@@ -1,13 +1,10 @@
 package com.example.ku_novel.service;
 
 
-import com.example.ku_novel.domain.NovelRoom;
 import com.example.ku_novel.domain.User;
 import com.example.ku_novel.domain.Vote;
-import com.example.ku_novel.repository.NovelRoomRepository;
 import com.example.ku_novel.repository.VoteRepository;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.example.ku_novel.utils.VoteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +16,10 @@ import java.util.Optional;
 public class VoteService {
 
     private final VoteRepository voteRepository;
-    private final NovelRoomRepository novelRoomRepository;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, NovelRoomRepository novelRoomRepository) {
+    public VoteService(VoteRepository voteRepository) {
         this.voteRepository = voteRepository;
-        this.novelRoomRepository = novelRoomRepository;
     }
 
     public Vote getVoteById(int voteId) {
@@ -66,34 +61,28 @@ public class VoteService {
         }
     }
 
-    public void submitNovel(Integer roomId, String sender, String content) {
-        Gson gson = new Gson();
+    public void addContentOption(int voteId, String newContent) {
+        Optional<Vote> voteOptional = voteRepository.findById(voteId);
+        if (voteOptional.isPresent()) {
+            Vote vote = voteOptional.get();
 
-        // 소설방 정보 확인
-        NovelRoom novelRoom = novelRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("소설 방을 찾을 수 없습니다."));
+            // JSON 문자열에서 List<String>으로 변환
+            List<String> contentOptions = vote.getContentOptions();
 
-        // 소설가 권한 확인
-        String participantIdsJson = novelRoom.getParticipantIds();
-        List<String> participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {}.getType());
+            // 새로운 항목 추가
+            contentOptions.add(newContent);
 
-        if (participantIds == null || !participantIds.contains(sender)) {
-            throw new IllegalArgumentException("소설 작성 권한이 없습니다.");
+            // List<String>을 JSON 문자열로 변환
+            String updatedContentOptionsJson = VoteUtils.toContentOptions(contentOptions);
+
+            // 업데이트된 JSON 문자열 저장
+            vote.setContentOptions(updatedContentOptionsJson);
+            voteRepository.save(vote);
+        } else {
+            throw new IllegalArgumentException("Vote ID not found: " + voteId);
         }
-
-        // Vote 엔티티 생성 및 저장
-        String contentOptionsJson = gson.toJson(List.of(content));
-        Vote vote = Vote.builder()
-                .novelRoomId(roomId)
-                .contentOptions(contentOptionsJson)
-                .votes("{}")
-                .createdAt(LocalDateTime.now())
-                .submissionDuration(novelRoom.getSubmissionDuration())
-                .votingDuration(novelRoom.getVotingDuration())
-                .status("WRITER_ENABLED")
-                .build();
-        voteRepository.save(vote);
     }
+
 //    public String getVoteStatus(int id, int authorWriteMinutes, int votingMinutes) {
 //        Vote vote = voteRepository.findById(id).orElse(null);
 //

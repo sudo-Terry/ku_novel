@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.time.Duration;
 
@@ -42,6 +43,48 @@ public class VoteUtils {
 
         // 현재 시간이 작성 시간 이후, 투표 시간 내라면 투표 종료까지 남은 초 반환
         return (int) Duration.between(now, votingEndTime).getSeconds();
+    }
+
+    // JSON 문자열에서 List<String>으로 변환
+    public static List<String> parseContentOptions(String participantIdsJson) {
+        if (participantIdsJson == null || participantIdsJson.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return gson.fromJson(participantIdsJson, listType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse participant IDs", e);
+        }
+    }
+
+    // List<String>을 JSON 문자열로 변환
+    public static String toContentOptions(List<String> participantIds) {
+        try {
+            return gson.toJson(participantIds);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert participant IDs to JSON", e);
+        }
+    }
+
+    // JSON 문자열에서 Map<String, Object>로 변환
+    public static HashMap<String, Object> parseJsonToMap(String json) {
+        if (json == null || json.isEmpty()) {
+            return new HashMap<>();
+        }
+        try {
+            return gson.fromJson(json, new TypeToken<HashMap<String, Object>>() {}.getType());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse JSON to Map", e);
+        }
+    }
+
+    // Map<String, Object>를 JSON 문자열로 변환
+    public static String toJsonFromMap(HashMap<String, Object> map) {
+        try {
+            return gson.toJson(map);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert Map to JSON", e);
+        }
     }
 
 //    public static String getVoteStatus(LocalDateTime createdAt, int authorWriteMinutes, int votingMinutes) {
