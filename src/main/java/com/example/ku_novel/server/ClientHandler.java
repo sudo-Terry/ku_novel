@@ -117,9 +117,6 @@ class ClientHandler implements Runnable {
             case MESSAGE_SEND:
                 handleChatMessage(message);
                 break;
-//            case ROOM_UPDATE_SETTING:
-//                handleUpdateRoomSetting(message);
-//                break;
             case AUTHOR_APPLY:
                 handleApplyAuthor(message);
                 break;
@@ -141,6 +138,9 @@ class ClientHandler implements Runnable {
              case ROOM_STATUS_UPDATE:
                  handleUpdateRoomSetting(message);
                  break;
+            case ROOM_FETCH_RANK:
+                handleRankingNovelRooms();
+                break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
@@ -645,6 +645,46 @@ class ClientHandler implements Runnable {
         }
         sendMessageToCurrentClient(responseMessage);
     }
+
+    /* 랭킨 순 정렬 로직 */
+    public List<Map<String, Object>> getAllRoomsSortedByParticipants() {
+        return roomUsers.entrySet().stream()
+                .sorted((entry1, entry2) -> Integer.compare(entry2.getValue().size(), entry1.getValue().size())) // 접속자 수 기준 내림차순
+                .map(entry -> {
+                    Map<String, Object> roomData = new HashMap<>();
+                    roomData.put("roomId", entry.getKey());
+                    roomData.put("participantCount", entry.getValue().size());
+                    return roomData;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void handleRankingNovelRooms() {
+        try {
+            List<Map<String, Object>> sortedRooms = getAllRoomsSortedByParticipants();
+
+            List<Message> rankedMessages = sortedRooms.stream().map(roomData -> {
+                Message roomMessage = new Message();
+                roomMessage.setNovelRoomId((Integer) roomData.get("roomId"));
+                roomMessage.setContent("참여자 수: " + roomData.get("participantCount"));
+                return roomMessage;
+            }).collect(Collectors.toList());
+
+            Message response = new Message()
+                    .setType(MessageType.ROOM_FETCH_RANK_SUCCESS)
+                    .setContent("참여자 수 기준으로 정렬된 소설방 목록입니다.")
+                    .setRankNovelRooms(rankedMessages);
+            sendMessageToCurrentClient(response);
+        } catch (Exception e) {
+            Message errorResponse = new Message()
+                    .setType(MessageType.ROOM_FETCH_RANK_FAILED)
+                    .setContent("방 정렬 중 오류 발생: " + e.getMessage());
+            sendMessageToCurrentClient(errorResponse);
+        }
+    }
+
+
+
 
     /* 소설 작성 로직 */
 

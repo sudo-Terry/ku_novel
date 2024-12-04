@@ -33,6 +33,7 @@ public class Message {
     private List<Message> allNovelRooms;
     private List<Message> activeNovelRooms;
     private List<Message> participatingNovelRooms;
+    private List<Message> rankNovelRooms;
 
     /// 소설방 관련
     private int novelRoomId;
@@ -110,6 +111,11 @@ public class Message {
 
     public Message setNovelRoomId(Integer novelRoomId) {
         this.novelRoomId = novelRoomId;
+        return this;
+    }
+
+    public Message setRankNovelRooms(List<Message> rankNovelRooms) {
+        this.rankNovelRooms = rankNovelRooms;
         return this;
     }
 
