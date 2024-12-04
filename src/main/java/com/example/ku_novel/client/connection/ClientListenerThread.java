@@ -105,7 +105,7 @@ public class ClientListenerThread extends Thread {
                         List.class
                 );
                 dataModel.setVoteOptions(options);
-                dataModel.setCountDown(jsonObject.get("countDown").getAsInt());
+                dataModel.setCountDown(voteObject.get("countDown").getAsInt());
             } else {
                 System.out.println("contentOptions가 JSON에 없습니다.");
                 dataModel.setVoteOptions(new ArrayList<>());
