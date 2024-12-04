@@ -98,7 +98,12 @@ public class NovelInputModalUI extends JDialog {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        JButton okButton = new RoundedButton("등록(10:00)", NovelColor.DARK_GREEN, Color.WHITE);
+        CountdownButtonUtility countdownButtonUtility = new CountdownButtonUtility(
+                ClientDataModel.getInstance().getCountDown(),
+                "등록"
+        );
+        JButton okButton = countdownButtonUtility.getButton();
+        countdownButtonUtility.startCountdown();
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         okButton.setPreferredSize(new Dimension(100, 40));
 

@@ -92,7 +92,7 @@ public class VoteService {
             Vote vote = voteOptional.get();
 
             if (!vote.getStatus().equals("VOTING_ENABLED")) {
-                throw new IllegalArgumentException("투표 가능한 시간이 아닙니다.");
+                throw new IllegalArgumentException(" 투표 가능한 시간이 아닙니다.");
             }
 
             HashMap<String, Object> votes = vote.getVotes();
