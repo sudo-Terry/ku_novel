@@ -646,44 +646,61 @@ class ClientHandler implements Runnable {
         sendMessageToCurrentClient(responseMessage);
     }
 
-    /* 랭킨 순 정렬 로직 */
-    public List<Map<String, Object>> getAllRoomsSortedByParticipants() {
-        return roomUsers.entrySet().stream()
-                .sorted((entry1, entry2) -> Integer.compare(entry2.getValue().size(), entry1.getValue().size())) // 접속자 수 기준 내림차순
-                .map(entry -> {
+    /* 랭킹 순 정렬 로직 */
+    public List<Map<String, Object>> getTopRoomsByParticipants(int limit) {
+
+        List<NovelRoom> allNovelRooms = novelRoomService.getActiveNovelRooms();
+
+        // 소설방 접속자 수 기준으로 정렬
+        return allNovelRooms.stream()
+                .map(novelRoom -> {
+                    int roomId = novelRoom.getId();
+                    int participantCount = roomUsers.getOrDefault(roomId, Collections.emptySet()).size();
+
+                    // Map 형태로 변환
                     Map<String, Object> roomData = new HashMap<>();
-                    roomData.put("roomId", entry.getKey());
-                    roomData.put("participantCount", entry.getValue().size());
+                    roomData.put("roomId", roomId);
+                    roomData.put("title", novelRoom.getTitle());
+                    roomData.put("description", novelRoom.getDescription());
+                    roomData.put("participantCount", participantCount);
                     return roomData;
                 })
+                .sorted((room1, room2) -> Integer.compare((int) room2.get("participantCount"), (int) room1.get("participantCount"))) // 내림차순 정렬
+                .limit(limit) // 상위 limit개만 선택
                 .collect(Collectors.toList());
     }
 
+
     public void handleRankingNovelRooms() {
         try {
-            List<Map<String, Object>> sortedRooms = getAllRoomsSortedByParticipants();
+            // 상위 20개의 소설방 가져오기
+            List<Map<String, Object>> topRooms = getTopRoomsByParticipants(20);
 
-            List<Message> rankedMessages = sortedRooms.stream().map(roomData -> {
+            // Map 데이터를 Message로 변환
+            List<Message> rankedMessages = topRooms.stream().map(roomData -> {
                 Message roomMessage = new Message();
                 roomMessage.setNovelRoomId((Integer) roomData.get("roomId"));
+                roomMessage.setNovelRoomTitle((String) roomData.get("title"));
+                roomMessage.setNovelRoomDescription((String) roomData.get("description"));
                 roomMessage.setContent("참여자 수: " + roomData.get("participantCount"));
                 return roomMessage;
             }).collect(Collectors.toList());
 
+            // 클라이언트에 전송할 응답 생성
             Message response = new Message()
                     .setType(MessageType.ROOM_FETCH_RANK_SUCCESS)
                     .setContent("참여자 수 기준으로 정렬된 소설방 목록입니다.")
                     .setRankNovelRooms(rankedMessages);
+
             sendMessageToCurrentClient(response);
         } catch (Exception e) {
+            // 오류 처리
             Message errorResponse = new Message()
                     .setType(MessageType.ROOM_FETCH_RANK_FAILED)
                     .setContent("방 정렬 중 오류 발생: " + e.getMessage());
             sendMessageToCurrentClient(errorResponse);
         }
     }
-
-
 
 
     /* 소설 작성 로직 */
