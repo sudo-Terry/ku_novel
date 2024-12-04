@@ -17,6 +17,8 @@ class ClientHandler implements Runnable {
     private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
     private static final Map<Integer, Set<String>> roomUsers = new HashMap<>(); // 소설방별 접속중인 유저 아이디 관리
     private static final Map<Integer, Set<String>> roomApplicants = new HashMap<>(); // 방별 소설가 신청자
+    private static final Map<Integer, Set<String>> roomSubmittedAuthors = new HashMap<>();
+
 
     private final Socket socket;
     private BufferedReader in;
@@ -525,7 +527,7 @@ class ClientHandler implements Runnable {
                         .setNovelRoom(novelRoom.toMessage()); // novelRoom 추가
                 sendMessageToCurrentClient(responseMessage);
 
-                sendRecentRoomInfo(roomId);
+//                sendRecentRoomInfo(roomId);
 
                 System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
                 return;
@@ -540,33 +542,33 @@ class ClientHandler implements Runnable {
         sendMessageToCurrentClient(responseMessage);
     }
 
-    private void sendRecentRoomInfo(int roomId) {
-        try {
-            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
-            if (novelRoomOpt.isPresent()) {
-                NovelRoom novelRoom = novelRoomOpt.get();
-
-                // 현재 참여자 수 계산
-                int participantCount = 0;
-                synchronized (roomUsers) {
-                    Set<String> set = roomUsers.get(roomId);
-                    if (set != null) {
-                        participantCount = set.size();
-                        for (String userId : set) {
-                            Message responseMessage = new Message()
-                                    .setType(MessageType.ROOM_FETCH_BY_ID)
-                                    .setContent("소설 방 정보 갱신")
-                                    .setParticipantsCount(participantCount) // 현재 참여자 수 설정
-                                    .setNovelRoom(novelRoom.toMessage());
-                            sendMessageToUser(userId, responseMessage);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-
-        }
-    }
+//    private void sendRecentRoomInfo(int roomId) {
+//        try {
+//            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+//            if (novelRoomOpt.isPresent()) {
+//                NovelRoom novelRoom = novelRoomOpt.get();
+//
+//                // 현재 참여자 수 계산
+//                int participantCount = 0;
+//                synchronized (roomUsers) {
+//                    Set<String> set = roomUsers.get(roomId);
+//                    if (set != null) {
+//                        participantCount = set.size();
+//                        for (String userId : set) {
+//                            Message responseMessage = new Message()
+//                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+//                                    .setContent("소설 방 정보 갱신")
+//                                    .setParticipantsCount(participantCount) // 현재 참여자 수 설정
+//                                    .setNovelRoom(novelRoom.toMessage());
+//                            sendMessageToUser(userId, responseMessage);
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
+//    }
 
     /* 출석 로직 */
     private void handleAttendance(Message message) {
@@ -735,6 +737,20 @@ class ClientHandler implements Runnable {
                         .setNovelRoom(novelRoom.toMessage())
                         .setContent("소설가로 승인되었습니다.");
                 sendMessageToUser(applyUsrId, responseToApplicant);
+
+                synchronized (roomUsers) {
+                    Set<String> usersInRoom = roomUsers.get(roomId);
+                    if (usersInRoom != null) {
+                        for (String userId : usersInRoom) {
+                            Message updateMessage = new Message()
+                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+                                    .setNovelRoomId(roomId)
+                                    .setNovelRoom(novelRoom.toMessage())
+                                    .setContent("소설가 상태가 갱신되었습니다.");
+                            sendMessageToUser(userId, updateMessage);
+                        }
+                    }
+                }
             } else {
                 System.out.println("NovelRoom not found for roomId=" + roomId);
             }
@@ -788,6 +804,22 @@ class ClientHandler implements Runnable {
                 return;
             }
 
+            // 이미 소설을 제출한 경우
+            synchronized (roomSubmittedAuthors) {
+                roomSubmittedAuthors.putIfAbsent(roomId, new HashSet<>());
+                if (roomSubmittedAuthors.get(roomId).contains(sender)) {
+                    Message response = new Message()
+                            .setType(MessageType.ERROR)
+                            .setContent("이미 소설을 제출했습니다. 다음 턴까지 기다려 주세요.")
+                            .setNovelRoomId(roomId);
+                    sendMessageToUser(sender, response);
+                    return;
+                }
+
+                // 소설 제출자로 등록
+                roomSubmittedAuthors.get(roomId).add(sender);
+            }
+
             // DB에 저장
             voteService.addContentOption(voteId, content);
 
@@ -834,7 +866,7 @@ class ClientHandler implements Runnable {
                 }
             }
 
-            sendRecentRoomInfo(roomId);
+//            sendRecentRoomInfo(roomId);
         } catch (Exception e) {
         }
 
