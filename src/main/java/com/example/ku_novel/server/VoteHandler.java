@@ -1,11 +1,13 @@
 package com.example.ku_novel.server;
 
+import com.example.ku_novel.common.Message;
+import com.example.ku_novel.common.MessageType;
 import com.example.ku_novel.domain.Vote;
 import com.example.ku_novel.service.NovelRoomService;
 import com.example.ku_novel.service.VoteService;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+
+import java.io.PrintWriter;
+import java.util.*;
 
 public class VoteHandler extends Thread {
     private final int voteId;
@@ -13,13 +15,17 @@ public class VoteHandler extends Thread {
     private final int votingMinutes;
     private final VoteService voteService;
     private final NovelRoomService novelRoomService;
+    private final Map<Integer, Set<String>> roomUsers; // 소설방별 접속중인 유저 아이디 관리
+    private final HashMap<String, PrintWriter> activeClients;
 
-    public VoteHandler(int voteId, int authorWriteMinutes, int votingMinutes, VoteService voteService, NovelRoomService novelRoomService) {
+    public VoteHandler(int voteId, int authorWriteMinutes, int votingMinutes, VoteService voteService, NovelRoomService novelRoomService, Map<Integer, Set<String>> roomUsers, HashMap<String, PrintWriter> activeClients) {
         this.voteId = voteId;
         this.authorWriteMinutes = authorWriteMinutes;
         this.votingMinutes = votingMinutes;
         this.voteService = voteService;
         this.novelRoomService = novelRoomService;
+        this.roomUsers = roomUsers;
+        this.activeClients = activeClients;
         // 스레드 생성시 WRITER_ENABLED 로 변경
         voteService.updateVoteStatus(voteId, "WRITER_ENABLED");
         voteService.updateCreatedAtToNow(voteId);
@@ -40,11 +46,9 @@ public class VoteHandler extends Thread {
             // 투표 종료까지 대기
             Thread.sleep(votingMinutes * 60 * 1000L);
 
-            // 상태를 VOTE_COMPLETED 업데이트하고 최종결과 저장하고
+            // 상태를 VOTE_COMPLETED 업데이트하고 최종결과 저장하고 broadcast
             finalizeVoteAndUpdateNovel();
             System.out.println("Vote ID " + voteId + " VOTE_COMPLETED");
-
-            // Todo: 모든 클라이언트에게 broadcast
 
         } catch (InterruptedException e) {
             System.err.println("VoteHandler Error" + voteId);
@@ -56,11 +60,14 @@ public class VoteHandler extends Thread {
     private void finalizeVoteAndUpdateNovel() {
         // Vote 가져오기
         Vote vote = voteService.getVoteById(voteId);
+        Integer roomId = vote.getNovelRoomId();
 
         // votes JSON을 Map으로 변환
         HashMap<String, Object> votes = vote.getVotes();
+        String topVotedContent = null;
+        String novelContent = null;
 
-        if(votes != null) {
+        if (votes != null) {
             // 득표수 계산
             HashMap<String, Integer> voteCounts = new HashMap<>();
             for (Object value : votes.values()) {
@@ -69,14 +76,31 @@ public class VoteHandler extends Thread {
             }
 
             // 가장 많은 득표수를 받은 항목 찾기 (공동 득표일 경우 랜덤 선택)
-            String topVotedContent = getTopVotedContent(voteCounts);
+            topVotedContent = getTopVotedContent(voteCounts);
 
             // Novel의 내용을 업데이트
-            novelRoomService.appendContentToNovel(vote.getNovelRoomId(), topVotedContent);
+            novelContent = novelRoomService.appendContentToNovel(roomId, topVotedContent);
         }
 
         // vote 초기화
         voteService.initializeVote(voteId);
+
+        if (topVotedContent != null) {
+            // 모든 사용자에게 알림 전송
+            synchronized (roomUsers) {
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                if (usersInRoom != null) {
+                    for (String userId : usersInRoom) {
+                        Message response = new Message()
+                                .setType(MessageType.VOTE_RESULT)
+                                .setContent(topVotedContent);
+                        response.setNovelVoteId(roomId);
+                        response.setNovelContent(novelContent);
+                        sendMessageToUser(userId, response);
+                    }
+                }
+            }
+        }
     }
 
     private String getTopVotedContent(HashMap<String, Integer> voteCounts) {
@@ -94,6 +118,16 @@ public class VoteHandler extends Thread {
         }
 
         return null; // 득표 항목이 없을 경우
+    }
+
+    private void sendMessageToUser(String userId, Message message) {
+        synchronized (activeClients) {
+            PrintWriter writer = activeClients.get(userId);
+            if (writer != null) {
+                writer.println(message.toJson()); // JSON 변환 후 메시지 전송
+                System.out.println("[SEND] " + message);
+            }
+        }
     }
 }
 

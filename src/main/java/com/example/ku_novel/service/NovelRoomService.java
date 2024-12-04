@@ -67,14 +67,17 @@ public class NovelRoomService {
         return novelRoomRepository.findByParticipantId(escapedId);
     }
 
-    public void appendContentToNovel(Integer novelRoomId, String newContent) {
+    public String appendContentToNovel(Integer novelRoomId, String newContent) {
         Optional<NovelRoom> novelRoom = novelRoomRepository.findById(novelRoomId);
         if (novelRoom.isPresent()) {
             NovelRoom room = novelRoom.get();
             String novelContent = (room.getNovelContent() == null ? newContent : (room.getNovelContent() + "\n" + newContent));
             room.setNovelContent(novelContent);
             novelRoomRepository.save(room);
+
+            return novelContent;
         }
+        return null;
     }
 
     // 아이디로 소설 방 조회
