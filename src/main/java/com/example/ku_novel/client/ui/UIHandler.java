@@ -3,6 +3,7 @@ package com.example.ku_novel.client.ui;
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -26,6 +27,11 @@ public class UIHandler {
     private VoteModalUI voteModalUI;
     private NovelRoomSettingsModalUI novelRoomSettingsModalUI;
     private DownloadModalUI downloadModalUI;
+    private RankingModalUI rankingModalUI;
+    private ImageEditModalUI imageEditModalUI;
+    private PwEditModalUI pwEditModalUI;
+    private NameEditModalUI nameEditModalUI;
+
 
     // 생성자에서 데몬 스레드 실행
     public UIHandler() {
@@ -143,8 +149,10 @@ public class UIHandler {
     }
 
     public void showAlertModal(Component parentComponent, String title, String message, int messageType) {
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(parentComponent, message, title, messageType)
+        SwingUtilities.invokeLater(() -> {
+            //JOptionPane.showMessageDialog(parentComponent, message, title, messageType)
+            CustomAlert.showAlert((Window) parentComponent, title, message, null);
+            }
         );
     }
 
@@ -217,6 +225,50 @@ public class UIHandler {
                 downloadModalUI.showModal();
             }else {
                 System.out.println("downloadModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void showRankingModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (rankingModalUI == null || !rankingModalUI.isVisible()) {
+                rankingModalUI = new RankingModalUI(frame);
+                rankingModalUI.showModal();
+            }else {
+                System.out.println("rankingModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void showImageEditModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (imageEditModalUI == null || !imageEditModalUI.isVisible()) {
+                imageEditModalUI = new ImageEditModalUI(frame);
+                imageEditModalUI.showModal();
+            }else {
+                System.out.println("imageEditModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void showPwEditModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (pwEditModalUI == null || !pwEditModalUI.isVisible()) {
+                pwEditModalUI = new PwEditModalUI(frame);
+                pwEditModalUI.showModal();
+            }else {
+                System.out.println("pwEditModalUI 이미 열려 있음");
+            }
+        });
+    }
+
+    public void showNameEditModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (nameEditModalUI == null || !nameEditModalUI.isVisible()) {
+                nameEditModalUI = new NameEditModalUI(frame);
+                nameEditModalUI.showModal();
+            }else {
+                System.out.println("nameEditModalUI 이미 열려 있음");
             }
         });
     }

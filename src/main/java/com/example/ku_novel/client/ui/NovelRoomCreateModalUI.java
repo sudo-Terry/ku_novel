@@ -1,10 +1,8 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
-import com.example.ku_novel.client.ui.component.CustomizedTextField;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.NovelColor;
-import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,14 +28,21 @@ public class NovelRoomCreateModalUI extends JDialog {
         Dimension spinnerSize = new Dimension(70, 30);
 
         // 소설방 생성 제목
-        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        createPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 10, 0));
+        JPanel createPanel = new JPanel(new BorderLayout());
+        createPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
         createPanel.setBackground(Color.WHITE);
         createPanel.setPreferredSize(new Dimension(800, 150));
 
         JLabel createLabel = new JLabel("소설방 생성");
         createLabel.setFont(FontSetting.getInstance().loadCustomFont(48f));
-        createPanel.add(createLabel);
+        createLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JLabel label = new JLabel("※ 방 생성: 500포인트 차감 (보유: "+ClientDataModel.getInstance().getUserPoint()+"포인트)");
+        label.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        createPanel.add(label, BorderLayout.SOUTH);
+
+        createPanel.add(createLabel, BorderLayout.CENTER);
         mainPanel.add(createPanel, BorderLayout.NORTH);
 
         JPanel emptyPanel = new JPanel();
@@ -224,7 +229,8 @@ public class NovelRoomCreateModalUI extends JDialog {
 
         // 유효성 검사
         if (roomTitle.isEmpty() || roomDescription.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "모든 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -233,7 +239,8 @@ public class NovelRoomCreateModalUI extends JDialog {
             ClientSenderThread.getInstance().requestCreateNovelRoom(roomTitle, roomDescription, submissionDuration, voingDuration, novelistCount);
             dispose();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "소설방 생성 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "소설방 생성 중 오류가 발생했습니다.", null);
+            //JOptionPane.showMessageDialog(this, "소설방 생성 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }

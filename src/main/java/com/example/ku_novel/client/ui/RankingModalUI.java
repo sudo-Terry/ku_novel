@@ -1,7 +1,5 @@
 package com.example.ku_novel.client.ui;
 
-import com.example.ku_novel.client.connection.ClientSenderThread;
-import com.example.ku_novel.client.ui.component.CustomizedTextField;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.client.ui.component.RoundedButton;
@@ -9,18 +7,17 @@ import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
-public class DownloadModalUI extends JDialog {
+public class RankingModalUI extends JDialog {
     private NovelRoom[] rooms;
 
     private JTable table;
 
-    private String[] columnNames = {"제목", "설명"};
+    private String[] columnNames = {"순위", "제목", "설명"};
 
-    public DownloadModalUI(Frame parent) {
+    public RankingModalUI(Frame parent) {
         super(parent, "완결 소설 다운", true);
 
         setSize(800, 600);
@@ -32,7 +29,7 @@ public class DownloadModalUI extends JDialog {
         downloadPanel.setPreferredSize(new Dimension(400, 80));
         downloadPanel.setBackground(Color.WHITE);
 
-        JLabel downloadLabel = new JLabel("완결 소설");
+        JLabel downloadLabel = new JLabel("인기 소설 랭킹");
         downloadLabel.setFont(FontSetting.getInstance().loadCustomFont(40f));
         downloadPanel.add(downloadLabel);
         add(downloadPanel, BorderLayout.NORTH);
@@ -51,6 +48,11 @@ public class DownloadModalUI extends JDialog {
         table.getTableHeader().setBackground(NovelColor.DARK_GREEN);
         table.getTableHeader().setForeground(Color.WHITE);
         table.getTableHeader().setReorderingAllowed(false);
+
+        TableColumn column1 = table.getColumnModel().getColumn(0); // 첫 번째 열
+        column1.setPreferredWidth(50); // 원하는 너비 설정
+        column1.setMinWidth(50);       // 최소 너비 설정
+        column1.setMaxWidth(50);       // 최대 너비 설정
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());

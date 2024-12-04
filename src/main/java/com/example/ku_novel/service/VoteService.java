@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -77,6 +79,25 @@ public class VoteService {
 
             // 업데이트된 JSON 문자열 저장
             vote.setContentOptions(updatedContentOptionsJson);
+            voteRepository.save(vote);
+        } else {
+            throw new IllegalArgumentException("Vote ID not found: " + voteId);
+        }
+    }
+
+    public void addVotes(int voteId, String userId, String votedContent) {
+        Optional<Vote> voteOptional = voteRepository.findById(voteId);
+        if (voteOptional.isPresent()) {
+            Vote vote = voteOptional.get();
+
+            HashMap<String, Object> votes = vote.getVotes();
+            votes.put(userId, votedContent);
+
+            // map을 JSON 문자열로 변환
+            String json = VoteUtils.toJsonFromMap(votes);
+
+            // 업데이트된 JSON 문자열 저장
+            vote.setVotes(json);
             voteRepository.save(vote);
         } else {
             throw new IllegalArgumentException("Vote ID not found: " + voteId);

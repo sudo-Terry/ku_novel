@@ -132,6 +132,9 @@ class ClientHandler implements Runnable {
                 handleApproveAuthor(message);
                 break;
             case VOTE_FETCH_BY_ID:
+                handleVoteFetch(message);
+                break;
+            case VOTE:
                 handleVote(message);
                 break;
             // case ROOM_STATUS_UPDATE:
@@ -147,7 +150,7 @@ class ClientHandler implements Runnable {
 //        message.setNovelVoteId(1);
 //        message.setSender("aa");
 //        message.setContent("추가한 내용");
-//        handleWriteNovel(message);
+//        handleVote(message);
 
 
         // vote 테스트
@@ -158,6 +161,82 @@ class ClientHandler implements Runnable {
 
 
     private void handleVote(Message message) {
+        String sender = message.getSender();
+        String content = message.getContent();
+        Message response = new Message().setType(MessageType.VOTE_FAILED);
+
+        try {
+            // ToDo 유효한 사용자아이디인지(굳이?), 투표 가능한 상태인지 확인, 투표한 아이템이 유효한지 확인해야함.
+
+            int voteId = message.getNovelVoteId();
+            Vote vote = voteService.getVoteById(voteId);
+
+            // 이미 투표했는지 검사
+            if (vote.getVotes().containsKey(sender)) {
+                response.setContent("이미 투표를 했습니다.");
+                sendMessageToCurrentClient(response);
+                return;
+            }
+
+            voteService.addVotes(voteId, sender, content);
+
+            NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
+            int roomId = room.getId();
+
+            // 모든 사용자에게 알림 전송
+            synchronized (roomUsers) {
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                if (usersInRoom != null) {
+                    Message voteMessage = voteService.getVoteById(voteId).toMessage();
+                    for (String userId : usersInRoom) {
+                        response
+                                .setType(MessageType.VOTE_SUCCESS)
+                                .setContent("투표 갱신");
+                        response.setVote(voteMessage);
+//                        response.setSender(sender);
+                        sendMessageToUser(userId, response);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            response
+                    .setType(MessageType.VOTE_FAILED)
+                    .setContent("에러가 발생했습니다");
+            sendMessageToUser(sender, response);
+        }
+    }
+
+
+    private void handleAuthorApply(Message message) {
+        Message responseMessage = new Message();
+        try {
+            String userId = message.getSender();
+            int novelRoomId = message.getNovelRoomId();
+            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(novelRoomId);
+
+            if (room.isPresent()) {
+                String hostUserId = room.get().getHostUserId();
+
+                synchronized (roomUsers) {
+                    if (roomUsers.containsKey(novelRoomId)) {
+                        if (roomUsers.get(novelRoomId).contains(hostUserId)) {
+                            synchronized (activeClients) {
+                                if (activeClients.containsKey(hostUserId)) {
+                                    PrintWriter writer = activeClients.get(hostUserId);
+                                    responseMessage.setType(MessageType.AUTHOR_APPLY_RECEIVED).setSender(userId).setNovelRoomId(novelRoomId); // 방장에게 소설가 요청한 유저아이디와 방번호 보냄.
+                                    sendMessageToWriter(writer, responseMessage);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        // 클라이언트에게 따로 응답하지 않음.
+    }
+
+    private void handleVoteFetch(Message message) {
         Message responseMessage = new Message();
 
         try {
@@ -652,7 +731,7 @@ class ClientHandler implements Runnable {
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Message response = new Message()
                     .setType(MessageType.ERROR)
                     .setContent("에러가 발생했습니다");
