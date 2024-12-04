@@ -122,7 +122,7 @@ public class NovelRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 방이 존재하지 않습니다: " + roomId));
     }
 
-    public void updateNovelRoomSettings(Integer roomId, String updatedTitle, Integer updatedMaxParticipants, String updatedContent) {
+    public void updateNovelRoomSettings(Integer roomId, String updatedTitle, Integer updatedMaxParticipants, String updatedDescription) {
 
         NovelRoom novelRoom = novelRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("소설방을 찾을 수 없습니다: roomId=" + roomId));
@@ -138,8 +138,8 @@ public class NovelRoomService {
             novelRoom.setMaxParticipants(updatedMaxParticipants);
         }
 
-        if (updatedContent != null) {
-            novelRoom.setNovelContent(updatedContent);
+        if (updatedDescription != null) {
+            novelRoom.setDescription(updatedDescription);
         }
 
         novelRoomRepository.save(novelRoom);

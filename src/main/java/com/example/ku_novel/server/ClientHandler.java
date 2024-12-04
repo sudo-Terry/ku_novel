@@ -611,12 +611,28 @@ class ClientHandler implements Runnable {
         Message responseMessage = new Message();
         try {
             Integer roomId = message.getNovelRoomId();
+            NovelRoom novelRoom = novelRoomService.getNovelRoomById(roomId)
+                    .orElseThrow();
             String title = message.getNovelRoomTitle();
             Integer maxParticipants = message.getMaxParticipants();
             String novelRoomDescription = message.getNovelRoomDescription();
 
             // 소설방 설정 변경
             novelRoomService.updateNovelRoomSettings(roomId, title, maxParticipants, novelRoomDescription);
+
+            synchronized (roomUsers) {
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                if (usersInRoom != null) {
+                    for (String userId : usersInRoom) {
+                        Message updateMessage = new Message()
+                                .setType(MessageType.ROOM_FETCH_BY_ID)
+                                .setNovelRoomId(roomId)
+                                .setNovelRoom(novelRoom.toMessage())
+                                .setContent("소설방 설정이 변경되었습니다.");
+                        sendMessageToUser(userId, updateMessage);
+                    }
+                }
+            }
 
             // 성공 메시지
             responseMessage.setType(MessageType.ROOM_UPDATE_SETTING_SUCCESS)
