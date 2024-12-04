@@ -202,7 +202,7 @@ public class ClientSenderThread extends Thread{
 
     public void requestAuthorRejected() {
         Message authorRejectedMessage = new Message();
-        authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
+        authorRejectedMessage.setType(MessageType.AUTHOR_APPROVE_REJECTED);
         authorRejectedMessage.setSender(ClientDataModel.getInstance().getUserId());
         authorRejectedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
