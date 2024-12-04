@@ -25,8 +25,7 @@ public class VoteService {
     }
 
     public Vote getVoteById(int voteId) {
-        return voteRepository.findById(voteId)
-                .orElseThrow(() -> new IllegalArgumentException("Vote not found: " + voteId));
+        return voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Vote not found: " + voteId));
     }
 
     public void updateVoteStatus(int voteId, String status) {
@@ -89,6 +88,10 @@ public class VoteService {
         Optional<Vote> voteOptional = voteRepository.findById(voteId);
         if (voteOptional.isPresent()) {
             Vote vote = voteOptional.get();
+
+            if (!vote.getStatus().equals("VOTING_ENABLED")) {
+                throw new IllegalArgumentException("투표 가능한 시간이 아닙니다.");
+            }
 
             HashMap<String, Object> votes = vote.getVotes();
             votes.put(userId, votedContent);
