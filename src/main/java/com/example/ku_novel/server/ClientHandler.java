@@ -521,10 +521,12 @@ class ClientHandler implements Runnable {
                         .setContent("소설 방 참가에 성공했습니다.")
                         .setParticipantsCount(participantCount) // 현재 참여자 수 설정
                         .setNovelRoom(novelRoom.toMessage()); // novelRoom 추가
+                sendMessageToCurrentClient(responseMessage);
 
                 sendRecentRoomInfo(roomId);
 
                 System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
+                return;
             } else {
                 responseMessage.setContent("소설 방을 찾을 수 없습니다.");
             }
