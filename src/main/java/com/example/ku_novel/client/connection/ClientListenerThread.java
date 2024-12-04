@@ -52,7 +52,9 @@ public class ClientListenerThread extends Thread {
     private void handleMessageType(String messageType, JsonObject jsonObject, UIHandler uiHandler) {
         switch (messageType) {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
-            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED", "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED" -> uiHandler.showAlertModal(
+            case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED",
+                 "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED",
+                 "VOTE_FETCH_BY_ID_FAILED"-> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS", "ATTENDANCE_CHECK_SUCCESS" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
@@ -63,8 +65,19 @@ public class ClientListenerThread extends Thread {
             case "ROOM_JOIN_SUCCESS" -> handleRoomJoinSuccess(jsonObject, uiHandler);
             case "ROOM_CREATE_SUCCESS" -> handleRoomCreateSuccess(jsonObject, uiHandler);
             case "MESSAGE_RECEIVE" -> handleChatMessageReceive(jsonObject, uiHandler);
+            case "AUTHOR_APPLY_RECEIVED" -> handleAuthorApplyReceiverd(jsonObject, uiHandler);
+            case "VOTE_FETCH_BY_ID_SUCCESS" -> handleVoteFetchByIdSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        System.out.println(jsonObject);
+
+        // 데이터 모델 초기화
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        uiHandler.repaintVoteModalUI();
     }
 
     private void handleRoomCreateSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -150,6 +163,12 @@ public class ClientListenerThread extends Thread {
             System.err.println("handleChatMessage 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void handleAuthorApplyReceiverd(JsonObject jsonObject, UIHandler uiHandler) {
+        String nickname = jsonObject.get("nickname").getAsString();
+
+        uiHandler.showAuthorAcceptModalUI(nickname);
     }
 
     private void enqueueMessage(JsonObject jsonObject) {
