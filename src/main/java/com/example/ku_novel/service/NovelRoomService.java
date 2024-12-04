@@ -92,6 +92,16 @@ public class NovelRoomService {
         return novelRoomRepository.findByStatus("DEACTIVATE");
     }
 
+    public void save(NovelRoom novelRoom) {
+        novelRoomRepository.save(novelRoom);
+    }
+
+    public String getHostUserId(Integer roomId) {
+        return novelRoomRepository.findById(roomId)
+                .map(NovelRoom::getHostUserId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 방이 존재하지 않습니다: " + roomId));
+    }
+
 //    // 소설 방 참가
 //    public void joinNovelRoom(Integer id, String participantId) {
 //        Optional<NovelRoom> optionalRoom = novelRoomRepository.findById(id);

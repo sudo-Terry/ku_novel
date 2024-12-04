@@ -91,6 +91,7 @@ public class NovelRoom {
         message.setNovelRoomTitle(this.title);
         message.setNovelRoomDescription(this.description);
         message.setNovelRoomStatus(this.status);
+        message.setNovelVoteId(this.currentVoteId);
         message.setNovelHostUser(this.hostUserId);
         message.setNovelParticipantIds(this.getParticipantIdsAsList());
         message.setVotingDuration(this.votingDuration);
@@ -98,14 +99,6 @@ public class NovelRoom {
         message.setMaxParticipants(this.maxParticipants);
         message.setNovelContent(this.novelContent);
         return message;
-    }
-
-    public int getCurrentParticipantCount() {
-        if (participantIds == null || participantIds.isEmpty()) {
-            return 0;
-        }
-        List<String> participants = ParticipantUtils.parseParticipantIds(participantIds);
-        return participants.size();
     }
 
     public List<String> getParticipantIdsAsList() {

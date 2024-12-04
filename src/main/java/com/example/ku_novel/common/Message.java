@@ -46,6 +46,7 @@ public class Message {
     private int submissionDuration;
     private int maxParticipants;
     private int voteChoice;
+    private int participantsCount;
     private String novelEnded; // Lombok에서 is 접두사가 붙은 이름을 boolean getter로 간주해서 네이밍을 이렇게 하였음
 //    private boolean isParticipating; // 안씀
 
@@ -95,6 +96,7 @@ public class Message {
         return this;
     }
 
+
     public Message setPassword(String password) {
         this.password = password;
         return this;
@@ -105,9 +107,24 @@ public class Message {
         return this;
     }
 
+    public Message setNovelRoomId(Integer novelRoomId) {
+        this.novelRoomId = novelRoomId;
+        return this;
+    }
+
     public String toJson() {
         Gson gson = new GsonBuilder().create();
         return gson.toJson(this);
+    }
+
+    public Message setParticipantsCount(int participantsCount) {
+        this.participantsCount = participantsCount;
+        return this;
+    }
+
+    public Message setNovelRoom(Message novelRoom) {
+        this.novelRoom = novelRoom;
+        return this;
     }
 
     @Override
