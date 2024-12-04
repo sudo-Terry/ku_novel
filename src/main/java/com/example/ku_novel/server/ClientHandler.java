@@ -116,17 +116,20 @@ class ClientHandler implements Runnable {
             case MESSAGE_SEND:
                 handleChatMessage(message);
                 break;
-            case ROOM_MODIFY_SETTING:
-                handleModifyRoomSetting(message);
-                break;
+//            case ROOM_UPDATE_SETTING:
+//                handleUpdateRoomSetting(message);
+//                break;
             case AUTHOR_APPLY:
                 handleApplyAuthor(message);
                 break;
             case AUTHOR_WRITE:
                 handleWriteNovel(message);
                 break;
-            case AUTHOR_APPROVE:
+            case AUTHOR_APPROVED:
                 handleApproveAuthor(message);
+                break;
+            case AUTHOR_APPROVE_REJECTED:
+                handleRejectAuthor(message);
                 break;
             case VOTE_FETCH_BY_ID:
                 handleVoteFetch(message);
@@ -134,9 +137,9 @@ class ClientHandler implements Runnable {
             case VOTE:
                 handleVote(message);
                 break;
-            // case ROOM_STATUS_UPDATE:
-            // handleUpdateRoomStatus(message);
-            // break;
+             case ROOM_STATUS_UPDATE:
+                 handleUpdateRoomSetting(message);
+                 break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
@@ -567,10 +570,28 @@ class ClientHandler implements Runnable {
 
     /* 소설방 설정 변경 로직 */
 
-    private void handleModifyRoomSetting(Message message) {
+    private void handleUpdateRoomSetting(Message message) {
 
         Message responseMessage = new Message();
+        try {
+            Integer roomId = message.getNovelRoomId();
+            String title = message.getNovelRoomTitle();
+            Integer maxParticipants = message.getMaxParticipants();
+            String novelRoomDescription = message.getNovelRoomDescription();
 
+            // 소설방 설정 변경
+            novelRoomService.updateNovelRoomSettings(roomId, title, maxParticipants, novelRoomDescription);
+
+            // 성공 메시지
+            responseMessage.setType(MessageType.ROOM_UPDATE_SETTING_SUCCESS)
+                    .setNovelRoomId(roomId)
+                    .setContent("소설방 설정이 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            // 실패 메시지
+            responseMessage.setType(MessageType.ROOM_UPDATE_SETTING_FAILED)
+                    .setContent("소설방 설정 변경 실패: " + e.getMessage());
+        }
+        sendMessageToCurrentClient(responseMessage);
     }
 
     /* 소설 작성 로직 */
@@ -630,14 +651,11 @@ class ClientHandler implements Runnable {
     private void handleApproveAuthor(Message message) {
         Integer roomId = message.getNovelRoomId();
         String applicant = message.getSender();
-        boolean isApproved = message.getContent().equalsIgnoreCase("APPROVE");
 
         synchronized (roomApplicants) {
             if (!roomApplicants.containsKey(roomId) || !roomApplicants.get(roomId).contains(applicant)) {
                 return; // 신청자가 없으면 무시
             }
-
-            if (isApproved) {
                 Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
 
                 if (novelRoomOpt.isPresent()) {
@@ -646,7 +664,14 @@ class ClientHandler implements Runnable {
                     // ParticipantUtils 사용
                     List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
 
-                    // 최대 참여자 확인
+                    if (participantIds.contains(applicant)) {
+                        sendMessageToUser(applicant, new Message()
+                                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                                .setNovelRoomId(roomId)
+                                .setContent("이미 소설가로 승인되었습니다."));
+                        roomApplicants.get(roomId).remove(applicant);
+                        return;
+                    }
                     if (participantIds.size() >= novelRoom.getMaxParticipants()) {
                         sendMessageToUser(applicant, new Message()
                                 .setType(MessageType.AUTHOR_APPROVE_REJECTED)
@@ -661,8 +686,6 @@ class ClientHandler implements Runnable {
                     System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
                     novelRoom.setParticipantIds(updatedParticipantIdsJson);
                     novelRoomService.save(novelRoom);
-                    System.out.println("Saving NovelRoom with updated participants: " + novelRoom.getParticipantIds());
-
 
                     // 승인 메시지 전송
                     sendMessageToUser(applicant, new Message()
@@ -673,12 +696,20 @@ class ClientHandler implements Runnable {
                 } else {
                     System.out.println("NovelRoom not found for roomId=" + roomId);
                 }
-            }
             roomApplicants.get(roomId).remove(applicant);
         }
     }
 
+    // 소설가 승인 거절 로직
+    public void handleRejectAuthor(Message message) {
+        Integer roomId = message.getNovelRoomId();
+        String applicant = message.getSender();
 
+        sendMessageToUser(applicant, new Message()
+                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                .setNovelRoomId(roomId)
+                .setContent("소설가 신청이 거절되었습니다."));
+    }
 
     private void handleWriteNovel(Message message) {
         String sender = message.getSender();

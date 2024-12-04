@@ -122,8 +122,27 @@ public class NovelRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 방이 존재하지 않습니다: " + roomId));
     }
 
-    public void modifyRoomSetting(Integer roomId) {
+    public void updateNovelRoomSettings(Integer roomId, String updatedTitle, Integer updatedMaxParticipants, String updatedContent) {
 
+        NovelRoom novelRoom = novelRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("소설방을 찾을 수 없습니다: roomId=" + roomId));
+
+        if (updatedTitle != null && !updatedTitle.trim().isEmpty()) {
+            novelRoom.setTitle(updatedTitle);
+        }
+
+        if (updatedMaxParticipants != null && updatedMaxParticipants > 0) {
+            if (updatedMaxParticipants < ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds()).size()) {
+                throw new IllegalArgumentException("최대 참가자 수는 현재 참가자 수보다 작을 수 없습니다.");
+            }
+            novelRoom.setMaxParticipants(updatedMaxParticipants);
+        }
+
+        if (updatedContent != null) {
+            novelRoom.setNovelContent(updatedContent);
+        }
+
+        novelRoomRepository.save(novelRoom);
     }
 
 //    // 소설 방 참가
