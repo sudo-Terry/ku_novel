@@ -72,6 +72,11 @@ public class NovelRoomService {
         return novelRoomRepository.findById(id);
     }
 
+    // 투표 아이디로 소설 방 조회
+    public NovelRoom getNovelRoomByCurrentVoteId(Integer voteId) {
+        return novelRoomRepository.findByCurrentVoteId(voteId);
+    }
+
     // 활성화된 소설 방 조회
     public List<NovelRoom> getActiveNovelRooms() {
         return novelRoomRepository.findByStatus("ACTIVE");
