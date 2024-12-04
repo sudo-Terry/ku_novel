@@ -53,6 +53,10 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public User findNicknameById(String id) {
+        return userRepository.findNicknameById(id);
+    }
+
     // 포인트가 500 이상인지 확인
     public boolean hasEnoughPoints(String id) {
             User user = userRepository.findById(id).orElse(null);
