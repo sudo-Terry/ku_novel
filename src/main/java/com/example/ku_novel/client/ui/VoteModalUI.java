@@ -1,5 +1,7 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.model.VoteTableModel;
 import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.client.ui.component.FontSetting;
@@ -11,9 +13,11 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.util.List;
 
 public class VoteModalUI extends JDialog {
     private static final int TIME_LIMIT_SECONDS = 10; // 제한 시간 (초 단위)
+    private static VoteTableModel model;
 
     public VoteModalUI(NovelRoomModalUI parent) {
         super(parent, "투표", true);
@@ -33,7 +37,8 @@ public class VoteModalUI extends JDialog {
         mainPanel.add(preLabel, BorderLayout.NORTH);
 
         // 테이블 모델 생성
-        VoteTableModel model = new VoteTableModel();
+        model = new VoteTableModel();
+        initializeTableData();
 
         // JTable 생성
         JTable table = new JTable(model);
@@ -50,7 +55,7 @@ public class VoteModalUI extends JDialog {
 
         // 체크박스 렌더러 및 에디터 설정
         table.getColumn("선택").setCellRenderer(new RadioButtonRenderer());
-        table.getColumn("선택").setCellEditor(new RadioButtonEditor(model));
+        table.getColumn("선택").setCellEditor(new RadioButtonEditor());
 
         TableColumn column = table.getColumnModel().getColumn(1);
         column.setPreferredWidth(120); // 원하는 너비 설정
@@ -81,7 +86,24 @@ public class VoteModalUI extends JDialog {
 
         // 확인 버튼 동작
         okButton.addActionListener(e -> {
-            CustomAlert.showAlert(this, "정보", "등록 완료", null);
+            int selectedRow = -1;
+            for (int row = 0; row < model.getRowCount(); row++) {
+                if ((Boolean) model.getValueAt(row, 1)) {
+                    selectedRow = row;
+                    break;
+                }
+            }
+            if (selectedRow == -1) {
+                CustomAlert.showAlert(this, "오류", "옵션을 선택해주세요.", null);
+                return;
+            }
+            String selectedOption = (String) model.getValueAt(selectedRow, 0);
+
+            ClientSenderThread.getInstance().requestVote(
+                ClientDataModel.getInstance().getUserId(),
+                ClientDataModel.getInstance().getNovelVoteId(),
+                selectedOption
+            );
             dispose();
         });
 
@@ -111,11 +133,9 @@ public class VoteModalUI extends JDialog {
     // 체크박스 에디터
     static class RadioButtonEditor extends AbstractCellEditor implements TableCellEditor {
         private final JRadioButton radioButton;
-        private final VoteTableModel model;
         private int row;
 
-        public RadioButtonEditor(VoteTableModel model) {
-            this.model = model;
+        public RadioButtonEditor() {
             radioButton = new JRadioButton();
             radioButton.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -136,6 +156,16 @@ public class VoteModalUI extends JDialog {
         @Override
         public Object getCellEditorValue() {
             return radioButton.isSelected();
+        }
+    }
+
+    public void initializeTableData() {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        List<String> voteOptions = dataModel.getVoteOptions();
+
+        model.clear();
+        for (String option : voteOptions) {
+            model.addRow(option);
         }
     }
 }

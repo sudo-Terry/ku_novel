@@ -11,6 +11,8 @@ import com.google.gson.JsonObject;
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClientListenerThread extends Thread {
@@ -83,10 +85,24 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        System.out.println(jsonObject);
-
-        // 데이터 모델 초기화
         ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        if (jsonObject.has("vote")) {
+            JsonObject voteObject = jsonObject.getAsJsonObject("vote");
+            if (voteObject != null && voteObject.has("contentOptions")) {
+                List<String> options = dataModel.getGson().fromJson(
+                        voteObject.getAsJsonArray("contentOptions"),
+                        List.class
+                );
+                dataModel.setVoteOptions(options);
+            } else {
+                System.out.println("contentOptions가 JSON에 없습니다.");
+                dataModel.setVoteOptions(new ArrayList<>());
+            }
+        } else {
+            System.out.println("vote 객체가 JSON에 없습니다.");
+            dataModel.setVoteOptions(new ArrayList<>());
+        }
 
         uiHandler.repaintVoteModalUI();
     }

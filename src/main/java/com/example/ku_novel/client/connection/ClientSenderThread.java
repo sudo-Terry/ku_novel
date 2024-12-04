@@ -190,6 +190,16 @@ public class ClientSenderThread extends Thread{
         writer.println(voteFetchByIDMessage.toJson());
     }
 
+    public void requestVote(String senderId, int novelVoteId, String novelOption) {
+        Message voteMessage = new Message();
+        voteMessage.setType(MessageType.VOTE);
+        voteMessage.setSender(senderId);
+        voteMessage.setNovelVoteId(novelVoteId);
+        voteMessage.setContent(novelOption);
+
+        writer.println(voteMessage.toJson());
+    }
+
     public void requestAuthorRejected() {
         Message authorRejectedMessage = new Message();
         authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
