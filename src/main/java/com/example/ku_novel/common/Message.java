@@ -128,6 +128,11 @@ public class Message {
         return this;
     }
 
+    public Message setNovelParticipantIds(List<String> novelParticipantIds) {
+        this.novelParticipantIds = novelParticipantIds;
+        return this;
+    }
+
     @Override
     public String toString() {
         return toJson().toString();

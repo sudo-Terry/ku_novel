@@ -738,15 +738,17 @@ class ClientHandler implements Runnable {
                         .setContent("소설가로 승인되었습니다.");
                 sendMessageToUser(applyUsrId, responseToApplicant);
 
+                List<String> updatedParticipantIds = ParticipantUtils.parseParticipantIds(updatedParticipantIdsJson);
+
                 synchronized (roomUsers) {
                     Set<String> usersInRoom = roomUsers.get(roomId);
                     if (usersInRoom != null) {
                         for (String userId : usersInRoom) {
                             Message updateMessage = new Message()
-                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+                                    .setType(MessageType.AUTHOR_LIST_UPDATE)
+                                    .setContent("소설가 상태가 갱신되었습니다.")
                                     .setNovelRoomId(roomId)
-                                    .setNovelRoom(novelRoom.toMessage())
-                                    .setContent("소설가 상태가 갱신되었습니다.");
+                                    .setNovelParticipantIds(updatedParticipantIds);
                             sendMessageToUser(userId, updateMessage);
                         }
                     }
