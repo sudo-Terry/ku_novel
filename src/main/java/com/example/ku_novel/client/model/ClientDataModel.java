@@ -36,6 +36,7 @@ public class ClientDataModel {
     private List<String> novelParticipantIds; // 소설가 아이디 배열
     private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
     private int novelVoteId;
+    private int participantsCount;
     private List<String> voteOptions;
     private int countDownVote;
     private int countDownWrite;
