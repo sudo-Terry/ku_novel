@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 @Repository
@@ -18,6 +19,8 @@ public interface NovelRoomRepository extends JpaRepository<NovelRoom, Integer> {
 
     // 방장이 생성한 모든 소설방 조회
     List<NovelRoom> findByHostUserId(String hostUserId);
+
+    NovelRoom findByCurrentVoteId(Integer currentVoteId);
 
     // 최대 참여 인원이 특정 값 이상인 소설방 조회
     List<NovelRoom> findByMaxParticipantsGreaterThanEqual(Integer minParticipants);
