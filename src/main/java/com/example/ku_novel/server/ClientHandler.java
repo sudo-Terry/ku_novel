@@ -727,7 +727,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             Message response = new Message()
                     .setType(MessageType.ERROR)
-                    .setContent("에러가 발생했습니다");
+                    .setContent(e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
