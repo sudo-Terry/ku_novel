@@ -200,19 +200,21 @@ public class ClientSenderThread extends Thread{
         writer.println(voteMessage.toJson());
     }
 
-    public void requestAuthorRejected() {
+    public void requestAuthorRejected(String requestUserNickname) {
         Message authorRejectedMessage = new Message();
         authorRejectedMessage.setType(MessageType.AUTHOR_APPROVE_REJECTED);
         authorRejectedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorRejectedMessage.setContent(requestUserNickname);
         authorRejectedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
         writer.println(authorRejectedMessage.toJson());
     }
 
-    public void requestAuthorApproved() {
+    public void requestAuthorApprove(String requestUserNickname) {
         Message authorApprovedMessage = new Message();
-        authorApprovedMessage.setType(MessageType.AUTHOR_APPROVED);
+        authorApprovedMessage.setType(MessageType.AUTHOR_APPROVE);
         authorApprovedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorApprovedMessage.setContent(requestUserNickname);
         authorApprovedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
         writer.println(authorApprovedMessage.toJson());
