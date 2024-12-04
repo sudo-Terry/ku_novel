@@ -7,6 +7,7 @@ import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.ui.component.CountdownButtonUtility;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -73,7 +74,13 @@ public class VoteModalUI extends JDialog {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setPreferredSize(new Dimension(800, 50));
 
-        JButton okButton = new RoundedButton("투표(10:00)", NovelColor.DARK_GREEN, Color.WHITE);
+        CountdownButtonUtility countdownButtonUtility = new CountdownButtonUtility(
+                ClientDataModel.getInstance().getCountDown(),
+                "투표"
+        );
+        JButton okButton = countdownButtonUtility.getButton();
+        countdownButtonUtility.startCountdown();
+
         okButton.setPreferredSize(new Dimension(100, 40));
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
 
