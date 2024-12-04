@@ -363,6 +363,7 @@ public class NovelRoomModalUI extends JDialog {
             ClientSenderThread.getInstance().requestVoteFetchByID(
                     ClientDataModel.getInstance().getNovelVoteId()
             );
+            UIHandler.getInstance().setVoteModalUIVisible();
         });
 
         bottomGbc.gridx = 3;

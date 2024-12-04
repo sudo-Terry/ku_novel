@@ -24,7 +24,6 @@ public class ClientDataModel {
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private List<NovelRoom> chatRoomsSearchResult;
-    private int novelVoteId;
     private Gson gson;
 
     // NovelRoomModalUI 데이터
@@ -34,6 +33,8 @@ public class ClientDataModel {
     private String novelRoomStatus;
     private String[] novelParticipantIds; // 소설가 아이디 배열
     private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
+    private int novelVoteId;
+    private List<String> voteOptions;
 
     private static volatile ClientDataModel instance;
 

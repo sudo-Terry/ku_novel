@@ -236,9 +236,19 @@ public class UIHandler {
         });
     }
 
-    public void repaintVoteModalUI(){
-        // TODO : VoteFetch 응답에 대해서 VoteModal을 Re-Render 하는것 구현 필요
-        // Listener에서 응답을 받으면 데이터를 갱신하고 repaint를 수행한다.
+    public void repaintVoteModalUI() {
+        SwingUtilities.invokeLater(() -> {
+            voteModalUI = new VoteModalUI(novelRoomModalUI);
+            voteModalUI.initializeTableData();
+        });
+    }
+
+    public void setVoteModalUIVisible() {
+        SwingUtilities.invokeLater(() -> {
+            if (voteModalUI != null) {
+                voteModalUI.setVisible(true);
+            }
+        });
     }
 
     public void showRankingModal(JFrame frame) {
