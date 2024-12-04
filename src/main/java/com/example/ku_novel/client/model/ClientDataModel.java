@@ -3,6 +3,8 @@ package com.example.ku_novel.client.model;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +33,7 @@ public class ClientDataModel {
     private String novelRoomDescription;
     private String hostUserId;
     private String novelRoomStatus;
-    private String[] novelParticipantIds; // 소설가 아이디 배열
+    private List<String> novelParticipantIds; // 소설가 아이디 배열
     private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
     private int novelVoteId;
     private List<String> voteOptions;
@@ -65,7 +67,13 @@ public class ClientDataModel {
             this.currentRoomId = novelRoomObject.get("novelRoomId").getAsInt();
             this.hostUserId = novelRoomObject.get("novelHostUser").getAsString();
             this.novelRoomStatus = novelRoomObject.get("novelRoomStatus").getAsString();
-            this.novelParticipantIds = novelRoomObject.get("novelParticipantIds").getAsString().split(",");
+            this.novelParticipantIds = new ArrayList<>();
+            JsonArray participantsArray = novelRoomObject.getAsJsonArray("novelParticipantIds");
+            if (participantsArray != null) {
+                for (JsonElement participant : participantsArray) {
+                    this.novelParticipantIds.add(participant.getAsString());
+                }
+            }
             this.novelMaxParticipants = novelRoomObject.get("maxParticipants").getAsInt();
             this.novelVoteId = novelRoomObject.get("novelVoteId").getAsInt();
 

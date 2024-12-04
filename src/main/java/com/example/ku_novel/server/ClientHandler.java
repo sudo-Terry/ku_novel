@@ -629,50 +629,48 @@ class ClientHandler implements Runnable {
     // 소설가 승인 로직
     private void handleApproveAuthor(Message message) {
         Integer roomId = message.getNovelRoomId();
-        String applicant = message.getSender();
-        boolean isApproved = message.getContent().equalsIgnoreCase("APPROVE");
+        String applicant = message.getContent();
 
         synchronized (roomApplicants) {
             if (!roomApplicants.containsKey(roomId) || !roomApplicants.get(roomId).contains(applicant)) {
                 return; // 신청자가 없으면 무시
             }
 
-            if (isApproved) {
-                Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
 
-                if (novelRoomOpt.isPresent()) {
-                    NovelRoom novelRoom = novelRoomOpt.get();
+            if (novelRoomOpt.isPresent()) {
+                NovelRoom novelRoom = novelRoomOpt.get();
 
-                    // ParticipantUtils 사용
-                    List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
+                // ParticipantUtils 사용
+                List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
 
-                    // 최대 참여자 확인
-                    if (participantIds.size() >= novelRoom.getMaxParticipants()) {
-                        sendMessageToUser(applicant, new Message()
-                                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
-                                .setNovelRoomId(roomId)
-                                .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다."));
-                        roomApplicants.get(roomId).remove(applicant);
-                        return;
-                    }
-
-                    // 새 참여자 추가
-                    String updatedParticipantIdsJson = ParticipantUtils.addParticipant(novelRoom.getParticipantIds(), applicant);
-                    System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
-                    novelRoom.setParticipantIds(updatedParticipantIdsJson);
-                    novelRoomService.save(novelRoom);
-                    System.out.println("Saving NovelRoom with updated participants: " + novelRoom.getParticipantIds());
-
-
-                    // 승인 메시지 전송
+                // 최대 참여자 확인
+                if (participantIds.size() >= novelRoom.getMaxParticipants()) {
                     sendMessageToUser(applicant, new Message()
-                            .setType(MessageType.AUTHOR_APPROVED)
+                            .setType(MessageType.AUTHOR_APPROVE_REJECTED)
                             .setNovelRoomId(roomId)
-                            .setSender(applicant)
-                            .setContent("소설가로 승인되었습니다."));
-                } else {
-                    System.out.println("NovelRoom not found for roomId=" + roomId);
+                            .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다."));
+                    roomApplicants.get(roomId).remove(applicant);
+                    return;
                 }
+
+                // 새 참여자 추가
+                String updatedParticipantIdsJson = ParticipantUtils.addParticipant(novelRoom.getParticipantIds(), applicant);
+                System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
+                novelRoom.setParticipantIds(updatedParticipantIdsJson);
+                novelRoomService.save(novelRoom);
+                System.out.println("Saving NovelRoom with updated participants: " + novelRoom.getParticipantIds());
+
+
+                // 승인 메시지 전송
+                sendMessageToUser(applicant, new Message()
+                        .setType(MessageType.AUTHOR_APPROVED)
+                        .setNovelRoomId(roomId)
+                        .setNovelRoom(novelRoom.toMessage())
+                        .setSender(applicant)
+                        .setContent("소설가로 승인되었습니다."));
+            } else {
+                System.out.println("NovelRoom not found for roomId=" + roomId);
             }
             roomApplicants.get(roomId).remove(applicant);
         }

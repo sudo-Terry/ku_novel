@@ -343,7 +343,7 @@ public class NovelRoomModalUI extends JDialog {
         // 현재 소설가 버튼
         JButton authorButton = new ImageButton("src/main/resources/icon/people.png", Color.WHITE);
         authorButton.addActionListener(e -> {
-            String participantIds = Arrays.toString(ClientDataModel.getInstance().getNovelParticipantIds());
+            String participantIds = ClientDataModel.getInstance().getNovelParticipantIds().toString();
             UIHandler.getInstance().showAlertModal(
                     this, "정보", "현재 소설가는 " + participantIds + " 입니다.", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -475,5 +475,9 @@ public class NovelRoomModalUI extends JDialog {
 
     public void updateChatArea(String formattedChat){
         chatTextArea.append(formattedChat + '\n');
+    }
+
+    public void updateButtonArea(){
+        initUI();
     }
 }

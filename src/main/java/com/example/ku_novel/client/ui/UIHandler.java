@@ -189,6 +189,10 @@ public class UIHandler {
         HomeUI.getInstance().repaintHomeUI();
     }
 
+    public void repaintNovelRoomModalUI() {
+        NovelRoomModalUI.getInstance().updateButtonArea();
+    }
+
     public void updateNovelRoomChat(int roomId, String formattedMessage) {
         if(novelRoomModalUI.getRoomId() == ClientDataModel.getInstance().getCurrentRoomId())
             novelRoomModalUI.updateChatArea(formattedMessage);
