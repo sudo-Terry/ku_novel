@@ -204,7 +204,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             response
                     .setType(MessageType.VOTE_FAILED)
-                    .setContent("에러가 발생했습니다"+ e.getMessage());
+                    .setContent("에러가 발생했습니다" + e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
@@ -507,9 +507,12 @@ class ClientHandler implements Runnable {
                 }
 
                 // 현재 참여자 수 계산
-                int participantCount;
+                int participantCount = 0;
                 synchronized (roomUsers) {
-                    participantCount = roomUsers.get(roomId).size();
+                    Set<String> set = roomUsers.get(roomId);
+                    if (set != null) {
+                        participantCount = set.size();
+                    }
                 }
 
                 // 성공 응답 메시지 생성
@@ -677,7 +680,6 @@ class ClientHandler implements Runnable {
     }
 
 
-
     private void handleWriteNovel(Message message) {
         String sender = message.getSender();
 
@@ -737,9 +739,6 @@ class ClientHandler implements Runnable {
             sendMessageToUser(sender, response);
         }
     }
-
-
-
 
 
     // 소설방 나가기 로직
