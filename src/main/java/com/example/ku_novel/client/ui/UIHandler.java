@@ -3,6 +3,7 @@ package com.example.ku_novel.client.ui;
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -230,7 +231,7 @@ public class UIHandler {
 
     public void showAuthorAcceptModalUI(String nickname) {
         SwingUtilities.invokeLater(() -> {
-            AuthorAcceptModalUI modal = new AuthorAcceptModalUI(null, "nickname");
+            AuthorAcceptModalUI modal = new AuthorAcceptModalUI(null, nickname);
             modal.setVisible(true);
         });
     }

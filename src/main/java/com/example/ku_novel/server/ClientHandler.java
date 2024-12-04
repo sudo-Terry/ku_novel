@@ -109,9 +109,6 @@ class ClientHandler implements Runnable {
                 break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
-                //소설가 요청 테스트
-//                message.setNovelVoteId(6);
-//                handleAuthorApply(message);;
                 break;
             case ROOM_LEAVE:
                 handleLeaveRoom(message);
@@ -213,34 +210,34 @@ class ClientHandler implements Runnable {
     }
 
 
-    private void handleAuthorApply(Message message) {
-        Message responseMessage = new Message();
-        try {
-            String userId = message.getSender();
-            int novelRoomId = message.getNovelRoomId();
-            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(novelRoomId);
-
-            if (room.isPresent()) {
-                String hostUserId = room.get().getHostUserId();
-
-                synchronized (roomUsers) {
-                    if (roomUsers.containsKey(novelRoomId)) {
-                        if (roomUsers.get(novelRoomId).contains(hostUserId)) {
-                            synchronized (activeClients) {
-                                if (activeClients.containsKey(hostUserId)) {
-                                    PrintWriter writer = activeClients.get(hostUserId);
-                                    responseMessage.setType(MessageType.AUTHOR_APPLY_RECEIVED).setSender(userId).setNovelRoomId(novelRoomId); // 방장에게 소설가 요청한 유저아이디와 방번호 보냄.
-                                    sendMessageToWriter(writer, responseMessage);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
-        // 클라이언트에게 따로 응답하지 않음.
-    }
+//    private void handleAuthorApply(Message message) {
+//        Message responseMessage = new Message();
+//        try {
+//            String userId = message.getSender();
+//            int novelRoomId = message.getNovelRoomId();
+//            Optional<NovelRoom> room = novelRoomService.getNovelRoomById(novelRoomId);
+//
+//            if (room.isPresent()) {
+//                String hostUserId = room.get().getHostUserId();
+//
+//                synchronized (roomUsers) {
+//                    if (roomUsers.containsKey(novelRoomId)) {
+//                        if (roomUsers.get(novelRoomId).contains(hostUserId)) {
+//                            synchronized (activeClients) {
+//                                if (activeClients.containsKey(hostUserId)) {
+//                                    PrintWriter writer = activeClients.get(hostUserId);
+//                                    responseMessage.setType(MessageType.AUTHOR_APPLY_RECEIVED).setSender(userId).setNovelRoomId(novelRoomId); // 방장에게 소설가 요청한 유저아이디와 방번호 보냄.
+//                                    sendMessageToWriter(writer, responseMessage);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//        }
+//        // 클라이언트에게 따로 응답하지 않음.
+//    }
 
     private void handleVoteFetch(Message message) {
         Message responseMessage = new Message();
@@ -582,44 +579,52 @@ class ClientHandler implements Runnable {
     private void handleApplyAuthor(Message message) {
         Integer roomId = message.getNovelRoomId();
         String sender = message.getSender();
+        User user = userService.findNicknameById(sender);
+        String nickname = user.getNickname();
 
         synchronized (roomApplicants) {
             roomApplicants.putIfAbsent(roomId, new HashSet<>());
             roomApplicants.get(roomId).remove(sender);
             roomApplicants.get(roomId).add(sender);
 
-                try {
-                    // 방장 ID 조회
-                    String hostId = novelRoomService.getHostUserId(roomId);
+            try {
+                // 방장 ID 조회
+                String hostId = novelRoomService.getHostUserId(roomId);
 
-                    synchronized (roomUsers) {
-                        if (roomUsers.get(roomId).contains(hostId)) {
-                            // 방장이 활성 상태인 경우 메시지 전송
-                            Message response = new Message()
-                                    .setType(MessageType.AUTHOR_APPLY_SUCCESS)
-                                    .setContent("소설가 신청이 접수되었습니다.")
-                                    .setSender(sender)
-                                    .setNovelRoomId(roomId);
+                synchronized (roomUsers) {
+                    if (roomUsers.containsKey(roomId) && roomUsers.get(roomId).contains(hostId)) {
+                        // 방장이 활성 상태인 경우 메시지 전송
+                        Message responseToApplicant = new Message()
+                                .setType(MessageType.AUTHOR_APPLY_SUCCESS)
+                                .setContent("소설가 신청이 접수되었습니다.")
+                                .setSender(sender)
+                                .setNovelRoomId(roomId);
+                        sendMessageToUser(sender, responseToApplicant);
 
-                            sendMessageToUser(hostId, response);
-                        } else {
-                            // 방장이 비활성 상태인 경우 신청자에게 거절 메시지 전송
-                            Message rejection = new Message()
-                                    .setType(MessageType.AUTHOR_APPLY_REJECTED)
-                                    .setContent("소설가 신청이 거절되었습니다. 방장이 비활성 상태입니다.")
-                                    .setSender("System")
-                                    .setNovelRoomId(roomId);
-
-                            sendMessageToUser(sender, rejection);
-                        }
+                        // 방장에게 알림 전송
+                        Message notifyHost = new Message()
+                                .setType(MessageType.AUTHOR_APPLY_RECEIVED)
+                                .setContent("새로운 소설가 신청이 접수되었습니다.")
+                                .setNickname(nickname)
+                                .setNovelRoomId(roomId);
+                        sendMessageToUser(hostId, notifyHost);
+                    } else {
+                        // 방장이 비활성 상태인 경우 신청자에게 거절 메시지 전송
+                        Message rejection = new Message()
+                                .setType(MessageType.AUTHOR_APPLY_REJECTED)
+                                .setContent("소설가 신청이 거절되었습니다. 방장이 비활성 상태입니다.")
+                                .setSender(sender)
+                                .setNovelRoomId(roomId);
+                        sendMessageToUser(sender, rejection);
                     }
-                } catch (Exception e) {
-                    System.err.println("방장 정보를 찾을 수 없습니다: " + e.getMessage());
-                    e.printStackTrace();
                 }
-
+            } catch (Exception e) {
+                System.err.println("방장 정보를 찾을 수 없습니다: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
+
 
     // 소설가 승인 로직
     private void handleApproveAuthor(Message message) {
@@ -638,49 +643,41 @@ class ClientHandler implements Runnable {
                 if (novelRoomOpt.isPresent()) {
                     NovelRoom novelRoom = novelRoomOpt.get();
 
-                    // participantIds 처리
-                    Gson gson = new Gson();
-                    String participantIdsJson = novelRoom.getParticipantIds();
-                    List<String> participantIds;
+                    // ParticipantUtils 사용
+                    List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
 
-                    if (participantIdsJson == null || participantIdsJson.isEmpty()) {
-                        participantIds = new ArrayList<>();
-                    } else {
-                        participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {
-                        }.getType());
-                    }
-
-                    // 최대 소설가 가능 인원 체크
+                    // 최대 참여자 확인
                     if (participantIds.size() >= novelRoom.getMaxParticipants()) {
-                        // 신청 거절 메시지 전송
-                        Message response = new Message()
+                        sendMessageToUser(applicant, new Message()
                                 .setType(MessageType.AUTHOR_APPROVE_REJECTED)
                                 .setNovelRoomId(roomId)
-                                .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다.");
-                        sendMessageToUser(applicant, response);
-
-                        // 신청자 목록에서 제거
+                                .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다."));
                         roomApplicants.get(roomId).remove(applicant);
                         return;
                     }
 
-                    // 신청자를 소설가로 추가
-                    participantIds.add(applicant);
-                    novelRoom.setParticipantIds(gson.toJson(participantIds));
+                    // 새 참여자 추가
+                    String updatedParticipantIdsJson = ParticipantUtils.addParticipant(novelRoom.getParticipantIds(), applicant);
+                    System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
+                    novelRoom.setParticipantIds(updatedParticipantIdsJson);
                     novelRoomService.save(novelRoom);
+                    System.out.println("Saving NovelRoom with updated participants: " + novelRoom.getParticipantIds());
+
 
                     // 승인 메시지 전송
-                    Message response = new Message()
+                    sendMessageToUser(applicant, new Message()
                             .setType(MessageType.AUTHOR_APPROVED)
                             .setNovelRoomId(roomId)
-                            .setContent("소설가로 승인되었습니다.");
-                    sendMessageToUser(applicant, response);
+                            .setSender(applicant)
+                            .setContent("소설가로 승인되었습니다."));
+                } else {
+                    System.out.println("NovelRoom not found for roomId=" + roomId);
                 }
             }
-            // 신청자 제거
             roomApplicants.get(roomId).remove(applicant);
         }
     }
+
 
 
     private void handleWriteNovel(Message message) {
@@ -744,6 +741,8 @@ class ClientHandler implements Runnable {
             sendMessageToUser(sender, response);
         }
     }
+
+
 
 
 

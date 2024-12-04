@@ -7,6 +7,7 @@ import com.example.ku_novel.repository.NovelRoomRepository;
 import com.example.ku_novel.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -110,14 +111,19 @@ public class NovelRoomService {
         return novelRoomRepository.findByStatus("DEACTIVATE");
     }
 
+    @Transactional
     public void save(NovelRoom novelRoom) {
-        novelRoomRepository.save(novelRoom);
+        novelRoomRepository.saveAndFlush(novelRoom);
     }
 
     public String getHostUserId(Integer roomId) {
         return novelRoomRepository.findById(roomId)
                 .map(NovelRoom::getHostUserId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 방이 존재하지 않습니다: " + roomId));
+    }
+
+    public void modifyRoomSetting(Integer roomId) {
+
     }
 
 //    // 소설 방 참가
