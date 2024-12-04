@@ -37,7 +37,8 @@ public class ClientDataModel {
     private int novelMaxParticipants; // maxParticipants : 최대 소설가 수
     private int novelVoteId;
     private List<String> voteOptions;
-    private int countDown;
+    private int countDownVote;
+    private int countDownWrite;
 
     private static volatile ClientDataModel instance;
 

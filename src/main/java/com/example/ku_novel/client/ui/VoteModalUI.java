@@ -75,7 +75,7 @@ public class VoteModalUI extends JDialog {
         buttonPanel.setPreferredSize(new Dimension(800, 50));
 
         CountdownButtonUtility countdownButtonUtility = new CountdownButtonUtility(
-                ClientDataModel.getInstance().getCountDown(),
+                ClientDataModel.getInstance().getCountDownVote(),
                 "투표"
         );
         JButton okButton = countdownButtonUtility.getButton();
