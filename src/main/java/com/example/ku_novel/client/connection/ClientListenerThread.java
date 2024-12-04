@@ -73,8 +73,15 @@ public class ClientListenerThread extends Thread {
             case "VOTE_FETCH_BY_ID_SUCCESS" -> handleVoteFetchByIdSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_FAVOURITE_SUCCESS" -> handleFetchFavouriteSuccess(jsonObject, uiHandler);
             case "AUTHOR_APPROVED" -> handleAuthorApproved(jsonObject, uiHandler);
+            case "ROOM_FETCH_BY_ID" -> handleRoomFetchById(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleRoomFetchById(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel.getInstance().setParticipantsCount(jsonObject.get("participantsCount").getAsInt());
+
+        uiHandler.updateNovelRoomParticipantsCount();
     }
 
     private void handleAuthorApproved(JsonObject jsonObject, UIHandler uiHandler) {
@@ -105,7 +112,14 @@ public class ClientListenerThread extends Thread {
                         List.class
                 );
                 dataModel.setVoteOptions(options);
-                dataModel.setCountDown(jsonObject.get("countDown").getAsInt());
+                if(voteObject.get("voteStatus").getAsString().equals("WRITER_ENABLED")){
+                    dataModel.setCountDownWrite(voteObject.get("countDown").getAsInt());
+                    dataModel.setCountDownVote(0);
+                }
+                if(voteObject.get("voteStatus").getAsString().equals("VOTING_ENABLED")){
+                    dataModel.setCountDownWrite(0);
+                    dataModel.setCountDownVote(voteObject.get("countDown").getAsInt());
+                }
             } else {
                 System.out.println("contentOptions가 JSON에 없습니다.");
                 dataModel.setVoteOptions(new ArrayList<>());
@@ -179,6 +193,7 @@ public class ClientListenerThread extends Thread {
             }
             ClientDataModel dataModel = ClientDataModel.getInstance();
             dataModel.setChatRoomFromJson(jsonObject);
+            dataModel.setParticipantsCount(jsonObject.get("participantsCount").getAsInt());
             uiHandler.showNovelRoomModalUI(dataModel.getCurrentRoomId());
         } catch (Exception e) {
             System.err.println("handleRoomJoinSuccess 처리 중 오류 발생: " + e.getMessage());

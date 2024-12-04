@@ -99,7 +99,7 @@ public class NovelInputModalUI extends JDialog {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         CountdownButtonUtility countdownButtonUtility = new CountdownButtonUtility(
-                ClientDataModel.getInstance().getCountDown(),
+                ClientDataModel.getInstance().getCountDownWrite(),
                 "등록"
         );
         JButton okButton = countdownButtonUtility.getButton();

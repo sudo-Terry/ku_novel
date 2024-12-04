@@ -206,7 +206,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             response
                     .setType(MessageType.VOTE_FAILED)
-                    .setContent("에러가 발생했습니다"+ e.getMessage());
+                    .setContent("에러가 발생했습니다" + e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
@@ -509,9 +509,12 @@ class ClientHandler implements Runnable {
                 }
 
                 // 현재 참여자 수 계산
-                int participantCount;
+                int participantCount = 0;
                 synchronized (roomUsers) {
-                    participantCount = roomUsers.get(roomId).size();
+                    Set<String> set = roomUsers.get(roomId);
+                    if (set != null) {
+                        participantCount = set.size();
+                    }
                 }
 
                 // 성공 응답 메시지 생성
@@ -520,8 +523,12 @@ class ClientHandler implements Runnable {
                         .setContent("소설 방 참가에 성공했습니다.")
                         .setParticipantsCount(participantCount) // 현재 참여자 수 설정
                         .setNovelRoom(novelRoom.toMessage()); // novelRoom 추가
+                sendMessageToCurrentClient(responseMessage);
+
+                sendRecentRoomInfo(roomId);
 
                 System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
+                return;
             } else {
                 responseMessage.setContent("소설 방을 찾을 수 없습니다.");
             }
@@ -531,6 +538,34 @@ class ClientHandler implements Runnable {
         }
 
         sendMessageToCurrentClient(responseMessage);
+    }
+
+    private void sendRecentRoomInfo(int roomId) {
+        try {
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+            if (novelRoomOpt.isPresent()) {
+                NovelRoom novelRoom = novelRoomOpt.get();
+
+                // 현재 참여자 수 계산
+                int participantCount = 0;
+                synchronized (roomUsers) {
+                    Set<String> set = roomUsers.get(roomId);
+                    if (set != null) {
+                        participantCount = set.size();
+                        for (String userId : set) {
+                            Message responseMessage = new Message()
+                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+                                    .setContent("소설 방 정보 갱신")
+                                    .setParticipantsCount(participantCount) // 현재 참여자 수 설정
+                                    .setNovelRoom(novelRoom.toMessage());
+                            sendMessageToUser(userId, responseMessage);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     /* 출석 로직 */
@@ -798,6 +833,8 @@ class ClientHandler implements Runnable {
                     throw new IllegalArgumentException("소설 방에 참가하지 않았습니다.");
                 }
             }
+
+            sendRecentRoomInfo(roomId);
         } catch (Exception e) {
         }
 

@@ -298,4 +298,8 @@ public class UIHandler {
             }
         });
     }
+
+    public void updateNovelRoomParticipantsCount() {
+        novelRoomModalUI.updateParticipantButton();
+    }
 }

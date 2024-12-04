@@ -27,6 +27,7 @@ public class NovelRoomModalUI extends JDialog {
     private int roomId;
     private String roomTitle;
     private String roomDescription;
+    RoundedButton participantButton;
 
     private Boolean isInterested = true; // 수정 필요
 
@@ -118,7 +119,11 @@ public class NovelRoomModalUI extends JDialog {
         participantPanel.setBackground(Color.WHITE);
         JLabel image = new JLabel("현재 독자 수", scaleIcon("src/main/resources/icon/eyes.png", 20, 20), JLabel.CENTER);
         image.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        RoundedButton participantButton = new RoundedButton("1,000", NovelColor.LIGHT_GREEN, Color.WHITE);
+        participantButton = new RoundedButton(
+                Integer.toString(ClientDataModel.getInstance().getParticipantsCount()),
+                NovelColor.LIGHT_GREEN,
+                Color.WHITE
+        );
         participantButton.setColorChangeEnabled(false);
         participantButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
         participantButton.setPreferredSize(new Dimension(110, 40));
@@ -479,5 +484,11 @@ public class NovelRoomModalUI extends JDialog {
 
     public void updateButtonArea(){
         initUI();
+    }
+
+    public void updateParticipantButton(){
+        participantButton.setText(String.valueOf(ClientDataModel.getInstance().getParticipantsCount()));
+        participantButton.repaint();
+        participantButton.revalidate();
     }
 }
