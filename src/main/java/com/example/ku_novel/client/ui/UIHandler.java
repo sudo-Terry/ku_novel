@@ -3,7 +3,6 @@ package com.example.ku_novel.client.ui;
 import com.example.ku_novel.client.connection.ClientListenerThread;
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
-import com.example.ku_novel.client.ui.component.CustomAlert;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.domain.NovelRoom;
 
@@ -156,19 +155,19 @@ public class UIHandler {
         );
     }
 
-    public void showNovelInputModal(NovelRoomModalUI frame) {
+    public void showNovelInputModal() {
         SwingUtilities.invokeLater(() -> {
             if(novelInputModalUI == null || !novelInputModalUI.isVisible()) {
-                novelInputModalUI = new NovelInputModalUI(frame);
+                novelInputModalUI = new NovelInputModalUI(novelRoomModalUI);
                 novelInputModalUI.setVisible(true);
             }
         });
     }
 
-    public void showVoteModal(NovelRoomModalUI frame) {
+    public void showVoteModal() {
         SwingUtilities.invokeLater(() -> {
             if(voteModalUI == null || !voteModalUI.isVisible()) {
-                voteModalUI = new VoteModalUI(frame);
+                voteModalUI = new VoteModalUI(novelRoomModalUI);
                 voteModalUI.setVisible(true);
             }
         });
@@ -227,6 +226,18 @@ public class UIHandler {
                 System.out.println("downloadModalUI 이미 열려 있음");
             }
         });
+    }
+
+    public void showAuthorAcceptModalUI(String nickname) {
+        SwingUtilities.invokeLater(() -> {
+            AuthorAcceptModalUI modal = new AuthorAcceptModalUI(null, "nickname");
+            modal.setVisible(true);
+        });
+    }
+
+    public void repaintVoteModalUI(){
+        // TODO : VoteFetch 응답에 대해서 VoteModal을 Re-Render 하는것 구현 필요
+        // Listener에서 응답을 받으면 데이터를 갱신하고 repaint를 수행한다.
     }
 
     public void showRankingModal(JFrame frame) {
