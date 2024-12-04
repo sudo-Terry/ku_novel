@@ -23,6 +23,7 @@ public class ClientDataModel {
     private List<NovelRoom> chatRoomsActive;
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
+    private List<NovelRoom> chatRoomsSearchResult;
     private Gson gson;
 
     // NovelRoomModalUI 데이터
@@ -88,6 +89,35 @@ public class ClientDataModel {
             participatingRooms.add(message.toNovelRoom());
         }
         chatRoomsParticipating = participatingRooms;
+
+        // TODO : 서버에서 로그인, 새로고침 갱신때 관심 소설방 데이터를 내려주면 데이터 초기화 부분 주석 해제
+        /* 관심 소설방 데이터
+        Message[] favouriteMessages = gson.fromJson(jsonObject.get(""), Message[].class);
+        List<NovelRoom> favouriteRooms = new ArrayList<>();
+        for (Message message : favouriteMessages) {
+            favouriteRooms.add(message.toNovelRoom());
+        }
+        chatRoomsFavorite = favouriteRooms;
+         */
+    }
+
+    public void setChatRoomsSearchResultFromJson(JsonObject jsonObject) {
+        Message[] searchResultMessage = gson.fromJson(jsonObject.get("allNovelRooms"), Message[].class);
+        List<NovelRoom> chatRoomsSearchResult = new ArrayList<>();
+        for (Message message : searchResultMessage) {
+            chatRoomsSearchResult.add(message.toNovelRoom());
+        }
+        this.chatRoomsSearchResult = chatRoomsSearchResult;
+    }
+
+    public void setChatRoomsFavoriteFromJson(JsonObject jsonObject) {
+        // TODO : 서버 로직 구현되면 필드명 추가해서 데이터 초기화 구현
+        Message[] favouriteMessages = gson.fromJson(jsonObject.get(""), Message[].class);
+        List<NovelRoom> favouriteRooms = new ArrayList<>();
+        for (Message message : favouriteMessages) {
+            favouriteRooms.add(message.toNovelRoom());
+        }
+        chatRoomsFavorite = favouriteRooms;
     }
 
     // 데이터 갱신 디버깅용

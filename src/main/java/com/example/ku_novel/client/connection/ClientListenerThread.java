@@ -56,7 +56,9 @@ public class ClientListenerThread extends Thread {
                  "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED",
                  "VOTE_FETCH_BY_ID_FAILED"-> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
-            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS", "ATTENDANCE_CHECK_SUCCESS" -> uiHandler.showAlertModal(
+            case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
+                 "ATTENDANCE_CHECK_SUCCESS", "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
+                 "ROOM_FETCH_FAVOURITE_FAILED" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
@@ -67,8 +69,17 @@ public class ClientListenerThread extends Thread {
             case "MESSAGE_RECEIVE" -> handleChatMessageReceive(jsonObject, uiHandler);
             case "AUTHOR_APPLY_RECEIVED" -> handleAuthorApplyReceiverd(jsonObject, uiHandler);
             case "VOTE_FETCH_BY_ID_SUCCESS" -> handleVoteFetchByIdSuccess(jsonObject, uiHandler);
+            case "ROOM_FETCH_FAVOURITE_SUCCESS" -> handleFetchFavouriteSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleFetchFavouriteSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setChatRoomsFavoriteFromJson(jsonObject);
+
+        // TODO : 데이터를 통해 마이페이지 다시 그리는 메소드 구현
+        // uiHandler.
     }
 
     private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -121,11 +132,10 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleRoomFetchByTitleSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        String content = jsonObject.get("content").getAsString();
-        NovelRoom[] rooms = gson.fromJson(content, NovelRoom[].class);
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setChatRoomsSearchResultFromJson(jsonObject);
 
-        // TODO : UI에 검색 결과 표시 (UIHandler에 구현 필요)
-        uiHandler.showRoomSearchResults(rooms);
+        uiHandler.showRoomSearchResults();
     }
 
     private void handleRoomFetchByTitleFailed(JsonObject jsonObject, UIHandler uiHandler) {
