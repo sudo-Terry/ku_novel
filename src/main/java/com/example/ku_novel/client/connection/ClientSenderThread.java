@@ -182,18 +182,17 @@ public class ClientSenderThread extends Thread{
         writer.println(attendanceCheckMessage.toJson());
     }
 
-    public void requestVoteFetchByID(String senderId, int novelRoomId) {
+    public void requestVoteFetchByID(int novelVoteId) {
         Message voteFetchByIDMessage = new Message();
         voteFetchByIDMessage.setType(MessageType.VOTE_FETCH_BY_ID);
-        voteFetchByIDMessage.setSender(senderId);
-        voteFetchByIDMessage.setNovelRoomId(novelRoomId);
+        voteFetchByIDMessage.setNovelVoteId(novelVoteId);
 
         writer.println(voteFetchByIDMessage.toJson());
     }
 
     public void requestAuthorRejected() {
         Message authorRejectedMessage = new Message();
-        // authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
+        authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
         authorRejectedMessage.setSender(ClientDataModel.getInstance().getUserId());
         authorRejectedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
@@ -202,7 +201,7 @@ public class ClientSenderThread extends Thread{
 
     public void requestAuthorApproved() {
         Message authorApprovedMessage = new Message();
-        // authorApprovedMessage.setType(MessageType.AUTHOR_APPROVED);
+        authorApprovedMessage.setType(MessageType.AUTHOR_APPROVED);
         authorApprovedMessage.setSender(ClientDataModel.getInstance().getUserId());
         authorApprovedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 

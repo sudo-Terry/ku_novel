@@ -24,6 +24,7 @@ public class ClientDataModel {
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private List<NovelRoom> chatRoomsSearchResult;
+    private int novelVoteId;
     private Gson gson;
 
     // NovelRoomModalUI 데이터
@@ -65,6 +66,7 @@ public class ClientDataModel {
             this.novelRoomStatus = novelRoomObject.get("novelRoomStatus").getAsString();
             this.novelParticipantIds = novelRoomObject.get("novelParticipantIds").getAsString().split(",");
             this.novelMaxParticipants = novelRoomObject.get("maxParticipants").getAsInt();
+            this.novelVoteId = novelRoomObject.get("novelVoteId").getAsInt();
 
             System.out.println("setChatRoomFromJson: 소설방 데이터 갱신 완료");
         } catch (Exception e) {

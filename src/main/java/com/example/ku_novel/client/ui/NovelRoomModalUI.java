@@ -361,8 +361,7 @@ public class NovelRoomModalUI extends JDialog {
         JButton voteButton = new ImageButton("src/main/resources/icon/vote.png", Color.WHITE);
         voteButton.addActionListener(e-> {
             ClientSenderThread.getInstance().requestVoteFetchByID(
-                    ClientDataModel.getInstance().getUserId(),
-                    ClientDataModel.getInstance().getCurrentRoomId()
+                    ClientDataModel.getInstance().getNovelVoteId()
             );
         });
 
@@ -429,8 +428,7 @@ public class NovelRoomModalUI extends JDialog {
 
         writeButton.addActionListener(e-> {
             ClientSenderThread.getInstance().requestVoteFetchByID(
-                    ClientDataModel.getInstance().getUserId(),
-                    ClientDataModel.getInstance().getCurrentRoomId()
+                    ClientDataModel.getInstance().getNovelVoteId()
             );
             UIHandler.getInstance().showNovelInputModal();
         });
