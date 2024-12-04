@@ -522,6 +522,8 @@ class ClientHandler implements Runnable {
                         .setParticipantsCount(participantCount) // 현재 참여자 수 설정
                         .setNovelRoom(novelRoom.toMessage()); // novelRoom 추가
 
+                sendRecentRoomInfo(roomId);
+
                 System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
             } else {
                 responseMessage.setContent("소설 방을 찾을 수 없습니다.");
@@ -532,6 +534,34 @@ class ClientHandler implements Runnable {
         }
 
         sendMessageToCurrentClient(responseMessage);
+    }
+
+    private void sendRecentRoomInfo(int roomId) {
+        try {
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+            if (novelRoomOpt.isPresent()) {
+                NovelRoom novelRoom = novelRoomOpt.get();
+
+                // 현재 참여자 수 계산
+                int participantCount = 0;
+                synchronized (roomUsers) {
+                    Set<String> set = roomUsers.get(roomId);
+                    if (set != null) {
+                        participantCount = set.size();
+                        for (String userId : set) {
+                            Message responseMessage = new Message()
+                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+                                    .setContent("소설 방 정보 갱신")
+                                    .setParticipantsCount(participantCount) // 현재 참여자 수 설정
+                                    .setNovelRoom(novelRoom.toMessage());
+                            sendMessageToUser(userId, responseMessage);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     /* 출석 로직 */
@@ -759,6 +789,8 @@ class ClientHandler implements Runnable {
                     throw new IllegalArgumentException("소설 방에 참가하지 않았습니다.");
                 }
             }
+
+            sendRecentRoomInfo(roomId);
         } catch (Exception e) {
         }
 
