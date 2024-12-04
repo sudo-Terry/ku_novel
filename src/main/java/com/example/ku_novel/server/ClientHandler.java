@@ -674,10 +674,7 @@ class ClientHandler implements Runnable {
         String sender = message.getSender();
 
         try {
-            int voteId = message.getNovelVoteId();
-            NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
-
-            int roomId = room.getId();
+            int roomId = message.getNovelRoomId();
             String content = message.getContent();
 
             // 소설방 정보 확인
@@ -692,6 +689,7 @@ class ClientHandler implements Runnable {
             }
 
             NovelRoom novelRoom = novelRoomOpt.get();
+            int voteId = novelRoom.getCurrentVoteId();
 
             // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
             String participantIdsJson = novelRoom.getParticipantIds();
