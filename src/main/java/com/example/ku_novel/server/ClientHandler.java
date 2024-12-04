@@ -614,55 +614,64 @@ class ClientHandler implements Runnable {
 
 
     private void handleWriteNovel(Message message) {
-        int voteId = message.getNovelVoteId();
-        NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
-
-        int roomId = room.getId();
         String sender = message.getSender();
-        String content = message.getContent();
 
-        // 소설방 정보 확인
-        Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
-        if (novelRoomOpt.isEmpty()) {
-            Message response = new Message()
-                    .setType(MessageType.ERROR)
-                    .setContent("소설 방을 찾을 수 없습니다.")
-                    .setNovelRoomId(roomId);
-            sendMessageToUser(sender, response);
-            return;
-        }
+        try {
+            int voteId = message.getNovelVoteId();
+            NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
 
-        NovelRoom novelRoom = novelRoomOpt.get();
+            int roomId = room.getId();
+            String content = message.getContent();
 
-        // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
-        String participantIdsJson = novelRoom.getParticipantIds();
-        List<String> participantIds = ParticipantUtils.parseParticipantIds(participantIdsJson);
+            // 소설방 정보 확인
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
+            if (novelRoomOpt.isEmpty()) {
+                Message response = new Message()
+                        .setType(MessageType.ERROR)
+                        .setContent("소설 방을 찾을 수 없습니다.")
+                        .setNovelRoomId(roomId);
+                sendMessageToUser(sender, response);
+                return;
+            }
 
-        if (participantIds == null || !participantIds.contains(sender)) {
-            Message response = new Message()
-                    .setType(MessageType.ERROR)
-                    .setContent("소설 작성 권한이 없습니다.")
-                    .setNovelRoomId(roomId);
-            sendMessageToUser(sender, response);
-            return;
-        }
+            NovelRoom novelRoom = novelRoomOpt.get();
 
-        voteService.addContentOption(voteId, content);
+            // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
+            String participantIdsJson = novelRoom.getParticipantIds();
+            List<String> participantIds = ParticipantUtils.parseParticipantIds(participantIdsJson);
 
-        // 모든 사용자에게 알림 전송
-        synchronized (roomUsers) {
-            Set<String> usersInRoom = roomUsers.get(roomId);
-            if(usersInRoom != null) {
-                Message voteMessage = voteService.getVoteById(voteId).toMessage();
-                for (String userId : usersInRoom) {
-                    Message response = new Message()
-                            .setType(MessageType.NOVEL_SUBMITTED)
-                            .setContent("새 소설이 제출되었습니다.");
-                    response.setVote(voteMessage);
-                    response.setSender(sender);
-                    sendMessageToUser(userId, response);
+            if (participantIds == null || !participantIds.contains(sender)) {
+                Message response = new Message()
+                        .setType(MessageType.ERROR)
+                        .setContent("소설 작성 권한이 없습니다.")
+                        .setNovelRoomId(roomId);
+                sendMessageToUser(sender, response);
+                return;
+            }
+
+            // DB에 저장
+            voteService.addContentOption(voteId, content);
+
+            // 모든 사용자에게 알림 전송
+            synchronized (roomUsers) {
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                if (usersInRoom != null) {
+                    Message voteMessage = voteService.getVoteById(voteId).toMessage();
+                    for (String userId : usersInRoom) {
+                        Message response = new Message()
+                                .setType(MessageType.NOVEL_SUBMITTED)
+                                .setContent("새 소설이 제출되었습니다.");
+                        response.setVote(voteMessage);
+                        response.setSender(sender);
+                        sendMessageToUser(userId, response);
+                    }
                 }
             }
+        }catch (Exception e){
+            Message response = new Message()
+                    .setType(MessageType.ERROR)
+                    .setContent("에러가 발생했습니다");
+            sendMessageToUser(sender, response);
         }
     }
 
