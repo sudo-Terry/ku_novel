@@ -173,7 +173,7 @@ class ClientHandler implements Runnable {
 
             // 이미 투표했는지 검사
             if (vote.getVotes().containsKey(sender)) {
-                response.setContent("이미 투표를 했습니다.");
+                response.setContent("이미 투표를 했습니다. (1인 1투표)");
                 sendMessageToCurrentClient(response);
                 return;
             }
@@ -191,7 +191,7 @@ class ClientHandler implements Runnable {
                     for (String userId : usersInRoom) {
                         response
                                 .setType(MessageType.VOTE_SUCCESS)
-                                .setContent("투표 갱신");
+                                .setContent("투표 갱신 완료");
                         response.setVote(voteMessage);
 //                        response.setSender(sender);
                         sendMessageToUser(userId, response);
@@ -201,7 +201,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             response
                     .setType(MessageType.VOTE_FAILED)
-                    .setContent("에러가 발생했습니다");
+                    .setContent("에러가 발생했습니다"+ e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
