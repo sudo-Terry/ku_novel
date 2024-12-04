@@ -157,6 +157,12 @@ class ClientHandler implements Runnable {
         //        message.setNovelVoteId(5);
         //        message.setNovelRoomId(5);
         //        handleVote(message);
+        //
+        //
+        // vote fecth 테스트
+//                message.setNovelVoteId(1);
+//                message.setNovelRoomId(1);
+//                handleVoteFetch(message);
     }
 
 
@@ -254,7 +260,7 @@ class ClientHandler implements Runnable {
                     break;
                 case "VOTE_COMPLETED":
                     // vote 시작 (synchronized 추후 고려)
-                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService);
+                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService, novelRoomService);
                     voteHandler.start();
                     vote = voteService.getVoteById(voteId); // vote 상태 업데이트
                     break;
