@@ -91,6 +91,7 @@ public class NovelRoom {
         message.setNovelRoomTitle(this.title);
         message.setNovelRoomDescription(this.description);
         message.setNovelRoomStatus(this.status);
+        message.setNovelVoteId(this.currentVoteId);
         message.setNovelHostUser(this.hostUserId);
         message.setNovelParticipantIds(this.getParticipantIdsAsList());
         message.setVotingDuration(this.votingDuration);
