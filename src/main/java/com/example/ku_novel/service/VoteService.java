@@ -1,9 +1,13 @@
 package com.example.ku_novel.service;
 
 
+import com.example.ku_novel.domain.NovelRoom;
 import com.example.ku_novel.domain.User;
 import com.example.ku_novel.domain.Vote;
+import com.example.ku_novel.repository.NovelRoomRepository;
 import com.example.ku_novel.repository.VoteRepository;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +19,12 @@ import java.util.Optional;
 public class VoteService {
 
     private final VoteRepository voteRepository;
+    private final NovelRoomRepository novelRoomRepository;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository) {
+    public VoteService(VoteRepository voteRepository, NovelRoomRepository novelRoomRepository) {
         this.voteRepository = voteRepository;
+        this.novelRoomRepository = novelRoomRepository;
     }
 
     public Vote getVoteById(int voteId) {
@@ -60,7 +66,34 @@ public class VoteService {
         }
     }
 
+    public void submitNovel(Integer roomId, String sender, String content) {
+        Gson gson = new Gson();
 
+        // 소설방 정보 확인
+        NovelRoom novelRoom = novelRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("소설 방을 찾을 수 없습니다."));
+
+        // 소설가 권한 확인
+        String participantIdsJson = novelRoom.getParticipantIds();
+        List<String> participantIds = gson.fromJson(participantIdsJson, new TypeToken<List<String>>() {}.getType());
+
+        if (participantIds == null || !participantIds.contains(sender)) {
+            throw new IllegalArgumentException("소설 작성 권한이 없습니다.");
+        }
+
+        // Vote 엔티티 생성 및 저장
+        String contentOptionsJson = gson.toJson(List.of(content));
+        Vote vote = Vote.builder()
+                .novelRoomId(roomId)
+                .contentOptions(contentOptionsJson)
+                .votes("{}")
+                .createdAt(LocalDateTime.now())
+                .submissionDuration(novelRoom.getSubmissionDuration())
+                .votingDuration(novelRoom.getVotingDuration())
+                .status("WRITER_ENABLED")
+                .build();
+        voteRepository.save(vote);
+    }
 //    public String getVoteStatus(int id, int authorWriteMinutes, int votingMinutes) {
 //        Vote vote = voteRepository.findById(id).orElse(null);
 //
