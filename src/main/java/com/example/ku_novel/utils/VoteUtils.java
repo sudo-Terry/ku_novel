@@ -44,6 +44,27 @@ public class VoteUtils {
         return (int) Duration.between(now, votingEndTime).getSeconds();
     }
 
+    // JSON 문자열에서 List<String>으로 변환
+    public static List<String> parseContentOptions(String participantIdsJson) {
+        if (participantIdsJson == null || participantIdsJson.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return gson.fromJson(participantIdsJson, listType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse participant IDs", e);
+        }
+    }
+
+    // List<String>을 JSON 문자열로 변환
+    public static String toContentOptions(List<String> participantIds) {
+        try {
+            return gson.toJson(participantIds);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert participant IDs to JSON", e);
+        }
+    }
+
 //    public static String getVoteStatus(LocalDateTime createdAt, int authorWriteMinutes, int votingMinutes) {
 //        if (createdAt == null) {
 //            return "WRITER_ENABLED"; // 소설가 작성 가능
