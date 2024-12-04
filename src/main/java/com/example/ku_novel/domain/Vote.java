@@ -8,7 +8,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "vote")
@@ -54,10 +56,14 @@ public class Vote {
         message.setSubmissionDuration(this.submissionDuration);
         message.setNovelRoomId(this.novelRoomId);
         message.setContentOptions(this.getContentOptions());
-        message.setVotes(this.votes);
+        message.setVotes(this.getVotes());
         message.setVoteStatus(this.status);
         message.setCountDown(VoteUtils.getCountDown(createdAt, submissionDuration, votingDuration));
         return message;
+    }
+
+    public HashMap<String, Object> getVotes() {
+        return VoteUtils.parseJsonToMap(this.votes);
     }
 
     public List<String> getContentOptions() {
