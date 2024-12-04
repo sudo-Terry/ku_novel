@@ -2,10 +2,7 @@ package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
-import com.example.ku_novel.client.ui.component.CustomScrollBarUI;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.NovelColor;
-import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -134,7 +131,8 @@ public class NovelInputModalUI extends JDialog {
         String content = novelInputTextArea.getText();
 
         if (content.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "모든 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -142,7 +140,8 @@ public class NovelInputModalUI extends JDialog {
             ClientSenderThread.getInstance().requestAuthorWrite(userId, novelRoomId, content);
             dispose();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "제출 중 오류가 발생하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "제출 중 오류가 발생하였습니다.", null);
+            //JOptionPane.showMessageDialog(this, "제출 중 오류가 발생하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }

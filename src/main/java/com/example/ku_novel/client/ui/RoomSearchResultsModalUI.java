@@ -1,10 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
-import com.example.ku_novel.client.ui.component.CustomizedTextField;
-import com.example.ku_novel.client.ui.component.FontSetting;
-import com.example.ku_novel.client.ui.component.NovelColor;
-import com.example.ku_novel.client.ui.component.RoundedButton;
+import com.example.ku_novel.client.ui.component.*;
 import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
@@ -98,14 +95,16 @@ public class RoomSearchResultsModalUI extends JDialog {
     private void handleSearchAction() {
         String roomTitle = searchField.getText().trim();
         if (roomTitle.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "방 제목을 입력해주세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "방 제목을 입력해주세요.", null);
+            //JOptionPane.showMessageDialog(this, "방 제목을 입력해주세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             ClientSenderThread.getInstance().requestRoomFetchByTitle(roomTitle);
         } catch (IllegalStateException ex) {
-            JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            CustomAlert.showAlert(this, "오류", "서버와 연결이 되어 있지 않습니다.", null);
+            //JOptionPane.showMessageDialog(this, "서버와 연결이 되어 있지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
 
