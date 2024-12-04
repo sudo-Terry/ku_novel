@@ -182,28 +182,39 @@ public class ClientSenderThread extends Thread{
         writer.println(attendanceCheckMessage.toJson());
     }
 
-    public void requestVoteFetchByID(String senderId, int novelRoomId) {
+    public void requestVoteFetchByID(int novelVoteId) {
         Message voteFetchByIDMessage = new Message();
         voteFetchByIDMessage.setType(MessageType.VOTE_FETCH_BY_ID);
-        voteFetchByIDMessage.setSender(senderId);
-        voteFetchByIDMessage.setNovelRoomId(novelRoomId);
+        voteFetchByIDMessage.setNovelVoteId(novelVoteId);
 
         writer.println(voteFetchByIDMessage.toJson());
     }
 
-    public void requestAuthorRejected() {
+    public void requestVote(String senderId, int novelVoteId, String novelOption) {
+        Message voteMessage = new Message();
+        voteMessage.setType(MessageType.VOTE);
+        voteMessage.setSender(senderId);
+        voteMessage.setNovelVoteId(novelVoteId);
+        voteMessage.setContent(novelOption);
+
+        writer.println(voteMessage.toJson());
+    }
+
+    public void requestAuthorRejected(String requestUserNickname) {
         Message authorRejectedMessage = new Message();
-        // authorRejectedMessage.setType(MessageType.AUTHOR_REJECTED);
+        authorRejectedMessage.setType(MessageType.AUTHOR_APPROVE_REJECTED);
         authorRejectedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorRejectedMessage.setContent(requestUserNickname);
         authorRejectedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
         writer.println(authorRejectedMessage.toJson());
     }
 
-    public void requestAuthorApproved() {
+    public void requestAuthorApprove(String requestUserNickname) {
         Message authorApprovedMessage = new Message();
-        // authorApprovedMessage.setType(MessageType.AUTHOR_APPROVED);
+        authorApprovedMessage.setType(MessageType.AUTHOR_APPROVE);
         authorApprovedMessage.setSender(ClientDataModel.getInstance().getUserId());
+        authorApprovedMessage.setContent(requestUserNickname);
         authorApprovedMessage.setNovelRoomId(ClientDataModel.getInstance().getCurrentRoomId());
 
         writer.println(authorApprovedMessage.toJson());

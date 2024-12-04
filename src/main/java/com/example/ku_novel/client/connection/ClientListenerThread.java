@@ -11,6 +11,8 @@ import com.google.gson.JsonObject;
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClientListenerThread extends Thread {
@@ -58,7 +60,7 @@ public class ClientListenerThread extends Thread {
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
                  "ATTENDANCE_CHECK_SUCCESS", "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
-                 "ROOM_FETCH_FAVOURITE_FAILED" -> uiHandler.showAlertModal(
+                 "ROOM_FETCH_FAVOURITE_FAILED", "AUTHOR_REJECTED" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
@@ -70,8 +72,18 @@ public class ClientListenerThread extends Thread {
             case "AUTHOR_APPLY_RECEIVED" -> handleAuthorApplyReceiverd(jsonObject, uiHandler);
             case "VOTE_FETCH_BY_ID_SUCCESS" -> handleVoteFetchByIdSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_FAVOURITE_SUCCESS" -> handleFetchFavouriteSuccess(jsonObject, uiHandler);
+            case "AUTHOR_APPROVED" -> handleAuthorApproved(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleAuthorApproved(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setChatRoomFromJson(jsonObject);
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+
+        uiHandler.repaintNovelRoomModalUI();
     }
 
     private void handleFetchFavouriteSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -83,10 +95,24 @@ public class ClientListenerThread extends Thread {
     }
 
     private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
-        System.out.println(jsonObject);
-
-        // 데이터 모델 초기화
         ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        if (jsonObject.has("vote")) {
+            JsonObject voteObject = jsonObject.getAsJsonObject("vote");
+            if (voteObject != null && voteObject.has("contentOptions")) {
+                List<String> options = dataModel.getGson().fromJson(
+                        voteObject.getAsJsonArray("contentOptions"),
+                        List.class
+                );
+                dataModel.setVoteOptions(options);
+            } else {
+                System.out.println("contentOptions가 JSON에 없습니다.");
+                dataModel.setVoteOptions(new ArrayList<>());
+            }
+        } else {
+            System.out.println("vote 객체가 JSON에 없습니다.");
+            dataModel.setVoteOptions(new ArrayList<>());
+        }
 
         uiHandler.repaintVoteModalUI();
     }

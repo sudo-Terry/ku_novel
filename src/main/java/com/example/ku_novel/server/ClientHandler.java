@@ -125,7 +125,7 @@ class ClientHandler implements Runnable {
             case AUTHOR_WRITE:
                 handleWriteNovel(message);
                 break;
-            case AUTHOR_APPROVED:
+            case AUTHOR_APPROVE:
                 handleApproveAuthor(message);
                 break;
             case AUTHOR_APPROVE_REJECTED:
@@ -656,46 +656,52 @@ class ClientHandler implements Runnable {
             if (!roomApplicants.containsKey(roomId) || !roomApplicants.get(roomId).contains(applicant)) {
                 return; // 신청자가 없으면 무시
             }
-                Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
 
-                if (novelRoomOpt.isPresent()) {
-                    NovelRoom novelRoom = novelRoomOpt.get();
+            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
 
-                    // ParticipantUtils 사용
-                    List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
+            if (novelRoomOpt.isPresent()) {
+                NovelRoom novelRoom = novelRoomOpt.get();
 
-                    if (participantIds.contains(applicant)) {
-                        sendMessageToUser(applicant, new Message()
-                                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
-                                .setNovelRoomId(roomId)
-                                .setContent("이미 소설가로 승인되었습니다."));
-                        roomApplicants.get(roomId).remove(applicant);
-                        return;
-                    }
-                    if (participantIds.size() >= novelRoom.getMaxParticipants()) {
-                        sendMessageToUser(applicant, new Message()
-                                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
-                                .setNovelRoomId(roomId)
-                                .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다."));
-                        roomApplicants.get(roomId).remove(applicant);
-                        return;
-                    }
+                // ParticipantUtils 사용
+                List<String> participantIds = ParticipantUtils.parseParticipantIds(novelRoom.getParticipantIds());
 
-                    // 새 참여자 추가
-                    String updatedParticipantIdsJson = ParticipantUtils.addParticipant(novelRoom.getParticipantIds(), applicant);
-                    System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
-                    novelRoom.setParticipantIds(updatedParticipantIdsJson);
-                    novelRoomService.save(novelRoom);
-
-                    // 승인 메시지 전송
+                if (participantIds.contains(applicant)) {
                     sendMessageToUser(applicant, new Message()
-                            .setType(MessageType.AUTHOR_APPROVED)
+                            .setType(MessageType.AUTHOR_APPROVE_REJECTED)
                             .setNovelRoomId(roomId)
-                            .setSender(applicant)
-                            .setContent("소설가로 승인되었습니다."));
-                } else {
-                    System.out.println("NovelRoom not found for roomId=" + roomId);
+                            .setContent("이미 소설가로 승인되었습니다."));
+                    roomApplicants.get(roomId).remove(applicant);
+                    return;
                 }
+
+                // 최대 참여자 확인
+                if (participantIds.size() >= novelRoom.getMaxParticipants()) {
+                    sendMessageToUser(applicant, new Message()
+                            .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                            .setNovelRoomId(roomId)
+                            .setContent("소설가 신청 가능 인원이 이미 꽉 찼습니다."));
+                    roomApplicants.get(roomId).remove(applicant);
+                    return;
+                }
+
+                // 새 참여자 추가
+                String updatedParticipantIdsJson = ParticipantUtils.addParticipant(novelRoom.getParticipantIds(), applicant);
+                System.out.println("Updated participant JSON: " + updatedParticipantIdsJson);
+                novelRoom.setParticipantIds(updatedParticipantIdsJson);
+                novelRoomService.save(novelRoom);
+                System.out.println("Saving NovelRoom with updated participants: " + novelRoom.getParticipantIds());
+
+
+                // 승인 메시지 전송
+                sendMessageToUser(applicant, new Message()
+                        .setType(MessageType.AUTHOR_APPROVED)
+                        .setNovelRoomId(roomId)
+                        .setNovelRoom(novelRoom.toMessage())
+                        .setSender(applicant)
+                        .setContent("소설가로 승인되었습니다."));
+            } else {
+                System.out.println("NovelRoom not found for roomId=" + roomId);
+            }
             roomApplicants.get(roomId).remove(applicant);
         }
     }
@@ -715,10 +721,7 @@ class ClientHandler implements Runnable {
         String sender = message.getSender();
 
         try {
-            int voteId = message.getNovelVoteId();
-            NovelRoom room = novelRoomService.getNovelRoomByCurrentVoteId(voteId);
-
-            int roomId = room.getId();
+            int roomId = message.getNovelRoomId();
             String content = message.getContent();
 
             // 소설방 정보 확인
@@ -733,6 +736,7 @@ class ClientHandler implements Runnable {
             }
 
             NovelRoom novelRoom = novelRoomOpt.get();
+            int voteId = novelRoom.getCurrentVoteId();
 
             // 소설가 권한 확인 (클라에서 막아놨지만 추가했음)
             String participantIdsJson = novelRoom.getParticipantIds();
@@ -768,7 +772,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             Message response = new Message()
                     .setType(MessageType.ERROR)
-                    .setContent("에러가 발생했습니다");
+                    .setContent(e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
