@@ -180,7 +180,7 @@ public class UIHandler {
                 novelRoomModalUI = NovelRoomModalUI.getInstance();
                 novelRoomModalUI.openModalWithRoomId(roomId);
             }else {
-                System.out.println("novelRoomUI 이미 열려 있음");
+                CustomAlert.showAlert((Window) novelRoomModalUI, "경고", "이미 참여중인 소설방이 있습니다.", null);
             }
         });
     }
