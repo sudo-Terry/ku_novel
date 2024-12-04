@@ -65,10 +65,9 @@ public class VoteService {
         Optional<Vote> voteOptional = voteRepository.findById(voteId);
         if (voteOptional.isPresent()) {
             Vote vote = voteOptional.get();
-            String contentOptionsJson = vote.getContentOptions();
 
             // JSON 문자열에서 List<String>으로 변환
-            List<String> contentOptions = VoteUtils.parseContentOptions(contentOptionsJson);
+            List<String> contentOptions = vote.getContentOptions();
 
             // 새로운 항목 추가
             contentOptions.add(newContent);

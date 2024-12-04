@@ -2,11 +2,13 @@ package com.example.ku_novel.domain;
 
 import com.example.ku_novel.LocalDateTimeConverter;
 import com.example.ku_novel.common.Message;
+import com.example.ku_novel.utils.ParticipantUtils;
 import com.example.ku_novel.utils.VoteUtils;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "vote")
@@ -51,10 +53,14 @@ public class Vote {
         message.setVotingDuration(this.votingDuration);
         message.setSubmissionDuration(this.submissionDuration);
         message.setNovelRoomId(this.novelRoomId);
-        message.setContentOptions(this.contentOptions);
+        message.setContentOptions(this.getContentOptions());
         message.setVotes(this.votes);
         message.setVoteStatus(this.status);
         message.setCountDown(VoteUtils.getCountDown(createdAt, submissionDuration, votingDuration));
         return message;
+    }
+
+    public List<String> getContentOptions() {
+        return VoteUtils.parseContentOptions(this.contentOptions);
     }
 }
