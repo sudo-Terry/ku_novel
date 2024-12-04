@@ -105,7 +105,14 @@ public class ClientListenerThread extends Thread {
                         List.class
                 );
                 dataModel.setVoteOptions(options);
-                dataModel.setCountDown(voteObject.get("countDown").getAsInt());
+                if(voteObject.get("voteStatus").getAsString().equals("WRITER_ENABLED")){
+                    dataModel.setCountDownWrite(voteObject.get("countDown").getAsInt());
+                    dataModel.setCountDownVote(0);
+                }
+                if(voteObject.get("voteStatus").getAsString().equals("VOTING_ENABLED")){
+                    dataModel.setCountDownWrite(0);
+                    dataModel.setCountDownVote(voteObject.get("countDown").getAsInt());
+                }
             } else {
                 System.out.println("contentOptions가 JSON에 없습니다.");
                 dataModel.setVoteOptions(new ArrayList<>());
