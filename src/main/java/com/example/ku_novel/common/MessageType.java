@@ -57,6 +57,7 @@ public enum MessageType {
     VOTE("VOTE"),
     VOTE_SUCCESS("VOTE_SUCCESS"),
     VOTE_FAILED("VOTE_FAILED"),
+    VOTE_RESULT("VOTE_RESULT"),
 
     VOTE_FETCH_BY_ID("VOTE_FETCH_BY_ID"), //소설 작성을 누를때 요청해주시면 됩니다!!
     VOTE_FETCH_BY_ID_SUCCESS("VOTE_FETCH_BY_ID_SUCCESS"),

@@ -25,8 +25,7 @@ public class VoteService {
     }
 
     public Vote getVoteById(int voteId) {
-        return voteRepository.findById(voteId)
-                .orElseThrow(() -> new IllegalArgumentException("Vote not found: " + voteId));
+        return voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Vote not found: " + voteId));
     }
 
     public void updateVoteStatus(int voteId, String status) {
@@ -51,12 +50,14 @@ public class VoteService {
         }
     }
 
-    public void finalizeVoteResults(int voteId) {
+    public void initializeVote(int voteId) {
         Optional<Vote> voteOptional = voteRepository.findById(voteId);
         if (voteOptional.isPresent()) {
             Vote vote = voteOptional.get();
             vote.setStatus("VOTE_COMPLETED");
-            // to do 소설방 테이블에 저장 & 상태변경
+            vote.setContentOptions(null);
+            vote.setCreatedAt(null);
+            vote.setVotes(null);
             voteRepository.save(vote); // 업데이트된 정보 저장
         } else {
             throw new IllegalArgumentException("Vote ID not found: " + voteId);
@@ -89,6 +90,10 @@ public class VoteService {
         Optional<Vote> voteOptional = voteRepository.findById(voteId);
         if (voteOptional.isPresent()) {
             Vote vote = voteOptional.get();
+
+            if (!vote.getStatus().equals("VOTING_ENABLED")) {
+                throw new IllegalArgumentException("투표 가능한 시간이 아닙니다.");
+            }
 
             HashMap<String, Object> votes = vote.getVotes();
             votes.put(userId, votedContent);

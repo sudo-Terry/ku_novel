@@ -157,6 +157,12 @@ class ClientHandler implements Runnable {
         //        message.setNovelVoteId(5);
         //        message.setNovelRoomId(5);
         //        handleVote(message);
+        //
+        //
+        // vote fecth 테스트
+//                message.setNovelVoteId(1);
+//                message.setNovelRoomId(1);
+//                handleVoteFetch(message);
     }
 
 
@@ -173,7 +179,7 @@ class ClientHandler implements Runnable {
 
             // 이미 투표했는지 검사
             if (vote.getVotes().containsKey(sender)) {
-                response.setContent("이미 투표를 했습니다.");
+                response.setContent("이미 투표를 했습니다. (1인 1투표)");
                 sendMessageToCurrentClient(response);
                 return;
             }
@@ -191,7 +197,7 @@ class ClientHandler implements Runnable {
                     for (String userId : usersInRoom) {
                         response
                                 .setType(MessageType.VOTE_SUCCESS)
-                                .setContent("투표 갱신");
+                                .setContent("투표 갱신 완료");
                         response.setVote(voteMessage);
 //                        response.setSender(sender);
                         sendMessageToUser(userId, response);
@@ -201,7 +207,7 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             response
                     .setType(MessageType.VOTE_FAILED)
-                    .setContent("에러가 발생했습니다");
+                    .setContent("에러가 발생했습니다"+ e.getMessage());
             sendMessageToUser(sender, response);
         }
     }
@@ -254,7 +260,7 @@ class ClientHandler implements Runnable {
                     break;
                 case "VOTE_COMPLETED":
                     // vote 시작 (synchronized 추후 고려)
-                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService);
+                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService, novelRoomService, roomUsers, activeClients);
                     voteHandler.start();
                     vote = voteService.getVoteById(voteId); // vote 상태 업데이트
                     break;
