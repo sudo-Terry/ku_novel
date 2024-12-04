@@ -4,6 +4,7 @@ package com.example.ku_novel.service;
 import com.example.ku_novel.domain.User;
 import com.example.ku_novel.domain.Vote;
 import com.example.ku_novel.repository.VoteRepository;
+import com.example.ku_novel.utils.VoteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,28 @@ public class VoteService {
         }
     }
 
+    public void addContentOption(int voteId, String newContent) {
+        Optional<Vote> voteOptional = voteRepository.findById(voteId);
+        if (voteOptional.isPresent()) {
+            Vote vote = voteOptional.get();
+            String contentOptionsJson = vote.getContentOptions();
+
+            // JSON 문자열에서 List<String>으로 변환
+            List<String> contentOptions = VoteUtils.parseContentOptions(contentOptionsJson);
+
+            // 새로운 항목 추가
+            contentOptions.add(newContent);
+
+            // List<String>을 JSON 문자열로 변환
+            String updatedContentOptionsJson = VoteUtils.toContentOptions(contentOptions);
+
+            // 업데이트된 JSON 문자열 저장
+            vote.setContentOptions(updatedContentOptionsJson);
+            voteRepository.save(vote);
+        } else {
+            throw new IllegalArgumentException("Vote ID not found: " + voteId);
+        }
+    }
 
 //    public String getVoteStatus(int id, int authorWriteMinutes, int votingMinutes) {
 //        Vote vote = voteRepository.findById(id).orElse(null);
