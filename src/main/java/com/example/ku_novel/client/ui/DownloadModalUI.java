@@ -42,7 +42,12 @@ public class DownloadModalUI extends JDialog {
         // DefaultTableModel 생성
         DefaultTableModel model = new DefaultTableModel(null, columnNames);
 
-        table = new JTable(model);
+        this.table = new JTable(model){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
         table.setFont(FontSetting.getInstance().loadCustomFont(16f));
