@@ -31,6 +31,7 @@ public class UIHandler {
     private ImageEditModalUI imageEditModalUI;
     private PwEditModalUI pwEditModalUI;
     private NameEditModalUI nameEditModalUI;
+    private MyPageModalUI myPageModalUI;
 
 
     // 생성자에서 데몬 스레드 실행
@@ -301,5 +302,16 @@ public class UIHandler {
 
     public void updateNovelRoomParticipantsCount() {
         novelRoomModalUI.updateParticipantButton();
+    }
+
+    public void showMyPageModal(JFrame frame) {
+        SwingUtilities.invokeLater(() -> {
+            if (myPageModalUI == null || !myPageModalUI.isVisible()) {
+                myPageModalUI = new MyPageModalUI(frame);
+                myPageModalUI.showModal();
+            }else {
+                System.out.println("nameEditModalUI 이미 열려 있음");
+            }
+        });
     }
 }

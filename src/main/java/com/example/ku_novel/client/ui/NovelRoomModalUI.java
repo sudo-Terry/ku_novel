@@ -208,7 +208,7 @@ public class NovelRoomModalUI extends JDialog {
 
         contentPanel.add(novelPanel);
 
-        //============= 2. "관심 소설방" 섹션
+        //============= 2. "채팅" 섹션
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
@@ -380,21 +380,6 @@ public class NovelRoomModalUI extends JDialog {
         voteLabel.setForeground(Color.WHITE);
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(voteLabel, bottomGbc);
-
-        // 관심 소설 버튼
-        interestButton = new ImageButton("src/main/resources/icon/heart.png", Color.WHITE);
-        interestButton.addActionListener(e->clickInterestNovel());
-        bottomGbc.gridx = 4;
-        bottomGbc.gridy = 0;
-        bottomButtonPanel.add(interestButton, bottomGbc);
-
-        interestLabel = new JLabel("관심 등록");
-        interestLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        interestLabel.setForeground(Color.WHITE);
-        bottomGbc.gridy = 1;
-        bottomButtonPanel.add(interestLabel, bottomGbc);
-
-        setInterestButton(isInterested);
 
         // 소설 저장 버튼
         bottomGbc.gridx = 5;
