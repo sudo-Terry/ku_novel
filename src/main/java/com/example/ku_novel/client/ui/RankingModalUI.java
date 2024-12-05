@@ -6,6 +6,7 @@ import com.example.ku_novel.client.ui.component.RoundedButton;
 import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -41,13 +42,23 @@ public class RankingModalUI extends JDialog {
         table = new JTable(model);
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
-        table.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        table.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        table.setRowHeight(40);// 각 행의 높이 설정
 
         table.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
         table.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         table.getTableHeader().setBackground(NovelColor.DARK_GREEN);
         table.getTableHeader().setForeground(Color.WHITE);
         table.getTableHeader().setReorderingAllowed(false);
+
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         TableColumn column1 = table.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(50); // 원하는 너비 설정

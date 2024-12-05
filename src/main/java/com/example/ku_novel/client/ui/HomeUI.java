@@ -8,6 +8,7 @@ import com.example.ku_novel.domain.NovelRoom;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -94,11 +95,11 @@ public class HomeUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        downloadButton = new ImageButton("src/main/resources/icon/download.png", Color.LIGHT_GRAY);
+        downloadButton = new ImageButton("src/main/resources/icon/file.png", Color.LIGHT_GRAY);
         downloadButton.addActionListener(e -> UIHandler.getInstance().showDownloadModal(HomeUI.this));
         leftButtonPanel.add(downloadButton, gbc);
 
-        JLabel downloadLabel = new JLabel("다운로드");
+        JLabel downloadLabel = new JLabel("완결 소설");
         downloadLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
         gbc.gridy = 1;
         leftButtonPanel.add(downloadLabel, gbc);
@@ -249,6 +250,15 @@ public class HomeUI extends JFrame {
         novelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         novelListTable.setGridColor(Color.LIGHT_GRAY);
 
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < novelListTable.getColumnCount(); i++) {
+            novelListTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
         TableColumn column1 = novelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
         column1.setMinWidth(120);       // 최소 너비 설정
@@ -317,6 +327,15 @@ public class HomeUI extends JFrame {
         activeNovelListTable.getTableHeader().setReorderingAllowed(false);
         activeNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         activeNovelListTable.setGridColor(Color.LIGHT_GRAY);
+
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer2 = new DefaultTableCellRenderer();
+        centerRenderer2.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < activeNovelListTable.getColumnCount(); i++) {
+            activeNovelListTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer2);
+        }
 
         column1 = activeNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
