@@ -16,8 +16,6 @@ public class NovelRoomSettingsModalUI extends JDialog {
 
     private Boolean isNovelEnded;
 
-    private JSpinner authorCountSpinner;
-
     private RoundedButton endNovelButton;
 
     public NovelRoomSettingsModalUI(JDialog parent) {
@@ -42,7 +40,6 @@ public class NovelRoomSettingsModalUI extends JDialog {
 
         Dimension fieldSize = new Dimension(250, 40);
         Dimension buttonSize = new Dimension(100, 40);
-        Dimension spinnerSize = new Dimension(70, 30);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
         topPanel.setBackground(Color.WHITE);
@@ -57,22 +54,6 @@ public class NovelRoomSettingsModalUI extends JDialog {
 
         topPanel.setBackground(NovelColor.DARK_GREEN);
         add(topPanel, BorderLayout.NORTH);
-
-        // 소설가 수
-        JLabel authorLabel = new JLabel("소설가 수");
-        authorLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        mainPanel.add(authorLabel, gbc);
-
-        authorCountSpinner = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
-        authorCountSpinner.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        authorCountSpinner.setPreferredSize(spinnerSize);
-        authorCountSpinner.setFont(FontSetting.getInstance().loadCustomFont(16f));
-
-        gbc.gridx = 2;
-        mainPanel.add(authorCountSpinner, gbc);
 
         // 소설 제목
         JLabel titleLabel = new JLabel("소설 제목");
@@ -136,7 +117,6 @@ public class NovelRoomSettingsModalUI extends JDialog {
 
     private void initData() {
         ClientDataModel dataModel = ClientDataModel.getInstance();
-        authorCountSpinner.setValue(dataModel.getNovelMaxParticipants());
         titleField.setText(dataModel.getNovelRoomTitle());
         descriptionField.setText(dataModel.getNovelRoomDescription());
         isNovelEnded = !dataModel.getNovelRoomStatus().equals("ACTIVE");
@@ -157,14 +137,13 @@ public class NovelRoomSettingsModalUI extends JDialog {
     }
 
     private void saveSettings() {
-        int novelAuthorCount = (Integer)authorCountSpinner.getValue();
         String novelRoomTitle = titleField.getText();
         String novelRoomDescription = descriptionField.getText();
         boolean isNovelEnded = !endNovelButton.isEnabled();
 
         // 서버로 요청
         ClientSenderThread.getInstance().requestRoomStatusUpdate(
-            novelAuthorCount, novelRoomTitle, novelRoomDescription, isNovelEnded
+                ClientDataModel.getInstance().getNovelMaxParticipants(), novelRoomTitle, novelRoomDescription, isNovelEnded
         );
 
         this.dispose();
