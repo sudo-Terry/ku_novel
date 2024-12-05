@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,14 +30,13 @@ public class NovelRoomModalUI extends JDialog {
     private String roomDescription;
     RoundedButton participantButton;
 
-    private Boolean isInterested = true; // 수정 필요
-
-    JButton interestButton;
-    JLabel interestLabel;
+    private Boolean isClosed = false;
 
     JPanel mainPanel, topPanel, bottomButtonPanel;
 
     JTextArea chatTextArea;
+
+    JTextPane novelTextPane;
 
     private NovelRoomModalUI() {
         setTitle("개별 소설방");
@@ -154,7 +154,7 @@ public class NovelRoomModalUI extends JDialog {
         novelPanel.add(novelTitlePanel);
 
         // 소설 내용
-        JTextPane novelTextPane = new JTextPane();
+        novelTextPane = new JTextPane();
         novelTextPane.setFont(FontSetting.getInstance().loadCustomFont(20f));
         novelTextPane.setBorder(null);
         novelTextPane.setEditable(false);
@@ -395,6 +395,13 @@ public class NovelRoomModalUI extends JDialog {
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(saveLabel, bottomGbc);
 
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
+            saveButton.setBackground(Color.WHITE);
+            saveButton.setEnabled(true);
+            saveLabel.setForeground(Color.WHITE);
+        }
+        saveButton.addActionListener(e->download());
+
         // 소설 작성 버튼
         ImageButton writeButton = new ImageButton("src/main/resources/icon/writing.png", NovelColor.BLACK_GREEN);
         writeButton.setEnabled(false);
@@ -427,33 +434,17 @@ public class NovelRoomModalUI extends JDialog {
 
     }
 
-    private void clickInterestNovel() {
-        if(isInterested) {
-            isInterested = false;
-            ClientSenderThread.getInstance().requestRoomAddFavourite(
-                    ClientDataModel.getInstance().getUserId(),
-                    ClientDataModel.getInstance().getCurrentRoomId(),
-                    "false"
-            );
-            setInterestButton(false);
-        } else {
-            isInterested = true;
-            ClientSenderThread.getInstance().requestRoomAddFavourite(
-                    ClientDataModel.getInstance().getUserId(),
-                    ClientDataModel.getInstance().getCurrentRoomId(),
-                    "true"
-            );
-            setInterestButton(true);
-        }
-    }
+    private void download() {
+        // 저장 경로 및 파일명
+        String fileName = roomTitle+".txt";
+        File file = new File(fileName);
 
-    private void setInterestButton(boolean isInterested) {
-        if(isInterested) {
-            interestButton.setIcon(scaleIcon("src/main/resources/icon/heart.png", 35, 35));
-            interestLabel.setText("관심 해제");
-        } else {
-            interestButton.setIcon(scaleIcon("src/main/resources/icon/emptyheart.png", 35, 35));
-            interestLabel.setText("관심 등록");
+        // 파일 저장
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(novelTextPane.getText());
+            CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 성공했습니다.", null);
+        } catch (IOException ex) {
+            CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 실패했습니다.", null);
         }
     }
 
