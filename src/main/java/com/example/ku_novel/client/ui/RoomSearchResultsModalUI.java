@@ -15,16 +15,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 public class RoomSearchResultsModalUI extends JDialog {
     private NovelRoom[] rooms;
-
     private JTextField searchField;
-
     private JTable table;
-
     private String[] columnNames = {"제목", "설명", "현재 소설가 수", "최대 소설가 수"};
+    private static final long DEBOUNCE_TIME = 500;
+    private long lastRequestTime = 0;
 
     public RoomSearchResultsModalUI(Frame parent) {
         super(parent, "검색", true);
@@ -60,6 +61,26 @@ public class RoomSearchResultsModalUI extends JDialog {
                 return false;
             }
         };
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
+                        return;
+                    }
+                    lastRequestTime = currentTime;
+
+                    int row = table.rowAtPoint(evt.getPoint());
+                    if (row >= 0) {
+                        String roomTitle = (String) table.getValueAt(row, 0);
+                        int roomId = ClientDataModel.getInstance().getChatRoomsSearchResult().get(row).getId();
+                        ClientSenderThread.getInstance().requestRoomJoin(roomId);
+                        dispose();
+                    }
+                }
+            }
+        });
+
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
         table.setFont(FontSetting.getInstance().loadCustomFont(16f));
