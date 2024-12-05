@@ -73,12 +73,12 @@ public class ClientListenerThread extends Thread {
             case "VOTE_FETCH_BY_ID_SUCCESS" -> handleVoteFetchByIdSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_FAVOURITE_SUCCESS" -> handleFetchFavouriteSuccess(jsonObject, uiHandler);
             case "AUTHOR_APPROVED" -> handleAuthorApproved(jsonObject, uiHandler);
-            case "ROOM_FETCH_BY_ID" -> handleRoomFetchById(jsonObject, uiHandler);
+            case "ROOM_FETCH_PARTICIPANTS" -> handleRoomFetchParticipants(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
     }
 
-    private void handleRoomFetchById(JsonObject jsonObject, UIHandler uiHandler) {
+    private void handleRoomFetchParticipants(JsonObject jsonObject, UIHandler uiHandler) {
         ClientDataModel.getInstance().setParticipantsCount(jsonObject.get("participantsCount").getAsInt());
 
         uiHandler.updateNovelRoomParticipantsCount();

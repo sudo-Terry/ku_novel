@@ -552,7 +552,7 @@ class ClientHandler implements Runnable {
                         participantCount = set.size();
                         for (String userId : set) {
                             Message responseMessage = new Message()
-                                    .setType(MessageType.ROOM_FETCH_BY_ID)
+                                    .setType(MessageType.ROOM_FETCH_PARTICIPANTS)
                                     .setContent("소설 방 정보 갱신")
                                     .setParticipantsCount(participantCount) // 현재 참여자 수 설정
                                     .setNovelRoom(novelRoom.toMessage());
