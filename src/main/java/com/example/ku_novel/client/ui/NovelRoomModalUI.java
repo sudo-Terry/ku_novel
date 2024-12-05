@@ -439,8 +439,12 @@ public class NovelRoomModalUI extends JDialog {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("소설 파일로 저장");
 
-        // 파일 필터 설정 (Only .txt files)
+        // 기본 파일 이름 설정
+        fileChooser.setSelectedFile(new java.io.File(roomTitle+".txt"));
+
+        // 파일 필터 추가
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text Files (*.txt)", "txt"));
+
 
         int userSelection = fileChooser.showSaveDialog(this);
 
