@@ -28,6 +28,7 @@ public class NovelRoomModalUI extends JDialog {
     private int roomId;
     private String roomTitle;
     private String roomDescription;
+    private StyledDocument doc;
     RoundedButton participantButton;
 
     private Boolean isClosed = false;
@@ -163,7 +164,7 @@ public class NovelRoomModalUI extends JDialog {
         novelTextPane.setMargin(new Insets(10, 10, 10, 10)); // 상, 좌, 하, 우 여백
 
         // 텍스트 스타일 설정
-        StyledDocument doc = novelTextPane.getStyledDocument();
+        doc = novelTextPane.getStyledDocument();
         SimpleAttributeSet paragraphAttributes = new SimpleAttributeSet();
         StyleConstants.setLineSpacing(paragraphAttributes, 0.2f); // 줄 간격
         StyleConstants.setLeftIndent(paragraphAttributes, 10);    // 왼쪽 들여쓰기
@@ -188,17 +189,11 @@ public class NovelRoomModalUI extends JDialog {
 
         // 소설 내용 추가
         try {
-            doc.insertString(doc.getLength(), roomId + "\n", null);
-            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "그때 어느 왕비가 흑단 나무로 만든 창틀에 앉아 바느질을 하고 있었습니다.\n", null);
-            doc.insertString(doc.getLength(), "옛날 옛적 한겨울에, 하늘에서 눈송이가 깃털처럼 내리고 있었습니다.\n", null);
+            doc.insertString(
+                    doc.getLength(),
+                    ClientDataModel.getInstance().getNovelContent() + '\n',
+                    null
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -479,6 +474,18 @@ public class NovelRoomModalUI extends JDialog {
 
     public void updateButtonArea(){
         initUI();
+    }
+
+    public void updateNovelContentArea(String newNovelContent){
+        try {
+            doc.insertString(
+                    doc.getLength(),
+                    newNovelContent + '\n',
+                    null
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateParticipantButton(){
