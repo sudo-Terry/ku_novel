@@ -300,6 +300,7 @@ public class UIHandler {
     }
 
     public void updateNovelRoomParticipantsCount() {
-        novelRoomModalUI.updateParticipantButton();
+        if (novelRoomModalUI != null)
+            novelRoomModalUI.updateParticipantButton();
     }
 }
