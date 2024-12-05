@@ -395,7 +395,7 @@ public class NovelRoomModalUI extends JDialog {
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(saveLabel, bottomGbc);
 
-        if(ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
             saveButton.setBackground(Color.WHITE);
             saveButton.setEnabled(true);
             saveLabel.setForeground(Color.WHITE);
