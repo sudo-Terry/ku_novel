@@ -7,10 +7,12 @@ import java.text.DecimalFormat;
 public class CountdownButtonUtility {
     private int countdownTime;
     private JButton button;
+    private String buttonLabel;
 
     public CountdownButtonUtility(int initialTimeInSeconds, String buttonLabel) {
         this.countdownTime = initialTimeInSeconds;
-        this.button = new RoundedButton(buttonLabel + "(" + formatTime(countdownTime) + ")", NovelColor.DARK_GREEN, Color.WHITE);
+        this.buttonLabel = buttonLabel;
+        this.button = new RoundedButton(this.buttonLabel + "(" + formatTime(countdownTime) + ")", NovelColor.DARK_GREEN, Color.WHITE);
         button.setFont(new Font("Serif", Font.BOLD, 16));
         button.setPreferredSize(new Dimension(120, 40));
     }
@@ -19,7 +21,7 @@ public class CountdownButtonUtility {
         Timer timer = new Timer(1000, e -> {
             if (countdownTime > 0) {
                 countdownTime--;
-                button.setText("투표(" + formatTime(countdownTime) + ")");
+                button.setText(this.buttonLabel + "(" + formatTime(countdownTime) + ")");
             } else {
                 ((Timer)e.getSource()).stop();  // 클라에선 타이머 중지
             }

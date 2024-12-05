@@ -40,7 +40,7 @@ public class ClientDataModel {
     private List<String> voteOptions;
     private int countDownVote;
     private int countDownWrite;
-
+    private String novelContent;
     private static volatile ClientDataModel instance;
 
     private ClientDataModel() {
@@ -71,6 +71,10 @@ public class ClientDataModel {
             this.hostUserId = novelRoomObject.get("novelHostUser").getAsString();
             this.novelRoomStatus = novelRoomObject.get("novelRoomStatus").getAsString();
             this.novelParticipantIds = new ArrayList<>();
+            JsonElement novelContentElement = novelRoomObject.get("novelContent");
+            this.novelContent = (novelContentElement != null && !novelContentElement.isJsonNull())
+                    ? novelContentElement.getAsString()
+                    : "";
             JsonArray participantsArray = novelRoomObject.getAsJsonArray("novelParticipantIds");
             if (participantsArray != null) {
                 for (JsonElement participant : participantsArray) {

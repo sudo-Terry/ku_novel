@@ -305,6 +305,11 @@ public class UIHandler {
             novelRoomModalUI.updateParticipantButton();
     }
 
+    public void updateNovelRoomNovelContentArea(String newNovelContent){
+        if (novelRoomModalUI != null)
+            novelRoomModalUI.updateNovelContentArea(newNovelContent);
+    }
+
     public void showMyPageModal(JFrame frame) {
         SwingUtilities.invokeLater(() -> {
             if (myPageModalUI == null || !myPageModalUI.isVisible()) {
