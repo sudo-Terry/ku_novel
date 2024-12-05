@@ -395,7 +395,7 @@ public class NovelRoomModalUI extends JDialog {
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(saveLabel, bottomGbc);
 
-        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
+        if(ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
             saveButton.setBackground(Color.WHITE);
             saveButton.setEnabled(true);
             saveLabel.setForeground(Color.WHITE);
@@ -435,16 +435,31 @@ public class NovelRoomModalUI extends JDialog {
     }
 
     private void download() {
-        // 저장 경로 및 파일명
-        String fileName = roomTitle+".txt";
-        File file = new File(fileName);
+        // 파일 저장 대화상자 열기
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("소설 파일로 저장");
 
-        // 파일 저장
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(novelTextPane.getText());
-            CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 성공했습니다.", null);
-        } catch (IOException ex) {
-            CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 실패했습니다.", null);
+        // 파일 필터 설정 (Only .txt files)
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text Files (*.txt)", "txt"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            try {
+                // 사용자가 확장자를 입력하지 않은 경우 자동으로 .txt 추가
+                String filePath = fileChooser.getSelectedFile().getPath();
+                if (!filePath.toLowerCase().endsWith(".txt")) {
+                    filePath += ".txt";
+                }
+
+                // 파일 저장
+                try (FileWriter writer = new FileWriter(filePath)) {
+                    writer.write(novelTextPane.getText());
+                    CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 성공했습니다.", null);
+                }
+            } catch (IOException ex) {
+                CustomAlert.showAlert(this, "파일 다운로드", "파일 저장에 실패했습니다.", null);
+            }
         }
     }
 
