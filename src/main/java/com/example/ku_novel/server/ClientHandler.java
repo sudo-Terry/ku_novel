@@ -141,6 +141,9 @@ class ClientHandler implements Runnable {
             case ROOM_FETCH_RANK:
                 handleRankingNovelRooms();
                 break;
+            case ROOM_CLOSE:
+                handleCloseNovelRoom(message);
+                break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
@@ -732,6 +735,39 @@ class ClientHandler implements Runnable {
                     .setType(MessageType.ROOM_FETCH_RANK_FAILED)
                     .setContent("방 정렬 중 오류 발생: " + e.getMessage());
             sendMessageToCurrentClient(errorResponse);
+        }
+    }
+
+
+    /* 소설방 종료 로직 */
+
+    private void handleCloseNovelRoom(Message message) {
+        Integer roomId = message.getNovelRoomId();
+
+        try {
+            novelRoomService.closeNovelRoom(roomId);
+
+            synchronized (roomUsers) {
+                Set<String> usersInRoom = roomUsers.get(roomId);
+                if (usersInRoom != null) {
+                    for (String userId : usersInRoom) {
+                        Message roomClosedMessage = new Message()
+                                .setType(MessageType.ROOM_CLOSED_SUCCESS)
+                                .setNovelRoomId(roomId)
+                                .setContent("소설방이 종료되었습니다.");
+                        sendMessageToUser(userId, roomClosedMessage);
+                    }
+                }
+            }
+            // 소설방의 사용자 목록 제거
+            roomUsers.remove(roomId);
+
+        } catch (Exception e) {
+            Message errorMessage = new Message()
+                    .setType(MessageType.ROOM_CLOSED_FAILED)
+                    .setNovelRoomId(roomId)
+                    .setContent("소설방 종료 실패: " + e.getMessage());
+            sendMessageToCurrentClient(errorMessage);
         }
     }
 
