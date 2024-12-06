@@ -10,20 +10,22 @@ import com.example.ku_novel.client.ui.component.*;
 import com.example.ku_novel.domain.NovelRoom;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 public class RoomSearchResultsModalUI extends JDialog {
     private NovelRoom[] rooms;
-
     private JTextField searchField;
-
     private JTable table;
-
     private String[] columnNames = {"제목", "설명", "현재 소설가 수", "최대 소설가 수"};
+    private static final long DEBOUNCE_TIME = 500;
+    private long lastRequestTime = 0;
 
     public RoomSearchResultsModalUI(Frame parent) {
         super(parent, "검색", true);
@@ -38,7 +40,7 @@ public class RoomSearchResultsModalUI extends JDialog {
         searchPanel.setBackground(Color.WHITE);
 
         // 검색 필드
-        searchField = new CustomizedTextField("제목으로 검색");
+        searchField = new CustomizedTextField("제목 키워드 입력");
         searchField.setPreferredSize(new Dimension(300, 45));
         searchField.setFont(FontSetting.getInstance().loadCustomFont(16f));
         searchPanel.add(searchField);
@@ -53,16 +55,51 @@ public class RoomSearchResultsModalUI extends JDialog {
         // DefaultTableModel 생성
         DefaultTableModel model = new DefaultTableModel(null, columnNames);
 
-        this.table = new JTable(model);
+        this.table = new JTable(model){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
+                        return;
+                    }
+                    lastRequestTime = currentTime;
+
+                    int row = table.rowAtPoint(evt.getPoint());
+                    if (row >= 0) {
+                        String roomTitle = (String) table.getValueAt(row, 0);
+                        int roomId = ClientDataModel.getInstance().getChatRoomsSearchResult().get(row).getId();
+                        ClientSenderThread.getInstance().requestRoomJoin(roomId);
+                        dispose();
+                    }
+                }
+            }
+        });
+
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
-        table.setFont(FontSetting.getInstance().loadCustomFont(14f));
+        table.setFont(FontSetting.getInstance().loadCustomFont(16f));
+        table.setRowHeight(40);// 각 행의 높이 설정
 
         table.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
         table.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         table.getTableHeader().setBackground(NovelColor.DARK_GREEN);
         table.getTableHeader().setForeground(Color.WHITE);
         table.getTableHeader().setReorderingAllowed(false);
+
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
