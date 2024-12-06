@@ -105,6 +105,7 @@ public class NovelRoomSettingsModalUI extends JDialog {
         endNovelButton.addActionListener(e-> {
             isNovelEnded = !isNovelEnded;
             setEndButton();
+            saveSettings();
         });
         buttonPanel.add(endNovelButton);
 
