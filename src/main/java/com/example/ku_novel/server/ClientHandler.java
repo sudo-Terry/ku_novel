@@ -415,6 +415,38 @@ class ClientHandler implements Runnable {
         }
 
         sendMessageToCurrentClient(responseMessage);
+
+        // 자동 새로고침
+        sendAllRefreshHome();
+    }
+
+    private void sendAllRefreshHome() {
+        synchronized (activeClients) {
+            for (String userId : activeClients.keySet()) {
+                Message responseMessage = new Message();
+                PrintWriter writer = activeClients.get(userId);
+
+                try {
+                    User user = userService.findById(userId);
+                    responseMessage.setPoint(user.getPoint());
+                    responseMessage.setNickname(user.getNickname());
+                    responseMessage.setType(MessageType.REFRESH_HOME_SUCCESS);
+                    responseMessage.setContent("자동 새로고침 데이터 응답");
+                    responseMessage.setSender(user.getId());
+                    responseMessage.setPassword(user.getPassword());
+
+                    List<NovelRoom> activeNovelRooms = novelRoomService.getActiveNovelRooms();
+                    List<NovelRoom> participatingRooms = novelRoomService.getRoomsByParticipantId(user.getId());
+
+                    responseMessage.setActiveNovelRooms(_convertNovelRoomsToMessages(activeNovelRooms));
+                    responseMessage.setParticipatingNovelRooms(_convertNovelRoomsToMessages(participatingRooms));
+                    sendMessageToWriter(writer, responseMessage);
+                } catch (Exception e) {
+                    responseMessage.setType(MessageType.REFRESH_HOME_SUCCESS);
+                    responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
+                }
+            }
+        }
     }
 
 //    // ID로 소설 방 조회
