@@ -72,7 +72,12 @@ public class NovelRoomService {
         Optional<NovelRoom> novelRoom = novelRoomRepository.findById(novelRoomId);
         if (novelRoom.isPresent()) {
             NovelRoom room = novelRoom.get();
-            String novelContent = (room.getNovelContent() == null ? newContent : (room.getNovelContent() + "\n\n" + newContent));
+            String originalContent = room.getNovelContent();
+
+            if (newContent == null)
+                return originalContent;
+
+            String novelContent = (originalContent == null ? newContent : (originalContent + "\n\n" + newContent));
             room.setNovelContent(novelContent);
             novelRoomRepository.save(room);
 
