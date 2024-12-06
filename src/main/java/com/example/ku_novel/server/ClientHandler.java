@@ -660,7 +660,7 @@ class ClientHandler implements Runnable {
                         Message updateMessage = new Message()
                                 .setType(MessageType.ROOM_FETCH_BY_ID)
                                 .setNovelRoomId(roomId)
-                                .setNovelRoom(novelRoom.toMessage())
+                                .setNovelRoom((novelRoomService.getNovelRoomById(roomId).orElseThrow().toMessage()))
                                 .setContent("소설방 설정이 변경되었습니다.");
                         sendMessageToUser(userId, updateMessage);
                     }

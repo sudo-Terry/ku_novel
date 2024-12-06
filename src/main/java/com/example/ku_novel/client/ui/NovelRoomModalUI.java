@@ -472,7 +472,9 @@ public class NovelRoomModalUI extends JDialog {
         chatTextArea.append(formattedChat + '\n');
     }
 
-    public void updateButtonArea(){
+    public void updateUI(){
+        this.roomTitle = ClientDataModel.getInstance().getNovelRoomTitle();
+        this.roomDescription = ClientDataModel.getInstance().getNovelRoomDescription();
         initUI();
     }
 
