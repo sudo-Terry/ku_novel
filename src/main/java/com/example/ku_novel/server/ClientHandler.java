@@ -126,7 +126,7 @@ class ClientHandler implements Runnable {
             case AUTHOR_APPROVE:
                 handleApproveAuthor(message);
                 break;
-            case AUTHOR_APPROVE_REJECTED:
+            case AUTHOR_REJECTED:
                 handleRejectAuthor(message);
                 break;
             case VOTE_FETCH_BY_ID:
@@ -614,11 +614,10 @@ class ClientHandler implements Runnable {
             NovelRoom novelRoom = novelRoomService.getNovelRoomById(roomId)
                     .orElseThrow();
             String title = message.getNovelRoomTitle();
-            Integer maxParticipants = message.getMaxParticipants();
             String novelRoomDescription = message.getNovelRoomDescription();
 
             // 소설방 설정 변경
-            novelRoomService.updateNovelRoomSettings(roomId, title, maxParticipants, novelRoomDescription);
+            novelRoomService.updateNovelRoomSettings(roomId, title, novelRoomDescription);
 
             synchronized (roomUsers) {
                 Set<String> usersInRoom = roomUsers.get(roomId);
@@ -781,7 +780,7 @@ class ClientHandler implements Runnable {
 
                 if (participantIds.contains(nickname)) {
                     sendMessageToUser(nickname, new Message()
-                            .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                            .setType(MessageType.AUTHOR_REJECTED)
                             .setNovelRoomId(roomId)
                             .setContent("이미 소설가로 승인되었습니다."));
                     roomApplicants.get(roomId).remove(nickname);
@@ -791,7 +790,7 @@ class ClientHandler implements Runnable {
                 // 최대 참여자 확인
                 if (participantIds.size() >= novelRoom.getMaxParticipants()) {
                     sendMessageToUser(nickname, new Message()
-                            .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                            .setType(MessageType.AUTHOR_REJECTED)
                             .setNovelRoomId(roomId)
                             .setContent("소설가 신청 가능 인원이 이미 모두 찼습니다."));
                     roomApplicants.get(roomId).remove(nickname);
@@ -841,7 +840,7 @@ class ClientHandler implements Runnable {
         String applyUsrId = user.getId();
 
         sendMessageToUser(applyUsrId, new Message()
-                .setType(MessageType.AUTHOR_APPROVE_REJECTED)
+                .setType(MessageType.AUTHOR_REJECTED)
                 .setNovelRoomId(roomId)
                 .setContent("소설가 신청이 거절되었습니다."));
     }
@@ -857,7 +856,7 @@ class ClientHandler implements Runnable {
             Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
             if (novelRoomOpt.isEmpty()) {
                 Message response = new Message()
-                        .setType(MessageType.ERROR)
+                        .setType(MessageType.ROOM_NOT_FOUND)
                         .setContent("소설 방을 찾을 수 없습니다.")
                         .setNovelRoomId(roomId);
                 sendMessageToUser(sender, response);
@@ -872,7 +871,7 @@ class ClientHandler implements Runnable {
 
             if (participantIds == null || !participantIds.contains(sender)) {
                 Message response = new Message()
-                        .setType(MessageType.ERROR)
+                        .setType(MessageType.AUTHOR_WRITE_REJECTED)
                         .setContent("소설 작성 권한이 없습니다.")
                         .setNovelRoomId(roomId);
                 sendMessageToUser(sender, response);
@@ -884,7 +883,7 @@ class ClientHandler implements Runnable {
                 roomSubmittedAuthors.putIfAbsent(roomId, new HashSet<>());
                 if (roomSubmittedAuthors.get(roomId).contains(sender)) {
                     Message response = new Message()
-                            .setType(MessageType.ERROR)
+                            .setType(MessageType.NOVEL_ALREADY_SUBMITTED)
                             .setContent("이미 소설을 제출했습니다. 다음 턴까지 기다려 주세요.")
                             .setNovelRoomId(roomId);
                     sendMessageToUser(sender, response);
@@ -915,7 +914,6 @@ class ClientHandler implements Runnable {
             }
         } catch (Exception e) {
             Message response = new Message()
-                    .setType(MessageType.ERROR)
                     .setContent(e.getMessage());
             sendMessageToUser(sender, response);
         }
