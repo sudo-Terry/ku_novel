@@ -127,8 +127,20 @@ public class NovelRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 방이 존재하지 않습니다: " + roomId));
     }
 
-    public void modifyRoomSetting(Integer roomId) {
+    public void updateNovelRoomSettings(Integer roomId, String updatedTitle, String updatedDescription) {
 
+        NovelRoom novelRoom = novelRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("소설방을 찾을 수 없습니다: roomId=" + roomId));
+
+        if (updatedTitle != null && !updatedTitle.trim().isEmpty()) {
+            novelRoom.setTitle(updatedTitle);
+        }
+
+        if (updatedDescription != null) {
+            novelRoom.setDescription(updatedDescription);
+        }
+
+        novelRoomRepository.save(novelRoom);
     }
 
 //    // 소설 방 참가
