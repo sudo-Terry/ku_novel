@@ -256,14 +256,14 @@ public class UIHandler {
         });
     }
 
-    public void showRankingModal(JFrame frame) {
+    public void showRankingModal() {
         SwingUtilities.invokeLater(() -> {
             if (rankingModalUI == null || !rankingModalUI.isVisible()) {
-                rankingModalUI = new RankingModalUI(frame);
-                rankingModalUI.showModal();
+                rankingModalUI = new RankingModalUI(HomeUI.getInstance());
             }else {
                 System.out.println("rankingModalUI 이미 열려 있음");
             }
+            rankingModalUI.showRoomRank();
         });
     }
 

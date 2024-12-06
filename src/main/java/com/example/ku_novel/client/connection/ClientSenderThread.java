@@ -238,4 +238,11 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomAddFavouriteMessage.toJson());
     }
+
+    public void requestRoomFetchRank() {
+        Message roomFetchRankMessage = new Message();
+        roomFetchRankMessage.setType(MessageType.ROOM_FETCH_RANK);
+
+        writer.println(roomFetchRankMessage.toJson());
+    }
 }

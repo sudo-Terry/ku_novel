@@ -1,5 +1,7 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.client.ui.component.RoundedButton;
@@ -10,13 +12,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 public class RankingModalUI extends JDialog {
     private NovelRoom[] rooms;
-
     private JTable table;
-
     private String[] columnNames = {"순위", "제목", "설명"};
+    private static final long DEBOUNCE_TIME = 500;
+    private long lastRequestTime = 0;
 
     public RankingModalUI(Frame parent) {
         super(parent, "완결 소설 다운", true);
@@ -56,6 +61,25 @@ public class RankingModalUI extends JDialog {
         table.getTableHeader().setForeground(Color.WHITE);
         table.getTableHeader().setReorderingAllowed(false);
 
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
+                        return;
+                    }
+                    lastRequestTime = currentTime;
+
+                    int row = table.rowAtPoint(evt.getPoint());
+                    if (row >= 0) {
+                        int roomId = ClientDataModel.getInstance().getChatRoomsByRank().get(row).getId();
+                        ClientSenderThread.getInstance().requestRoomJoin(roomId);
+                        dispose();
+                    }
+                }
+            }
+        });
+
         // DefaultTableCellRenderer로 가운데 정렬 설정
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -90,6 +114,24 @@ public class RankingModalUI extends JDialog {
     }
 
     public void showModal() {
+        setVisible(true);
+    }
+
+    public void showRoomRank() {
+        this.rooms = ClientDataModel.getInstance().getChatRoomsByRank().toArray(new NovelRoom[0]);
+
+        System.out.println(Arrays.toString(rooms));
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        int index = 1;
+        for (NovelRoom room : rooms) {
+            model.addRow(new Object[]{
+                    index++,
+                    room.getTitle(),
+                    room.getDescription(),
+            });
+        }
         setVisible(true);
     }
 }

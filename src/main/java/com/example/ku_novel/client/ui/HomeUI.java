@@ -108,7 +108,9 @@ public class HomeUI extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         rankingButton = new ImageButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
-        rankingButton.addActionListener(e -> UIHandler.getInstance().showRankingModal(HomeUI.this));
+        rankingButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestRoomFetchRank();
+        });
         leftButtonPanel.add(rankingButton, gbc);
 
         JLabel rankingLabel = new JLabel("랭킹");
