@@ -105,8 +105,8 @@ class ClientHandler implements Runnable {
             case ATTENDANCE_CHECK:
                 handleAttendance(message);
                 break;
-            case ROOM_FETCH_DEACTIVATE:
-                handleDeactivateRoom();
+            case ROOM_FETCH_BY_COMPLETED:
+                handleCompletedRoom();
                 break;
             case ROOM_JOIN:
                 handleJoinRoom(message);
@@ -623,16 +623,16 @@ class ClientHandler implements Runnable {
 
     /* 완결 상태 소설방 목록 조회 로직 */
 
-    private void handleDeactivateRoom() {
+    private void handleCompletedRoom() {
 
         List<NovelRoom> deactivateRooms = novelRoomService.getDeactivateRoom();
         Message responseMessage = new Message();
         try {
-            responseMessage.setType(MessageType.ROOM_FETCH_DEACTIVATE_SUCCESS)
+            responseMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED_SUCCESS)
                     .setContent("완결 상태 소설 목록 조회 성공")
                     .setJson(new Gson().toJson(deactivateRooms));
         } catch (Exception e) {
-            responseMessage.setType(MessageType.ROOM_FETCH_DEACTIVATE_FAILED)
+            responseMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED_FAILED)
                     .setContent("완결 상태 소설 목록 조회 실패");
         }
         sendMessageToCurrentClient(responseMessage);
