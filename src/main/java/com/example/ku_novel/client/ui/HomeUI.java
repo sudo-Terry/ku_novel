@@ -8,6 +8,7 @@ import com.example.ku_novel.domain.NovelRoom;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -18,8 +19,7 @@ import java.util.List;
 public class HomeUI extends JFrame {
     private static HomeUI instance;
     private JPanel mainPanel, topPanel, leftButtonPanel, rightButtonPanel, contentPanel, contentLeftPanel, contentRightPanel;
-    private JButton myButton, searchButton, rankingButton, attendanceButton, downloadButton, createButton, homeButton;
-    private JTextField searchField;
+    private JButton myButton, searchButton, rankingButton, attendanceButton, downloadButton, createButton;
     private JLabel changeLabel;
     private static final long DEBOUNCE_TIME = 500; // 500ms
     private long lastRequestTime = 0;
@@ -95,11 +95,11 @@ public class HomeUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        downloadButton = new ImageButton("src/main/resources/icon/download.png", Color.LIGHT_GRAY);
+        downloadButton = new ImageButton("src/main/resources/icon/file.png", Color.LIGHT_GRAY);
         downloadButton.addActionListener(e -> UIHandler.getInstance().showDownloadModal(HomeUI.this));
         leftButtonPanel.add(downloadButton, gbc);
 
-        JLabel downloadLabel = new JLabel("다운로드");
+        JLabel downloadLabel = new JLabel("완결 소설");
         downloadLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
         gbc.gridy = 1;
         leftButtonPanel.add(downloadLabel, gbc);
@@ -175,7 +175,7 @@ public class HomeUI extends JFrame {
         gbc.gridx = 2;
         gbc.gridy = 0;
         myButton = new ImageButton("src/main/resources/icon/my.png", NovelColor.DARK_GREEN);
-        myButton.addActionListener(e->showMyPage());
+        myButton.addActionListener(e->UIHandler.getInstance().showMyPageModal(this));
         rightButtonPanel.add(myButton, gbc);
 
         changeLabel = new JLabel("마이페이지");
@@ -250,6 +250,15 @@ public class HomeUI extends JFrame {
         novelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         novelListTable.setGridColor(Color.LIGHT_GRAY);
 
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < novelListTable.getColumnCount(); i++) {
+            novelListTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
         TableColumn column1 = novelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
         column1.setMinWidth(120);       // 최소 너비 설정
@@ -319,6 +328,15 @@ public class HomeUI extends JFrame {
         activeNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         activeNovelListTable.setGridColor(Color.LIGHT_GRAY);
 
+        // DefaultTableCellRenderer로 가운데 정렬 설정
+        DefaultTableCellRenderer centerRenderer2 = new DefaultTableCellRenderer();
+        centerRenderer2.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // 모든 열에 대해 가운데 정렬 설정
+        for (int i = 0; i < activeNovelListTable.getColumnCount(); i++) {
+            activeNovelListTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer2);
+        }
+
         column1 = activeNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
         column1.setPreferredWidth(120); // 원하는 너비 설정
         column1.setMinWidth(120);       // 최소 너비 설정
@@ -350,192 +368,6 @@ public class HomeUI extends JFrame {
         allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);
 
         contentRightPanel.add(allRoomsLabelPanel);
-        contentRightPanel.add(allRoomsPanel);
-
-        refreshPanels();
-    }
-
-    private void showMyPage() {
-        resetPanels();
-
-        //============= 상단 패널
-        JLabel titleLabel = new JLabel("마이페이지");
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 110, 0, 0));
-        titleLabel.setPreferredSize(new Dimension(600, 100));
-        titleLabel.setFont(FontSetting.getInstance().loadCustomFont(36f));
-        topPanel.add(titleLabel, BorderLayout.CENTER);
-
-        // 홈 버튼
-        JPanel homeButtonPanel = new JPanel(new GridBagLayout());
-        homeButtonPanel.setPreferredSize(new Dimension(110, 90));
-        homeButtonPanel.setBackground(Color.WHITE);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 0, 0, 15);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        homeButton = new ImageButton("src/main/resources/icon/home.png", NovelColor.DARK_GREEN);
-        homeButton.addActionListener(e->showHome());
-        homeButtonPanel.add(homeButton, gbc);
-
-        JLabel homeLabel = new JLabel("메인");
-        homeLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        gbc.gridy = 1;
-        homeButtonPanel.add(homeLabel, gbc);
-
-        topPanel.add(homeButtonPanel, BorderLayout.EAST);
-
-        //============= 콘텐츠 패널
-        //============= 1. "내 정보" 섹션
-        contentLeftPanel.setBackground(NovelColor.BLACK_GREEN);
-
-        JPanel infoLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        infoLabelPanel.setBackground(NovelColor.BLACK_GREEN);
-        JLabel infoLabel = new JLabel("내 정보");
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        infoLabel.setForeground(Color.WHITE);
-        infoLabel.setFont(FontSetting.getInstance().loadCustomFont(24f));
-        infoLabelPanel.add(infoLabel);
-
-        contentLeftPanel.add(infoLabelPanel);
-
-        JPanel infoContentPanel = new JPanel(new GridBagLayout());
-        infoContentPanel.setBackground(NovelColor.BLACK_GREEN);
-        GridBagConstraints mainGbc = new GridBagConstraints();
-
-        JPanel profileImage = new CircularImage("src/main/resources/image/image1.png");
-        profileImage.setPreferredSize(new Dimension(245, 245));
-        mainGbc.insets = new Insets(0, 0, 10, 0);
-        mainGbc.gridx = 0;
-        mainGbc.gridy = 0;
-        mainGbc.fill = GridBagConstraints.BOTH;
-        infoContentPanel.add(profileImage, mainGbc);
-
-        // JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
-        JPanel namePanel = new JPanel();
-        JLabel nameLabel;
-        if(ClientDataModel.getInstance().getUserName() == null) {
-            nameLabel = new JLabel("NICKNAME");
-        } else {
-            nameLabel = new JLabel(ClientDataModel.getInstance().getUserName());
-        }
-        nameLabel.setFont(FontSetting.getInstance().loadCustomFont(28f));
-        nameLabel.setForeground(Color.WHITE);
-        namePanel.add(nameLabel);
-        namePanel.setOpaque(false);
-
-        mainGbc.gridy = 2;
-        mainGbc.insets = new Insets(0, 0, 0, 0);
-        infoContentPanel.add(namePanel, mainGbc);
-
-        JPanel idPanel = new JPanel();
-        JLabel idLabel;
-        if(ClientDataModel.getInstance().getUserId() == null) {
-            idLabel = new JLabel("userID");
-        } else {
-            idLabel = new JLabel(ClientDataModel.getInstance().getUserId());
-        }
-        idLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        idLabel.setForeground(NovelColor.DEFAULT);
-        idPanel.add(idLabel);
-        idPanel.setOpaque(false);
-
-        mainGbc.gridy = 3;
-        infoContentPanel.add(idPanel, mainGbc);
-
-        contentLeftPanel.add(infoContentPanel);
-
-        // 포인트 패널
-        JPanel pointPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        pointPanel.setMaximumSize(new Dimension(200, 100));
-        pointPanel.setBackground(NovelColor.BLACK_GREEN);
-        pointPanel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
-
-        // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
-        JLabel pointLabel;
-        if(ClientDataModel.getInstance().getUserPoint() == null) {
-            pointLabel = new JLabel("1000");
-        } else {
-            pointLabel = new JLabel(ClientDataModel.getInstance().getUserPoint());
-        }
-        pointLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        pointLabel.setForeground(Color.WHITE);
-        pointPanel.add(pointLabel);
-
-        JLabel pointTitleLabel = new JLabel("POINT");
-        pointTitleLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        pointTitleLabel.setForeground(Color.WHITE);
-        pointPanel.add(pointTitleLabel);
-
-        contentLeftPanel.add(pointPanel);
-
-        // 버튼 패널 - 추후 프로필 변경 기능 추가시 사용
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-        buttonPanel.setPreferredSize(new Dimension(300, 70));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-        buttonPanel.setBackground(NovelColor.BLACK_GREEN);
-
-        Dimension buttonSize = new Dimension(120, 40);
-
-        JButton imageEditButton = new RoundedButton("프로필 변경", NovelColor.BLACK_GREEN, Color.WHITE);
-        imageEditButton.setPreferredSize(buttonSize);
-        imageEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        imageEditButton.addActionListener(e->UIHandler.getInstance().showImageEditModal(this));
-        buttonPanel.add(imageEditButton);
-
-        JButton pwEditButton = new RoundedButton("비밀번호 변경", NovelColor.BLACK_GREEN, Color.WHITE);
-        pwEditButton.addActionListener(e->UIHandler.getInstance().showPwEditModal(this));
-        pwEditButton.setPreferredSize(buttonSize);
-        pwEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        buttonPanel.add(pwEditButton);
-
-        JButton nameEditButton = new RoundedButton("닉네임 변경", NovelColor.BLACK_GREEN, Color.WHITE);
-        nameEditButton.setPreferredSize(buttonSize);
-        nameEditButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        nameEditButton.addActionListener(e->UIHandler.getInstance().showNameEditModal(this));
-        buttonPanel.add(nameEditButton);
-
-        contentLeftPanel.add(buttonPanel);
-
-        //============= 2. "관심 소설방" 섹션
-        JPanel interestedLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel interestedLabel = new JLabel("관심 소설방");
-        interestedLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 0));
-        interestedLabel.setFont(FontSetting.getInstance().loadCustomFont(20f));
-        interestedLabelPanel.add(interestedLabel);
-
-        // 관심 소설방 데이터
-        // DefaultTableModel 생성
-        DefaultTableModel allNovelListTM = new DefaultTableModel(new Object[]{"제목", "설명"}, 0);
-        DefaultListModel<String> novelListModel = new DefaultListModel<>();
-        for (NovelRoom room : activeNovelRooms) {
-            novelListModel.addElement("<html>" + room.getTitle() + "<br>" + room.getDescription() + "</html>");
-        }
-
-        // JTable 생성
-        JTable allNovelListTable = new JTable(allNovelListTM);
-        allNovelListTable.setFont(FontSetting.getInstance().loadCustomFont(16f)); // 폰트 설정
-        allNovelListTable.setRowHeight(50);// 각 행의 높이 설정
-        allNovelListTable.getTableHeader().setFont(FontSetting.getInstance().loadCustomFont(16f));
-        allNovelListTable.getTableHeader().setReorderingAllowed(false);
-        allNovelListTable.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        allNovelListTable.setGridColor(Color.LIGHT_GRAY);
-
-        TableColumn column1 = allNovelListTable.getColumnModel().getColumn(0); // 첫 번째 열
-        column1.setPreferredWidth(120); // 원하는 너비 설정
-        column1.setMinWidth(120);       // 최소 너비 설정
-        column1.setMaxWidth(120);       // 최대 너비 설정
-
-        JScrollPane scrollPane2 = new JScrollPane(allNovelListTable);
-        scrollPane2.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
-
-        JPanel allRoomsPanel = new JPanel(new BorderLayout());
-        allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);
-
-        contentRightPanel.add(interestedLabelPanel);
         contentRightPanel.add(allRoomsPanel);
 
         refreshPanels();

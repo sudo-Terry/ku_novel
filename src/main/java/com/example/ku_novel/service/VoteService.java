@@ -69,6 +69,10 @@ public class VoteService {
         if (voteOptional.isPresent()) {
             Vote vote = voteOptional.get();
 
+            if (!vote.getStatus().equals("WRITER_ENABLED")) {
+                throw new IllegalArgumentException("소설 등록 가능한 시간이 아닙니다.");
+            }
+
             // JSON 문자열에서 List<String>으로 변환
             List<String> contentOptions = vote.getContentOptions();
 
