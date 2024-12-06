@@ -191,7 +191,7 @@ public class UIHandler {
     }
 
     public void repaintNovelRoomModalUI() {
-        NovelRoomModalUI.getInstance().updateButtonArea();
+        NovelRoomModalUI.getInstance().updateUI();
     }
 
     public void updateNovelRoomChat(int roomId, String formattedMessage) {

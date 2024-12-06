@@ -56,11 +56,13 @@ public class ClientListenerThread extends Thread {
             case "LOGIN_SUCCESS" -> handleLoginSuccess(jsonObject, uiHandler);
             case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED",
                  "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED",
-                 "VOTE_FETCH_BY_ID_FAILED", "VOTE_FAILED" -> uiHandler.showAlertModal(
+                 "VOTE_FETCH_BY_ID_FAILED", "VOTE_FAILED", "ROOM_UPDATE_SETTING_FAILED",
+                 "NOVEL_ALREADY_SUBMITTED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
                  "ATTENDANCE_CHECK_SUCCESS", "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
-                 "ROOM_FETCH_FAVOURITE_FAILED", "AUTHOR_REJECTED", "NOVEL_SUBMITTED", "VOTE_SUCCESS" -> uiHandler.showAlertModal(
+                 "ROOM_FETCH_FAVOURITE_FAILED", "AUTHOR_REJECTED", "NOVEL_SUBMITTED", "VOTE_SUCCESS",
+                 "ROOM_WRITE_END", "ROOM_UPDATE_SETTING_SUCCESS", "AUTHOR_LIST_UPDATE", "AUTHOR_APPLY_REJECTED" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
@@ -75,7 +77,24 @@ public class ClientListenerThread extends Thread {
             case "AUTHOR_APPROVED" -> handleAuthorApproved(jsonObject, uiHandler);
             case "ROOM_FETCH_PARTICIPANTS" -> handleRoomFetchParticipants(jsonObject, uiHandler);
             case "VOTE_RESULT" -> handleVoteResult(jsonObject, uiHandler);
+            case "ROOM_FETCH_BY_ID" -> handleRoomFetchById(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
+        }
+    }
+
+    private void handleRoomFetchById(JsonObject jsonObject, UIHandler uiHandler) {
+        try {
+            JsonObject novelRoomObject = jsonObject.getAsJsonObject("novelRoom");
+            if (novelRoomObject == null) {
+                throw new IllegalArgumentException("novelRoom 객체가 없습니다.");
+            }
+            ClientDataModel dataModel = ClientDataModel.getInstance();
+            dataModel.setNovelRoomTitle(novelRoomObject.get("novelRoomTitle").getAsString());
+            dataModel.setNovelRoomDescription(novelRoomObject.get("novelRoomDescription").getAsString());
+            uiHandler.repaintNovelRoomModalUI();
+        } catch (Exception e) {
+            System.err.println("handleRoomFetchById 처리 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -84,7 +103,7 @@ public class ClientListenerThread extends Thread {
         uiHandler.showAlertModal(
                 null,
                 "정보",
-                newNovelContent + "가 투표로 선정되었습니다.",
+                newNovelContent + "(이)가 투표로 선정되었습니다. 소설가들은 다음 소설 작성을 시작해주세요!",
                 JOptionPane.INFORMATION_MESSAGE
         );
 
