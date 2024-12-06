@@ -57,7 +57,7 @@ public class ClientListenerThread extends Thread {
             case "LOGIN_FAILED", "SIGNUP_FAILED" , "ROOM_JOIN_FAILED", "REFRESH_HOME_FAILED",
                  "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED",
                  "VOTE_FETCH_BY_ID_FAILED", "VOTE_FAILED", "ROOM_UPDATE_SETTING_FAILED",
-                 "NOVEL_ALREADY_SUBMITTED", "ROOM_FETCH_RANK_FAILED" -> uiHandler.showAlertModal(
+                 "NOVEL_ALREADY_SUBMITTED", "ROOM_FETCH_RANK_FAILED", "ROOM_FETCH_BY_COMPLETED_FAILED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
                  "ATTENDANCE_CHECK_SUCCESS", "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
@@ -79,8 +79,16 @@ public class ClientListenerThread extends Thread {
             case "VOTE_RESULT" -> handleVoteResult(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_ID" -> handleRoomFetchById(jsonObject, uiHandler);
             case "ROOM_FETCH_RANK_SUCCESS" -> handleRoomFetchRankSuccess(jsonObject, uiHandler);
+            case "ROOM_FETCH_BY_COMPLETED_SUCCESS" -> handleRoomFetchByCompletedSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handleRoomFetchByCompletedSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+        dataModel.setChatRoomsCompletedFromJson(jsonObject);
+
+        uiHandler.showDownloadModal();
     }
 
     private void handleRoomFetchRankSuccess(JsonObject jsonObject, UIHandler uiHandler) {

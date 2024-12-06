@@ -96,7 +96,9 @@ public class HomeUI extends JFrame {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         downloadButton = new ImageButton("src/main/resources/icon/file.png", Color.LIGHT_GRAY);
-        downloadButton.addActionListener(e -> UIHandler.getInstance().showDownloadModal(HomeUI.this));
+        downloadButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestRoomFetchByCompleted();
+        });
         leftButtonPanel.add(downloadButton, gbc);
 
         JLabel downloadLabel = new JLabel("완결 소설");

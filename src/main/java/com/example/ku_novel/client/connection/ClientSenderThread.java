@@ -245,4 +245,11 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomFetchRankMessage.toJson());
     }
+
+    public void requestRoomFetchByCompleted(){
+        Message roomFetchCompletedMessage = new Message();
+        roomFetchCompletedMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED);
+
+        writer.println(roomFetchCompletedMessage.toJson());
+    }
 }

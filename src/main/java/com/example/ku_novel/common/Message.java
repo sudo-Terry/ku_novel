@@ -34,6 +34,7 @@ public class Message {
     private List<Message> activeNovelRooms;
     private List<Message> participatingNovelRooms;
     private List<Message> rankNovelRooms;
+    private List<Message> completedNovelRooms;
 
     /// 소설방 관련
     private int novelRoomId;

@@ -1,6 +1,7 @@
 package com.example.ku_novel.client.ui;
 
 import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.CustomizedTextField;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
@@ -13,13 +14,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.List;
 
 public class DownloadModalUI extends JDialog {
     private NovelRoom[] rooms;
-
     private JTable table;
-
     private String[] columnNames = {"제목", "설명"};
+    private static final long DEBOUNCE_TIME = 500;
+    private long lastRequestTime = 0;
 
     public DownloadModalUI(Frame parent) {
         super(parent, "완결 소설 다운", true);
@@ -48,6 +53,24 @@ public class DownloadModalUI extends JDialog {
                 return false;
             }
         };
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastRequestTime < DEBOUNCE_TIME) {
+                        return;
+                    }
+                    lastRequestTime = currentTime;
+
+                    int row = table.rowAtPoint(evt.getPoint());
+                    if (row >= 0) {
+                        int roomId = ClientDataModel.getInstance().getChatRoomsCompleted().get(row).getId();
+                        ClientSenderThread.getInstance().requestRoomJoin(roomId);
+                        dispose();
+                    }
+                }
+            }
+        });
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
         table.setFont(FontSetting.getInstance().loadCustomFont(16f));
@@ -88,6 +111,23 @@ public class DownloadModalUI extends JDialog {
     }
 
     public void showModal() {
+        setVisible(true);
+    }
+
+    public void showRoomCompleted() {
+        List<NovelRoom> rooms = ClientDataModel.getInstance().getChatRoomsCompleted();
+        if(rooms != null){
+            this.rooms = ClientDataModel.getInstance().getChatRoomsCompleted().toArray(new NovelRoom[0]);
+
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
+            for (NovelRoom room : rooms) {
+                model.addRow(new Object[]{
+                        room.getTitle(),
+                        room.getDescription(),
+                });
+            }
+        }
         setVisible(true);
     }
 }

@@ -223,14 +223,14 @@ public class UIHandler {
         });
     }
 
-    public void showDownloadModal(JFrame frame) {
+    public void showDownloadModal() {
         SwingUtilities.invokeLater(() -> {
             if (downloadModalUI == null || !downloadModalUI.isVisible()) {
-                downloadModalUI = new DownloadModalUI(frame);
-                downloadModalUI.showModal();
+                downloadModalUI = new DownloadModalUI(HomeUI.getInstance());
             }else {
                 System.out.println("downloadModalUI 이미 열려 있음");
             }
+            downloadModalUI.showRoomCompleted();
         });
     }
 
