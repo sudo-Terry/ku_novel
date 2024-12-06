@@ -26,6 +26,7 @@ public class ClientDataModel {
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private List<NovelRoom> chatRoomsSearchResult;
+    private List<NovelRoom> chatRoomsByRank;
     private Gson gson;
 
     // NovelRoomModalUI 데이터
@@ -126,6 +127,15 @@ public class ClientDataModel {
             chatRoomsSearchResult.add(message.toNovelRoom());
         }
         this.chatRoomsSearchResult = chatRoomsSearchResult;
+    }
+
+    public void setChatRoomsByRankFromJson(JsonObject jsonObject) {
+        Message[] rankMessage = gson.fromJson(jsonObject.get("rankNovelRooms"), Message[].class);
+        List<NovelRoom> chatRoomsByRank = new ArrayList<>();
+        for (Message message : rankMessage) {
+            chatRoomsByRank.add(message.toNovelRoom());
+        }
+        this.chatRoomsByRank = chatRoomsByRank;
     }
 
     public void setChatRoomsFavoriteFromJson(JsonObject jsonObject) {
