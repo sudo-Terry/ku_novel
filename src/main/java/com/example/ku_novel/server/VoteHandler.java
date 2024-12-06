@@ -17,8 +17,9 @@ public class VoteHandler extends Thread {
     private final NovelRoomService novelRoomService;
     private final Map<Integer, Set<String>> roomUsers; // 소설방별 접속중인 유저 아이디 관리
     private final HashMap<String, PrintWriter> activeClients;
+    private final Map<Integer, Set<String>> roomSubmittedAuthors;
 
-    public VoteHandler(int voteId, int authorWriteMinutes, int votingMinutes, VoteService voteService, NovelRoomService novelRoomService, Map<Integer, Set<String>> roomUsers, HashMap<String, PrintWriter> activeClients) {
+    public VoteHandler(int voteId, int authorWriteMinutes, int votingMinutes, VoteService voteService, NovelRoomService novelRoomService, Map<Integer, Set<String>> roomUsers, HashMap<String, PrintWriter> activeClients, Map<Integer, Set<String>> roomSubmittedAuthors) {
         this.voteId = voteId;
         this.authorWriteMinutes = authorWriteMinutes;
         this.votingMinutes = votingMinutes;
@@ -26,6 +27,7 @@ public class VoteHandler extends Thread {
         this.novelRoomService = novelRoomService;
         this.roomUsers = roomUsers;
         this.activeClients = activeClients;
+        this.roomSubmittedAuthors = roomSubmittedAuthors;
         // 스레드 생성시 WRITER_ENABLED 로 변경
         voteService.updateVoteStatus(voteId, "WRITER_ENABLED");
         voteService.updateCreatedAtToNow(voteId);
@@ -38,6 +40,8 @@ public class VoteHandler extends Thread {
 
             // 소설가 작성 시간 끝날때까지 대기
             Thread.sleep(authorWriteMinutes * 60 * 1000L);
+            int roomId = voteService.getVoteById(voteId).getNovelRoomId();
+            endAuthorWritePhase(roomId);
 
             // 상태를 VOTING_ENABLED로 바꿈.
             voteService.updateVoteStatus(voteId, "VOTING_ENABLED");
@@ -54,6 +58,23 @@ public class VoteHandler extends Thread {
             System.err.println("VoteHandler Error" + voteId);
             Thread.currentThread().interrupt();
         }
+
+
+    }
+
+    private void endAuthorWritePhase(int roomId) {
+        // 소설 제출자 목록 초기화
+        synchronized (roomSubmittedAuthors) {
+            roomSubmittedAuthors.put(roomId, new HashSet<>());
+            System.out.println("Room " + roomId + " submitted authors reset.");
+        }
+
+        Message broadcastMessage = new Message()
+                .setType(MessageType.ROOM_WRITE_END)
+                .setNovelRoomId(roomId)
+                .setContent("소설 작성이 종료되었습니다. 모두 투표해주세요!");
+
+        broadcastToRoom(roomId, broadcastMessage);
     }
 
 
@@ -129,5 +150,23 @@ public class VoteHandler extends Thread {
             }
         }
     }
+
+    private void broadcastToRoom(int roomId, Message message) {
+        synchronized (roomUsers) {
+            Set<String> usersInRoom = roomUsers.get(roomId);
+            if (usersInRoom != null) {
+                for (String userId : usersInRoom) {
+                    PrintWriter writer = activeClients.get(userId); // 사용자와 연결된 출력 스트림
+                    if (writer != null) {
+                        writer.println(message.toJson()); // 메시지를 JSON으로 변환 후 전송
+                        System.out.println("[BROADCAST] Sent to " + userId + ": " + message);
+                    } else {
+                        System.err.println("[BROADCAST] No active client for userId: " + userId);
+                    }
+                }
+            }
+        }
+    }
+
 }
 
