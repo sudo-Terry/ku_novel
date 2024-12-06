@@ -1,11 +1,15 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class NameEditModalUI extends JDialog {
+    private JTextField nameField;
+
     public NameEditModalUI(JFrame parent) {
         super(parent, "닉네임 변경", true);
         setSize(400, 250);
@@ -34,7 +38,7 @@ public class NameEditModalUI extends JDialog {
 
         Dimension fieldSize = new Dimension(220, 50);
 
-        JTextField nameField = new CustomizedTextField("새 닉네임 입력");
+        nameField = new CustomizedTextField("새 닉네임 입력");
         nameField.setFont(FontSetting.getInstance().loadCustomFont(16f));
         nameField.setPreferredSize(fieldSize);
         gbc.gridx = 0;
@@ -45,6 +49,7 @@ public class NameEditModalUI extends JDialog {
         RoundedButton userNameValidationButton = new RoundedButton("중복 확인", NovelColor.LIGHT_GREEN, Color.BLACK);
         userNameValidationButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         userNameValidationButton.setPreferredSize(new Dimension(80, 50));
+        userNameValidationButton.addActionListener(e -> handleUserNameValidation());
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
@@ -59,10 +64,33 @@ public class NameEditModalUI extends JDialog {
         JButton okButton = new RoundedButton("변경", NovelColor.YELLOW, Color.BLACK);
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         okButton.setPreferredSize(new Dimension(80, 40));
+        okButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestNicknameChange(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getUserName(),
+                    nameField.getText()
+            );
+        });
         buttonPanel.add(okButton);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+    }
+
+    private void handleUserNameValidation() {
+        String userName = nameField.getText();
+
+        if (userName.isEmpty()) {
+            CustomAlert.showAlert(this, "오류", "닉네임 필드를 입력하세요.", null);
+            return;
+        }
+
+        try {
+            ClientSenderThread.getInstance().requestNicknameValidation(userName);
+        } catch (Exception ex) {
+            CustomAlert.showAlert(this, "오류", "회원가입 중 오류가 발생했습니다.", null);
+            ex.printStackTrace();
+        }
     }
 
     public void showModal() {

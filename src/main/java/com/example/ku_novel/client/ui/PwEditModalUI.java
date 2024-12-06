@@ -1,5 +1,7 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.CustomizedPasswordField;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
@@ -63,6 +65,13 @@ public class PwEditModalUI extends JDialog {
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         okButton.setPreferredSize(new Dimension(80, 40));
         buttonPanel.add(okButton);
+        okButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestPasswordChange(
+                ClientDataModel.getInstance().getUserId(),
+                prePwField.getText(),
+                pwField.getText()
+            );
+        });
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 

@@ -26,6 +26,8 @@ public class ClientDataModel {
     private List<NovelRoom> chatRoomsParticipating;
     private List<NovelRoom> chatRoomsFavorite;
     private List<NovelRoom> chatRoomsSearchResult;
+    private List<NovelRoom> chatRoomsByRank;
+    private List<NovelRoom> chatRoomsCompleted;
     private Gson gson;
 
     // NovelRoomModalUI 데이터
@@ -128,6 +130,26 @@ public class ClientDataModel {
         this.chatRoomsSearchResult = chatRoomsSearchResult;
     }
 
+    public void setChatRoomsByRankFromJson(JsonObject jsonObject) {
+        Message[] rankMessage = gson.fromJson(jsonObject.get("rankNovelRooms"), Message[].class);
+        List<NovelRoom> chatRoomsByRank = new ArrayList<>();
+        for (Message message : rankMessage) {
+            chatRoomsByRank.add(message.toNovelRoom());
+        }
+        this.chatRoomsByRank = chatRoomsByRank;
+    }
+
+    public void setChatRoomsCompletedFromJson(JsonObject jsonObject) {
+        Message[] completedMessage = gson.fromJson(jsonObject.get("completedNovelRooms"), Message[].class);
+        List<NovelRoom> chatRoomsCompleted = new ArrayList<>();
+        if (completedMessage != null) {
+            for (Message message : completedMessage) {
+                chatRoomsCompleted.add(message.toNovelRoom());
+            }
+            this.chatRoomsCompleted = chatRoomsCompleted;
+        }
+    }
+    
     public void setChatRoomsFavoriteFromJson(JsonObject jsonObject) {
         // TODO : 서버 로직 구현되면 필드명 추가해서 데이터 초기화 구현
         Message[] favouriteMessages = gson.fromJson(jsonObject.get(""), Message[].class);

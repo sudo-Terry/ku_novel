@@ -96,7 +96,9 @@ public class HomeUI extends JFrame {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         downloadButton = new ImageButton("src/main/resources/icon/file.png", Color.LIGHT_GRAY);
-        downloadButton.addActionListener(e -> UIHandler.getInstance().showDownloadModal(HomeUI.this));
+        downloadButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestRoomFetchByCompleted();
+        });
         leftButtonPanel.add(downloadButton, gbc);
 
         JLabel downloadLabel = new JLabel("완결 소설");
@@ -108,7 +110,9 @@ public class HomeUI extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         rankingButton = new ImageButton("src/main/resources/icon/ranking.png", Color.LIGHT_GRAY);
-        rankingButton.addActionListener(e -> UIHandler.getInstance().showRankingModal(HomeUI.this));
+        rankingButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestRoomFetchRank();
+        });
         leftButtonPanel.add(rankingButton, gbc);
 
         JLabel rankingLabel = new JLabel("랭킹");

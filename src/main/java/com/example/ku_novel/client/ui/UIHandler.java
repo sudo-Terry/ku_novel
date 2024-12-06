@@ -191,7 +191,7 @@ public class UIHandler {
     }
 
     public void repaintNovelRoomModalUI() {
-        NovelRoomModalUI.getInstance().updateButtonArea();
+        NovelRoomModalUI.getInstance().updateUI();
     }
 
     public void updateNovelRoomChat(int roomId, String formattedMessage) {
@@ -223,14 +223,14 @@ public class UIHandler {
         });
     }
 
-    public void showDownloadModal(JFrame frame) {
+    public void showDownloadModal() {
         SwingUtilities.invokeLater(() -> {
             if (downloadModalUI == null || !downloadModalUI.isVisible()) {
-                downloadModalUI = new DownloadModalUI(frame);
-                downloadModalUI.showModal();
+                downloadModalUI = new DownloadModalUI(HomeUI.getInstance());
             }else {
                 System.out.println("downloadModalUI 이미 열려 있음");
             }
+            downloadModalUI.showRoomCompleted();
         });
     }
 
@@ -256,14 +256,14 @@ public class UIHandler {
         });
     }
 
-    public void showRankingModal(JFrame frame) {
+    public void showRankingModal() {
         SwingUtilities.invokeLater(() -> {
             if (rankingModalUI == null || !rankingModalUI.isVisible()) {
-                rankingModalUI = new RankingModalUI(frame);
-                rankingModalUI.showModal();
+                rankingModalUI = new RankingModalUI(HomeUI.getInstance());
             }else {
                 System.out.println("rankingModalUI 이미 열려 있음");
             }
+            rankingModalUI.showRoomRank();
         });
     }
 

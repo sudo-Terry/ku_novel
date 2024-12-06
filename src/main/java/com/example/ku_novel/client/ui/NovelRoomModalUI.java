@@ -292,7 +292,8 @@ public class NovelRoomModalUI extends JDialog {
         settingLabel.setForeground(Color.WHITE);
 
         // 방장만 소설방 설정 변경
-        if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())){
+        if(!ClientDataModel.getInstance().getUserId().equals(ClientDataModel.getInstance().getHostUserId())
+        || !ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
             settingButton.setBackground(NovelColor.BLACK_GREEN);
             settingButton.setEnabled(false);
             settingLabel.setForeground(NovelColor.BLACK_GREEN);
@@ -332,6 +333,11 @@ public class NovelRoomModalUI extends JDialog {
                 applyAuthorButton.setEnabled(false);
             }
         }
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
+            applyAuthorLabel.setForeground(NovelColor.BLACK_GREEN);
+            applyAuthorButton.setBackground(NovelColor.BLACK_GREEN);
+            applyAuthorButton.setEnabled(false);
+        }
 
         bottomGbc.gridx = 1;
         bottomGbc.gridy = 0;
@@ -357,6 +363,12 @@ public class NovelRoomModalUI extends JDialog {
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(authorLabel, bottomGbc);
 
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
+            authorButton.setBackground(NovelColor.BLACK_GREEN);
+            authorButton.setEnabled(false);
+            authorLabel.setForeground(NovelColor.BLACK_GREEN);
+        }
+
         // 투표 버튼
         JButton voteButton = new ImageButton("src/main/resources/icon/vote.png", Color.WHITE);
         voteButton.addActionListener(e-> {
@@ -375,6 +387,12 @@ public class NovelRoomModalUI extends JDialog {
         voteLabel.setForeground(Color.WHITE);
         bottomGbc.gridy = 1;
         bottomButtonPanel.add(voteLabel, bottomGbc);
+
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
+            voteButton.setBackground(NovelColor.BLACK_GREEN);
+            voteButton.setEnabled(false);
+            voteLabel.setForeground(NovelColor.BLACK_GREEN);
+        }
 
         // 소설 저장 버튼
         bottomGbc.gridx = 5;
@@ -412,7 +430,7 @@ public class NovelRoomModalUI extends JDialog {
 
         // 소설가만 소설작성 버튼 활성화
         for(String str : ClientDataModel.getInstance().getNovelParticipantIds()) {
-            if (str.equals(ClientDataModel.getInstance().getUserId())) {
+            if (str.equals(ClientDataModel.getInstance().getUserId()) && ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")) {
                 writeButton.setBackground(Color.WHITE);
                 writeButton.setEnabled(true);
                 writeLabel.setForeground(Color.WHITE);
@@ -472,7 +490,9 @@ public class NovelRoomModalUI extends JDialog {
         chatTextArea.append(formattedChat + '\n');
     }
 
-    public void updateButtonArea(){
+    public void updateUI(){
+        this.roomTitle = ClientDataModel.getInstance().getNovelRoomTitle();
+        this.roomDescription = ClientDataModel.getInstance().getNovelRoomDescription();
         initUI();
     }
 

@@ -238,4 +238,38 @@ public class ClientSenderThread extends Thread{
 
         writer.println(roomAddFavouriteMessage.toJson());
     }
+
+    public void requestRoomFetchRank() {
+        Message roomFetchRankMessage = new Message();
+        roomFetchRankMessage.setType(MessageType.ROOM_FETCH_RANK);
+
+        writer.println(roomFetchRankMessage.toJson());
+    }
+
+    public void requestRoomFetchByCompleted(){
+        Message roomFetchCompletedMessage = new Message();
+        roomFetchCompletedMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED);
+
+        writer.println(roomFetchCompletedMessage.toJson());
+    }
+
+    public void requestNicknameChange(String senderId, String nickname, String newNickname){
+        Message nicknameChangeMessage = new Message();
+        nicknameChangeMessage.setType(MessageType.NICKNAME_CHANGE);
+        nicknameChangeMessage.setSender(senderId);
+        nicknameChangeMessage.setNickname(nickname);
+        nicknameChangeMessage.setContent(newNickname);
+
+        writer.println(nicknameChangeMessage.toJson());
+    }
+
+    public void requestPasswordChange(String senderId, String password, String newPassword){
+        Message passwordChangeMessage = new Message();
+        passwordChangeMessage.setType(MessageType.PASSWORD_CHANGE);
+        passwordChangeMessage.setSender(senderId);
+        passwordChangeMessage.setPassword(password);
+        passwordChangeMessage.setContent(newPassword);
+
+        writer.println(passwordChangeMessage.toJson());
+    }
 }

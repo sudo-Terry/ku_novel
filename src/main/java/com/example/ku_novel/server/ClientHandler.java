@@ -633,10 +633,10 @@ class ClientHandler implements Runnable {
         try {
             responseMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED_SUCCESS)
                     .setContent("완결 상태 소설 목록 조회 성공")
-                    .setJson(new Gson().toJson(deactivateRooms));
+                    .setCompletedNovelRooms(_convertNovelRoomsToMessages(deactivateRooms));
         } catch (Exception e) {
             responseMessage.setType(MessageType.ROOM_FETCH_BY_COMPLETED_FAILED)
-                    .setContent("완결 상태 소설 목록 조회 실패");
+                    .setContent("완결 상태 소설 목록 조회 실패" + e.getMessage());
         }
         sendMessageToCurrentClient(responseMessage);
     }
@@ -663,7 +663,7 @@ class ClientHandler implements Runnable {
                         Message updateMessage = new Message()
                                 .setType(MessageType.ROOM_FETCH_BY_ID)
                                 .setNovelRoomId(roomId)
-                                .setNovelRoom(novelRoom.toMessage())
+                                .setNovelRoom((novelRoomService.getNovelRoomById(roomId).orElseThrow().toMessage()))
                                 .setContent("소설방 설정이 변경되었습니다.");
                         sendMessageToUser(userId, updateMessage);
                     }
