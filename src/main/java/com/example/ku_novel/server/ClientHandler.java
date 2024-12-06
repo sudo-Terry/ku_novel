@@ -559,7 +559,7 @@ class ClientHandler implements Runnable {
                         .setNovelRoom(novelRoom.toMessage()); // novelRoom 추가
                 sendMessageToCurrentClient(responseMessage);
 
-//                sendRecentRoomInfo(roomId);
+                sendRecentRoomInfo(roomId);
 
                 System.out.println("User " + sender + " joined room " + roomId + ". Current participants: " + participantCount);
                 return;
@@ -574,34 +574,6 @@ class ClientHandler implements Runnable {
         sendMessageToCurrentClient(responseMessage);
     }
 
-
-//    private void sendRecentRoomInfo(int roomId) {
-//        try {
-//            Optional<NovelRoom> novelRoomOpt = novelRoomService.getNovelRoomById(roomId);
-//            if (novelRoomOpt.isPresent()) {
-//                NovelRoom novelRoom = novelRoomOpt.get();
-//
-//                // 현재 참여자 수 계산
-//                int participantCount = 0;
-//                synchronized (roomUsers) {
-//                    Set<String> set = roomUsers.get(roomId);
-//                    if (set != null) {
-//                        participantCount = set.size();
-//                        for (String userId : set) {
-//                            Message responseMessage = new Message()
-//                                    .setType(MessageType.ROOM_FETCH_BY_ID)
-//                                    .setContent("소설 방 정보 갱신")
-//                                    .setParticipantsCount(participantCount) // 현재 참여자 수 설정
-//                                    .setNovelRoom(novelRoom.toMessage());
-//                            sendMessageToUser(userId, responseMessage);
-//                        }
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//
-//        }
-//    }
 
     private void sendRecentRoomInfo(int roomId) {
         try {
@@ -1001,7 +973,7 @@ class ClientHandler implements Runnable {
                 }
             }
 
-//            sendRecentRoomInfo(roomId);
+            sendRecentRoomInfo(roomId);
         } catch (Exception e) {
         }
 
