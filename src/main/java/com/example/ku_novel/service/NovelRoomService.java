@@ -113,7 +113,7 @@ public class NovelRoomService {
 
     // 완결 상태의 소설방 조회
     public List<NovelRoom> getDeactivateRoom() {
-        return novelRoomRepository.findByStatus("DEACTIVATE");
+        return novelRoomRepository.findByStatus("DEACTIVE");
     }
 
     @Transactional
