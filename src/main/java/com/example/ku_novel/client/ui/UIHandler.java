@@ -322,4 +322,15 @@ public class UIHandler {
             }
         });
     }
+
+    public void shutdownSocket() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                System.out.println("[Client] Socket closed.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

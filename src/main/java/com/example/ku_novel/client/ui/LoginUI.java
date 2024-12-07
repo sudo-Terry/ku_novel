@@ -7,13 +7,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class LoginUI extends JFrame {
 
     public LoginUI() {
         setTitle("로그인");
         setSize(1080, 720);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(
+                        LoginUI.this,
+                        "릴소 어플리케이션을 종료시겠습니까?",
+                        "확인",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    UIHandler.getInstance().shutdownSocket();
+                    System.exit(0);
+                }
+            }
+        });
         setResizable(false);    // 크기 조절 비활성화
         setLocationRelativeTo(null);
 
