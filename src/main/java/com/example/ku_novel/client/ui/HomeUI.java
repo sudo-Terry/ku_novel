@@ -139,7 +139,7 @@ public class HomeUI extends JFrame {
 
     private void initRightButtonPanel() {
         rightButtonPanel = new JPanel(new GridBagLayout());
-        rightButtonPanel.setPreferredSize(new Dimension(340, 90));
+        rightButtonPanel.setPreferredSize(new Dimension(250, 90));
         rightButtonPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -189,22 +189,22 @@ public class HomeUI extends JFrame {
 
 
         // 새로고침 버튼
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        createButton = new ImageButton("src/main/resources/icon/refresh.png", NovelColor.DARK_GREEN);
-        createButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String userId = ClientDataModel.getInstance().getUserId();
-                ClientSenderThread.getInstance().requestRefreshHome(userId);
-            }
-        });
-        rightButtonPanel.add(createButton, gbc);
-
-        JLabel refreshLabel = new JLabel("새로고침");
-        refreshLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
-        gbc.gridy = 1;
-        rightButtonPanel.add(refreshLabel, gbc);
+//        gbc.gridx = 3;
+//        gbc.gridy = 0;
+//        createButton = new ImageButton("src/main/resources/icon/refresh.png", NovelColor.DARK_GREEN);
+//        createButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String userId = ClientDataModel.getInstance().getUserId();
+//                ClientSenderThread.getInstance().requestRefreshHome(userId);
+//            }
+//        });
+//        rightButtonPanel.add(createButton, gbc);
+//
+//        JLabel refreshLabel = new JLabel("새로고침");
+//        refreshLabel.setFont(FontSetting.getInstance().loadCustomFont(14f));
+//        gbc.gridy = 1;
+//        rightButtonPanel.add(refreshLabel, gbc);
     }
 
     private void showHome() {
