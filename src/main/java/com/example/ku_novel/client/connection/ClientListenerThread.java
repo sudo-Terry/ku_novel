@@ -58,7 +58,8 @@ public class ClientListenerThread extends Thread {
                  "ROOM_CREATE_FAILED", "AUTHOR_APPLY_FAILED", "ATTENDANCE_CHECK_FAILED",
                  "VOTE_FETCH_BY_ID_FAILED", "VOTE_FAILED", "ROOM_UPDATE_SETTING_FAILED",
                  "NOVEL_ALREADY_SUBMITTED", "ROOM_FETCH_RANK_FAILED", "ROOM_FETCH_BY_COMPLETED_FAILED",
-                 "PASSWORD_CHANGE_FAILED", "NICKNAME_CHANGE_FAILED", "PROFILE_IMAGE_CHANGE_FAILED" -> uiHandler.showAlertModal(
+                 "PASSWORD_CHANGE_FAILED", "NICKNAME_CHANGE_FAILED", "PROFILE_IMAGE_CHANGE_FAILED",
+                 "NOVEL_FETCH_BY_ID_FAILED" -> uiHandler.showAlertModal(
                     null, "경고", jsonObject.get("content").getAsString(), JOptionPane.ERROR_MESSAGE);
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
                  "ATTENDANCE_CHECK_SUCCESS", "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
@@ -82,6 +83,7 @@ public class ClientListenerThread extends Thread {
             case "ROOM_FETCH_BY_ID" -> handleRoomFetchById(jsonObject, uiHandler);
             case "ROOM_FETCH_RANK_SUCCESS" -> handleRoomFetchRankSuccess(jsonObject, uiHandler);
             case "ROOM_FETCH_BY_COMPLETED_SUCCESS" -> handleRoomFetchByCompletedSuccess(jsonObject, uiHandler);
+            case "NOVEL_FETCH_BY_ID_SUCCESS" -> handleNovelFetchByIdSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
     }
@@ -152,6 +154,38 @@ public class ClientListenerThread extends Thread {
         // uiHandler.
     }
 
+    private void handleNovelFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel dataModel = ClientDataModel.getInstance();
+
+        if (jsonObject.has("vote")) {
+            JsonObject voteObject = jsonObject.getAsJsonObject("vote");
+            if (voteObject != null && voteObject.has("contentOptions")) {
+                List<String> options = dataModel.getGson().fromJson(
+                        voteObject.getAsJsonArray("contentOptions"),
+                        List.class
+                );
+                dataModel.setVoteOptions(options);
+                if(voteObject.get("voteStatus").getAsString().equals("WRITER_ENABLED")){
+                    dataModel.setCountDownWrite(voteObject.get("countDown").getAsInt());
+                    dataModel.setCountDownVote(0);
+                }
+                if(voteObject.get("voteStatus").getAsString().equals("VOTING_ENABLED")){
+                    dataModel.setCountDownWrite(0);
+                    dataModel.setCountDownVote(voteObject.get("countDown").getAsInt());
+                }
+                UIHandler.getInstance().setVoteModalUIVisible();
+            } else {
+                System.out.println("contentOptions가 JSON에 없습니다.");
+                dataModel.setVoteOptions(new ArrayList<>());
+            }
+        } else {
+            System.out.println("vote 객체가 JSON에 없습니다.");
+            dataModel.setVoteOptions(new ArrayList<>());
+        }
+
+        uiHandler.repaintVoteModalUI();
+    }
+
     private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
         ClientDataModel dataModel = ClientDataModel.getInstance();
 
@@ -171,6 +205,7 @@ public class ClientListenerThread extends Thread {
                     dataModel.setCountDownWrite(0);
                     dataModel.setCountDownVote(voteObject.get("countDown").getAsInt());
                 }
+                UIHandler.getInstance().showNovelInputModal();
             } else {
                 System.out.println("contentOptions가 JSON에 없습니다.");
                 dataModel.setVoteOptions(new ArrayList<>());
@@ -179,8 +214,6 @@ public class ClientListenerThread extends Thread {
             System.out.println("vote 객체가 JSON에 없습니다.");
             dataModel.setVoteOptions(new ArrayList<>());
         }
-
-        uiHandler.repaintVoteModalUI();
     }
 
     private void handleRoomCreateSuccess(JsonObject jsonObject, UIHandler uiHandler) {

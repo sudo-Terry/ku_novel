@@ -1,6 +1,7 @@
 package com.example.ku_novel.client.connection;
 
 import com.example.ku_novel.client.model.ClientDataModel;
+import com.example.ku_novel.client.ui.UIHandler;
 import com.example.ku_novel.common.Message;
 import com.example.ku_novel.common.MessageType;
 
@@ -188,6 +189,14 @@ public class ClientSenderThread extends Thread{
         voteFetchByIDMessage.setNovelVoteId(novelVoteId);
 
         writer.println(voteFetchByIDMessage.toJson());
+    }
+
+    public void requestNovelFetchByID(int novelVoteId) {
+        Message novelFetchByIDMessage = new Message();
+        novelFetchByIDMessage.setType(MessageType.NOVEL_FETCH_BY_ID);
+        novelFetchByIDMessage.setNovelVoteId(novelVoteId);
+
+        writer.println(novelFetchByIDMessage.toJson());
     }
 
     public void requestVote(String senderId, int novelVoteId, String novelOption) {
