@@ -6,17 +6,18 @@ import com.example.ku_novel.client.ui.component.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 
 public class NovelInputModalUI extends JDialog {
     private JTextArea novelInputTextArea;
-    private static final int TIME_LIMIT_SECONDS = 10; // 제한 시간 (초 단위)
 
     public NovelInputModalUI(NovelRoomModalUI parent) {
         super(parent, "다음 내용 입력", true);
         setBackground(Color.WHITE);
-        setSize(800, 600);
+        setSize(720, 540);
 
         JPanel mainPanel = new JPanel(new BorderLayout(20, 10));
         mainPanel.setBackground(Color.WHITE);
@@ -25,74 +26,45 @@ public class NovelInputModalUI extends JDialog {
 
         JLabel titleLabel = new JLabel("소설 작성");
         titleLabel.setFont(FontSetting.getInstance().loadCustomFont(28f));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JPanel titlePanel = new JPanel();
         titlePanel.add(titleLabel);
         titlePanel.setBackground(Color.WHITE);
         mainPanel.add(titlePanel, BorderLayout.NORTH);
 
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setBackground(Color.WHITE);
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 0, 20);
-
-        // 이전 소설 내용' 라벨
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-
-        JLabel preLabel = new JLabel("이전 소설 내용");
-        preLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        contentPanel.add(preLabel, gbc);
-
-        // 이전 소설 내용
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weighty = 2.0;
-        gbc.fill = GridBagConstraints.BOTH;
-
-        JTextArea preNovelTextArea = new JTextArea(10, 20);
-        preNovelTextArea.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        preNovelTextArea.append("이전 소설 내용입니다.");
-        preNovelTextArea.setEditable(false);
-
-        // 스크롤 추가
-        JScrollPane preScrollPane = new JScrollPane(preNovelTextArea);
-        preScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        preScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        preScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
-        contentPanel.add(preScrollPane, gbc);
-
-        // '내용 입력' 라벨
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel inputLabel = new JLabel("소설 내용 입력");
-        inputLabel.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        contentPanel.add(inputLabel, gbc);
-
-        // 내용 입력
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weighty = 2.0;
-        gbc.fill = GridBagConstraints.BOTH;
-
         novelInputTextArea = new JTextArea(10, 20);
-        novelInputTextArea.setFont(FontSetting.getInstance().loadCustomFont(16f));
-        novelInputTextArea.append("소설 입력창입니다.");
+        novelInputTextArea.setFont(FontSetting.getInstance().loadCustomFont(20f));
+
+        String placeholderText = "다음 내용 소설 입력창입니다.";
+        novelInputTextArea.setText(placeholderText);
+        novelInputTextArea.setForeground(Color.GRAY);
+
+        novelInputTextArea.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (novelInputTextArea.getText().equals(placeholderText)) {
+                    novelInputTextArea.setText("");
+                    novelInputTextArea.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (novelInputTextArea.getText().isEmpty()) {
+                    novelInputTextArea.setText(placeholderText);
+                    novelInputTextArea.setForeground(Color.GRAY);
+                }
+            }
+        });
 
         // 스크롤 추가
         JScrollPane inputScrollPane = new JScrollPane(novelInputTextArea);
         inputScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         inputScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         inputScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
-        contentPanel.add(inputScrollPane, gbc);
+
+        mainPanel.add(inputScrollPane, BorderLayout.CENTER);
 
         // 버튼 패널
         JPanel buttonPanel = new JPanel();

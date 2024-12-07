@@ -290,6 +290,7 @@ public class HomeUI extends JFrame {
         // 스크롤 추가
         JScrollPane scrollPane = new JScrollPane(novelListTable);
         scrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 
         // 패널에 추가
         JPanel participatingPanel = new JPanel(new BorderLayout());
@@ -367,6 +368,7 @@ public class HomeUI extends JFrame {
 
         JScrollPane scrollPane2 = new JScrollPane(activeNovelListTable);
         scrollPane2.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        scrollPane2.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 
         JPanel allRoomsPanel = new JPanel(new BorderLayout());
         allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);
