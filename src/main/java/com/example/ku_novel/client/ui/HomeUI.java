@@ -231,7 +231,7 @@ public class HomeUI extends JFrame {
 
         // 상단 패널 변경
         JLabel titleLabel = new JLabel("릴소");
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 90, 0, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(FontSetting.getInstance().loadLogoFont(54f));
         titleLabel.setForeground(NovelColor.DARK_GREEN);
