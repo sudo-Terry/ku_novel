@@ -1,5 +1,5 @@
 package com.example.ku_novel.service;
-
+import java.util.stream.Collectors;
 import com.example.ku_novel.domain.NovelRoom;
 import com.example.ku_novel.domain.Vote;
 import com.example.ku_novel.utils.ParticipantUtils;
@@ -65,7 +65,10 @@ public class NovelRoomService {
     // 특정 participantId가 포함된 소설방 조회
     public List<NovelRoom> getRoomsByParticipantId(String participantId) {
         String escapedId = "%\"" + participantId + "\"%";
-        return novelRoomRepository.findByParticipantId(escapedId);
+        return novelRoomRepository.findByParticipantId(escapedId)
+                .stream()
+                .filter(novelRoom -> "ACTIVE".equals(novelRoom.getStatus()))
+                .collect(Collectors.toList());
     }
 
     public String appendContentToNovel(Integer novelRoomId, String newContent) {
