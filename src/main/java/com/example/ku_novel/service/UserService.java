@@ -101,4 +101,8 @@ public class UserService {
 
         return points;
     }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
 }
