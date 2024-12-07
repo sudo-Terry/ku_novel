@@ -12,6 +12,7 @@ import com.example.ku_novel.service.UserService;
 import com.example.ku_novel.service.VoteService;
 import com.example.ku_novel.utils.ParticipantUtils;
 import com.google.gson.Gson;
+import org.aspectj.bridge.IMessage;
 
 class ClientHandler implements Runnable {
     private static final HashMap<String, PrintWriter> activeClients = new HashMap<>();
@@ -141,6 +142,14 @@ class ClientHandler implements Runnable {
             case ROOM_FETCH_RANK:
                 handleRankingNovelRooms();
                 break;
+            case NICKNAME_CHANGE:
+                handleUpdateNickname(message);
+                break;
+            case PASSWORD_CHANGE:
+                handleUpdatePassword(message);
+                break;
+            case PROFILE_IMAGE_CHANGE:
+                handleUpdateProfile(message);
 //            case ROOM_CLOSE:
 //                handleCloseNovelRoom(message);
 //                break;
@@ -365,6 +374,7 @@ class ClientHandler implements Runnable {
             responseMessage.setNickname(user.getNickname());
             responseMessage.setType(MessageType.LOGIN_SUCCESS);
             responseMessage.setContent("로그인이 성공되었습니다.");
+            responseMessage.setProfile_image(user.getProfile_image());
             responseMessage.setSender(id);
             responseMessage.setPassword(password);
 
@@ -393,6 +403,100 @@ class ClientHandler implements Runnable {
             activeClients.remove(id);
         }
         id = null;
+    }
+
+    private void handleUpdateNickname(Message message) {
+        String userId = message.getSender();
+        String currentNickname = message.getNickname();
+        String newNickname = message.getContent();
+
+        Message responseMessage = new Message();
+        try {
+            // 유저 정보 확인
+            User user = userService.findById(userId);
+            if (!user.getNickname().equals(currentNickname)) {
+                throw new IllegalArgumentException("현재 닉네임이 일치하지 않습니다.");
+            }
+
+            // 닉네임 중복 확인
+            if (userService.isNicknameExists(newNickname)) {
+                throw new IllegalArgumentException("새 닉네임이 이미 사용 중입니다.");
+            }
+
+            // 닉네임 변경
+            user.setNickname(newNickname);
+            userService.save(user);
+
+            responseMessage.setType(MessageType.NICKNAME_CHANGE_SUCCESS)
+                    .setContent("닉네임이 성공적으로 변경되었습니다.")
+                    .setSender(userId)
+                    .setNickname(newNickname);
+            sendAllRefreshHome();
+        } catch (Exception e) {
+            responseMessage.setType(MessageType.NICKNAME_CHANGE_FAILED)
+                    .setContent("닉네임 변경 실패: " + e.getMessage());
+        }
+        sendMessageToCurrentClient(responseMessage);
+    }
+
+    private void handleUpdatePassword(Message message) {
+        String senderId = message.getSender();
+        String currentPassword = message.getPassword();
+        String newPassword = message.getContent();
+
+        Message responseMessage = new Message();
+        try {
+            // 유저 정보 확인
+            User user = userService.findById(senderId);
+            if (!user.getPassword().equals(currentPassword)) {
+                throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            }
+
+            // 비밀번호 변경
+            user.setPassword(newPassword);
+            userService.save(user);
+            sendAllRefreshHome();
+
+            responseMessage.setType(MessageType.PASSWORD_CHANGE_SUCCESS)
+                    .setContent("비밀번호가 성공적으로 변경되었습니다.")
+                    .setSender(senderId)
+                    .setPassword(newPassword);
+            sendAllRefreshHome();
+        } catch (Exception e) {
+            responseMessage.setType(MessageType.PASSWORD_CHANGE_FAILED)
+                    .setContent("비밀번호 변경 실패: " + e.getMessage());
+        }
+        sendMessageToCurrentClient(responseMessage);
+    }
+
+    private void handleUpdateProfile(Message message) {
+        String senderId = message.getSender();
+        Integer currentProfile = message.getProfile_image();
+        Integer newProfile = Integer.valueOf(message.getContent());
+
+        Message responseMessage = new Message();
+        try {
+            // 유저 정보 확인
+            User user = userService.findById(senderId);
+            if (!user.getProfile_image().equals(currentProfile)) {
+                throw new IllegalArgumentException("현재 프로필이 존재하지 않습니다.");
+            }
+
+            // 프로필 변경
+            user.setProfile_image(newProfile);
+            userService.save(user);
+            sendAllRefreshHome();
+
+            responseMessage.setType(MessageType.PROFILE_IMAGE_CHANGE_SUCCESS)
+                    .setContent("프로필이 성공적으로 변경되었습니다.")
+                    .setSender(senderId)
+                    .setProfile_image(newProfile);
+            sendAllRefreshHome();
+        } catch (Exception e) {
+            responseMessage.setType(MessageType.PROFILE_IMAGE_CHANGE_FAILED)
+                    .setContent("프로필 변경 실패: " + e.getMessage());
+        }
+        sendMessageToCurrentClient(responseMessage);
     }
 
     /* 소설방 관련 로직 */

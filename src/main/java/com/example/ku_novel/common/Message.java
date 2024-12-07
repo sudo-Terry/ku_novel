@@ -26,6 +26,7 @@ public class Message {
     private String password;
     private String nickname;
     private int point;
+    private Integer profile_image;
 
     private String json;
 

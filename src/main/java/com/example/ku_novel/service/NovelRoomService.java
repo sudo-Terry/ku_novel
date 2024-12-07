@@ -1,7 +1,9 @@
 package com.example.ku_novel.service;
 import java.util.stream.Collectors;
 import com.example.ku_novel.domain.NovelRoom;
+import com.example.ku_novel.domain.User;
 import com.example.ku_novel.domain.Vote;
+import com.example.ku_novel.repository.UserRepository;
 import com.example.ku_novel.utils.ParticipantUtils;
 import com.example.ku_novel.repository.NovelRoomRepository;
 import com.example.ku_novel.repository.VoteRepository;
@@ -18,11 +20,13 @@ public class NovelRoomService {
 
     private final NovelRoomRepository novelRoomRepository;
     private final VoteRepository voteRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public NovelRoomService(NovelRoomRepository novelRoomRepository, VoteRepository voteRepository) {
+    public NovelRoomService(NovelRoomRepository novelRoomRepository, VoteRepository voteRepository, UserRepository userRepository) {
         this.novelRoomRepository = novelRoomRepository;
         this.voteRepository = voteRepository;
+        this.userRepository = userRepository;
     }
 
     // 소설 방 생성

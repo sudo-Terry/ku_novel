@@ -97,4 +97,8 @@ public class UserService {
         user.setLastAttendance(today);
         userRepository.save(user);
     }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
 }

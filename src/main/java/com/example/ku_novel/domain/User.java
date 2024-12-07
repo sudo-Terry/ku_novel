@@ -29,6 +29,10 @@ public class User {
     @Column(name = "last_attendance")
     private LocalDateTime lastAttendance;
 
+    @Column(name = "profile_image")
+    @Builder.Default
+    private Integer profile_image = 1;
+
     @Builder.Default
     @Column(name = "point", nullable = false)
     private Integer point = 500;
