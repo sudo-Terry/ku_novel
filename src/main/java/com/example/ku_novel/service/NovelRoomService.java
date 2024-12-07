@@ -141,10 +141,9 @@ public class NovelRoomService {
             novelRoom.setDescription(updatedDescription);
         }
 
-        if (updatedStatus != null && (updatedStatus.equals("N"))) {
+        if (updatedStatus != null && (updatedStatus.equals("Y"))) {
             novelRoom.setStatus("DEACTIVE");
         }
-
         novelRoomRepository.save(novelRoom);
     }
 }
