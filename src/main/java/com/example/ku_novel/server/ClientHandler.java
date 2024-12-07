@@ -141,6 +141,9 @@ class ClientHandler implements Runnable {
             case ROOM_FETCH_RANK:
                 handleRankingNovelRooms();
                 break;
+//            case ROOM_CLOSE:
+//                handleCloseNovelRoom(message);
+//                break;
             // case CHAT:
             // handleChatMessage(messageJson);
             // break;
@@ -645,13 +648,12 @@ class ClientHandler implements Runnable {
         Message responseMessage = new Message();
         try {
             Integer roomId = message.getNovelRoomId();
-            NovelRoom novelRoom = novelRoomService.getNovelRoomById(roomId)
-                    .orElseThrow();
             String title = message.getNovelRoomTitle();
             String novelRoomDescription = message.getNovelRoomDescription();
+            String updatedStatus = message.getNovelEnded();
 
             // 소설방 설정 변경
-            novelRoomService.updateNovelRoomSettings(roomId, title, novelRoomDescription);
+            novelRoomService.updateNovelRoomSettings(roomId, title, novelRoomDescription, updatedStatus);
 
             synchronized (roomUsers) {
                 Set<String> usersInRoom = roomUsers.get(roomId);
@@ -660,8 +662,9 @@ class ClientHandler implements Runnable {
                         Message updateMessage = new Message()
                                 .setType(MessageType.ROOM_FETCH_BY_ID)
                                 .setNovelRoomId(roomId)
+                                .setContent("소설방 설정이 변경되었습니다.")
                                 .setNovelRoom((novelRoomService.getNovelRoomById(roomId).orElseThrow().toMessage()))
-                                .setContent("소설방 설정이 변경되었습니다.");
+                                .setNovelRoomStatus(updatedStatus);
                         sendMessageToUser(userId, updateMessage);
                     }
                 }

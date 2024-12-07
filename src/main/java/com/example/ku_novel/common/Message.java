@@ -140,6 +140,11 @@ public class Message {
         return this;
     }
 
+    public Message setNovelRoomStatus(String novelRoomStatus) {
+        this.novelRoomStatus = novelRoomStatus;
+        return this;
+    }
+
     @Override
     public String toString() {
         return toJson().toString();
