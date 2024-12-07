@@ -8,7 +8,8 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class MyPageModalUI extends JDialog {
-    private JLabel pointLabel;
+    private JLabel pointLabel, nameLabel, idLabel;
+    CircularImage profileImage;
 
     public MyPageModalUI(JFrame parent) {
         super(parent, "마이페이지", true);
@@ -53,7 +54,8 @@ public class MyPageModalUI extends JDialog {
         infoContentPanel.setBackground(NovelColor.BLACK_GREEN);
         GridBagConstraints mainGbc = new GridBagConstraints();
 
-        JPanel profileImage = new CircularImage("src/main/resources/image/image1.png");
+        String imagePath = "src/main/resources/image/image" + ClientDataModel.getInstance().getUserProfileImage() + ".png";
+        profileImage = new CircularImage(imagePath);
         profileImage.setPreferredSize(new Dimension(245, 245));
         mainGbc.insets = new Insets(0, 0, 10, 0);
         mainGbc.gridx = 0;
@@ -63,7 +65,6 @@ public class MyPageModalUI extends JDialog {
 
         // JLabel nameLabel = new JLabel("Nickname: " + ClientDataModel.getInstance().getUserName());
         JPanel namePanel = new JPanel();
-        JLabel nameLabel;
         if(ClientDataModel.getInstance().getUserName() == null) {
             nameLabel = new JLabel("NICKNAME");
         } else {
@@ -79,7 +80,6 @@ public class MyPageModalUI extends JDialog {
         infoContentPanel.add(namePanel, mainGbc);
 
         JPanel idPanel = new JPanel();
-        JLabel idLabel;
         if(ClientDataModel.getInstance().getUserId() == null) {
             idLabel = new JLabel("userID");
         } else {
@@ -150,5 +150,14 @@ public class MyPageModalUI extends JDialog {
     public void showModal() {
         pointLabel = new JLabel(ClientDataModel.getInstance().getUserPoint());
         setVisible(true);
+    }
+
+    public void updateModal() {
+        nameLabel.setText(ClientDataModel.getInstance().getUserName());
+        idLabel.setText(ClientDataModel.getInstance().getUserId());
+        pointLabel.setText(ClientDataModel.getInstance().getUserPoint());
+        profileImage.changeImage("src/main/resources/image/image" + ClientDataModel.getInstance().getUserProfileImage() + ".png");
+        revalidate();
+        repaint();
     }
 }

@@ -281,4 +281,14 @@ public class ClientSenderThread extends Thread{
 
         writer.println(passwordChangeMessage.toJson());
     }
+
+    public void requestProfileImageChange(String senderId, int currentProfileImageNumber, String profileImageNumber){
+        Message profileImageChangeMessage = new Message();
+        profileImageChangeMessage.setType(MessageType.PROFILE_IMAGE_CHANGE);
+        profileImageChangeMessage.setSender(senderId);
+        profileImageChangeMessage.setProfile_image(currentProfileImageNumber);
+        profileImageChangeMessage.setContent(profileImageNumber);
+
+        writer.println(profileImageChangeMessage.toJson());
+    }
 }

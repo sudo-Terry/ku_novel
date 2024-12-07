@@ -1,5 +1,7 @@
 package com.example.ku_novel.client.ui;
 
+import com.example.ku_novel.client.connection.ClientSenderThread;
+import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.FontSetting;
 import com.example.ku_novel.client.ui.component.NovelColor;
 import com.example.ku_novel.client.ui.component.RoundedButton;
@@ -69,6 +71,13 @@ public class ImageEditModalUI extends JDialog {
         JButton okButton = new RoundedButton("변경", NovelColor.YELLOW, Color.BLACK);
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         okButton.setPreferredSize(new Dimension(80, 40));
+        okButton.addActionListener(e -> {
+            ClientSenderThread.getInstance().requestProfileImageChange(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getUserProfileImage(),
+                    String.valueOf(selectedIndex[0] + 1)
+            );
+        });
         buttonPanel.add(okButton);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);

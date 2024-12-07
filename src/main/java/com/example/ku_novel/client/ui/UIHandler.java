@@ -323,6 +323,26 @@ public class UIHandler {
         });
     }
 
+    public void updateMyPageModal(){
+        if (myPageModalUI != null)
+            myPageModalUI.updateModal();
+    }
+
+    public void disposeImageEditModalUI(){
+        if (imageEditModalUI != null)
+            imageEditModalUI.dispose();
+    }
+
+    public void disposePwEditModalUI(){
+        if (pwEditModalUI != null)
+            pwEditModalUI.dispose();
+    }
+
+    public void disposeNameEditModalUI(){
+        if (nameEditModalUI != null)
+            nameEditModalUI.dispose();
+    }
+
     public void shutdownSocket() {
         try {
             if (socket != null && !socket.isClosed()) {

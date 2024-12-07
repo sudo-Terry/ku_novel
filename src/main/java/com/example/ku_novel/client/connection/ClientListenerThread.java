@@ -64,8 +64,7 @@ public class ClientListenerThread extends Thread {
             case "ID_INVALID", "ID_VALID", "NICKNAME_INVALID", "NICKNAME_VALID", "AUTHOR_APPLY_SUCCESS",
                  "FAVOURITE_ADD_SUCCESS", "FAVOURITE_ADD_FAILED",
                  "ROOM_FETCH_FAVOURITE_FAILED", "AUTHOR_REJECTED", "NOVEL_SUBMITTED", "VOTE_SUCCESS",
-                 "ROOM_WRITE_END", "ROOM_UPDATE_SETTING_SUCCESS", "AUTHOR_LIST_UPDATE", "AUTHOR_APPLY_REJECTED",
-                 "PASSWORD_CHANGE_SUCCESS", "NICKNAME_CHANGE_SUCCESS", "PROFILE_IMAGE_CHANGE_SUCCESS"-> uiHandler.showAlertModal(
+                 "ROOM_WRITE_END", "ROOM_UPDATE_SETTING_SUCCESS", "AUTHOR_LIST_UPDATE", "AUTHOR_APPLY_REJECTED" -> uiHandler.showAlertModal(
                     null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
             case "SIGNUP_SUCCESS" -> handleSignupSuccess(jsonObject, uiHandler);
             case "REFRESH_HOME_SUCCESS" -> handleRefreshHomeSuccess(jsonObject, uiHandler);
@@ -85,8 +84,37 @@ public class ClientListenerThread extends Thread {
             case "ROOM_FETCH_BY_COMPLETED_SUCCESS" -> handleRoomFetchByCompletedSuccess(jsonObject, uiHandler);
             case "NOVEL_FETCH_BY_ID_SUCCESS" -> handleNovelFetchByIdSuccess(jsonObject, uiHandler);
             case "ATTENDANCE_CHECK_SUCCESS" -> handleAttendanceCheckSuccess(jsonObject, uiHandler);
+            case "NICKNAME_CHANGE_SUCCESS" -> handleNicknameChangeSuccess(jsonObject, uiHandler);
+            case "PROFILE_IMAGE_CHANGE_SUCCESS" -> handleProfileImageChangeSuccess(jsonObject, uiHandler);
+            case "PASSWORD_CHANGE_SUCCESS" -> handlePasswordChangeSuccess(jsonObject, uiHandler);
             default -> enqueueMessage(jsonObject);
         }
+    }
+
+    private void handlePasswordChangeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel.getInstance().setPassword(jsonObject.get("password").getAsString());
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+
+        uiHandler.disposePwEditModalUI();
+    }
+
+    private void handleProfileImageChangeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel.getInstance().setUserProfileImage(jsonObject.get("profile_image").getAsInt());
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+
+        uiHandler.updateMyPageModal();
+        uiHandler.disposeImageEditModalUI();
+    }
+
+    private void handleNicknameChangeSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+        ClientDataModel.getInstance().setUserName(jsonObject.get("nickname").getAsString());
+        uiHandler.showAlertModal(
+                null, "정보", jsonObject.get("content").getAsString(), JOptionPane.INFORMATION_MESSAGE);
+
+        uiHandler.updateMyPageModal();
+        uiHandler.disposeNameEditModalUI();
     }
 
     private void handleAttendanceCheckSuccess(JsonObject jsonObject, UIHandler uiHandler) {
@@ -253,6 +281,7 @@ public class ClientListenerThread extends Thread {
         dataModel.setPassword(jsonObject.get("password").getAsString());
         dataModel.setUserName(jsonObject.get("nickname").getAsString());
         dataModel.setUserPoint(jsonObject.get("point").getAsString());
+        dataModel.setUserProfileImage(jsonObject.get("profile_image").getAsInt());
         dataModel.setChatRoomsFromJson(jsonObject);
 
         uiHandler.disposeLoginUI();

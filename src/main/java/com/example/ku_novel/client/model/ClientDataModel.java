@@ -20,6 +20,7 @@ public class ClientDataModel {
     private String password;
     private String userName;
     private String userPoint;
+    private int userProfileImage;
     private int currentRoomId;
     private List<NovelRoom> chatRoomsAll;
     private List<NovelRoom> chatRoomsActive;
