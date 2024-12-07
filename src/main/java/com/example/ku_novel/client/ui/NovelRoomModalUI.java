@@ -194,6 +194,13 @@ public class NovelRoomModalUI extends JDialog {
                     ClientDataModel.getInstance().getNovelContent() + '\n',
                     null
             );
+            if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
+                doc.insertString(
+                        doc.getLength(),
+                        "==== 소설이 종료되었습니다. ====" + '\n',
+                        null
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,6 +258,9 @@ public class NovelRoomModalUI extends JDialog {
                 inputField.setText(""); // 입력 필드 초기화
             }
         });
+        if(!ClientDataModel.getInstance().getNovelRoomStatus().equals("ACTIVE")){
+            sendButton.setEnabled(false);
+        }
 
         // 엔터키 입력해도 채팅 입력되게
         inputField.addActionListener(e -> sendButton.doClick());

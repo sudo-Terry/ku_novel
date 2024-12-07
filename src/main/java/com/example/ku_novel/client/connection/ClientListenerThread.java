@@ -109,6 +109,7 @@ public class ClientListenerThread extends Thread {
             ClientDataModel dataModel = ClientDataModel.getInstance();
             dataModel.setNovelRoomTitle(novelRoomObject.get("novelRoomTitle").getAsString());
             dataModel.setNovelRoomDescription(novelRoomObject.get("novelRoomDescription").getAsString());
+            dataModel.setNovelRoomStatus(novelRoomObject.get("novelRoomStatus").getAsString());
             uiHandler.repaintNovelRoomModalUI();
         } catch (Exception e) {
             System.err.println("handleRoomFetchById 처리 중 오류 발생: " + e.getMessage());
