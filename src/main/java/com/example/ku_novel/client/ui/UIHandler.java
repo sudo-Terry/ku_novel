@@ -75,6 +75,7 @@ public class UIHandler {
         SwingUtilities.invokeLater(() -> {
             if (loginUI == null || !loginUI.isVisible()) { // 이미 창이 열려 있지 않을 때만 새로 생성
                 loginUI = new LoginUI();
+                loginUI.setVisible(true);
             }
         });
     }
@@ -82,6 +83,7 @@ public class UIHandler {
     public void disposeLoginUI() {
         SwingUtilities.invokeLater(() -> {
             if (loginUI != null) { // 로그인 UI가 존재하면 닫기
+                loginUI.setVisible(false);
                 loginUI.dispose();
                 loginUI = null; // 참조 해제
             }
@@ -319,5 +321,16 @@ public class UIHandler {
                 System.out.println("nameEditModalUI 이미 열려 있음");
             }
         });
+    }
+
+    public void shutdownSocket() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                System.out.println("[Client] Socket closed.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -14,6 +14,8 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 public class HomeUI extends JFrame {
@@ -45,7 +47,23 @@ public class HomeUI extends JFrame {
     private void initUI() {
         setTitle("릴소");
         setSize(1080, 720);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(
+                        HomeUI.this,
+                        "릴소 어플리케이션을 종료시겠습니까?",
+                        "확인",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    UIHandler.getInstance().shutdownSocket();
+                    System.exit(0);
+                }
+            }
+        });
         setResizable(false);    // 크기 조절 비활성화
         setLocationRelativeTo(null);
 
@@ -213,7 +231,7 @@ public class HomeUI extends JFrame {
 
         // 상단 패널 변경
         JLabel titleLabel = new JLabel("릴소");
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 90, 0, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(FontSetting.getInstance().loadLogoFont(54f));
         titleLabel.setForeground(NovelColor.DARK_GREEN);
@@ -290,6 +308,7 @@ public class HomeUI extends JFrame {
         // 스크롤 추가
         JScrollPane scrollPane = new JScrollPane(novelListTable);
         scrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 
         // 패널에 추가
         JPanel participatingPanel = new JPanel(new BorderLayout());
@@ -367,6 +386,7 @@ public class HomeUI extends JFrame {
 
         JScrollPane scrollPane2 = new JScrollPane(activeNovelListTable);
         scrollPane2.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        scrollPane2.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 
         JPanel allRoomsPanel = new JPanel(new BorderLayout());
         allRoomsPanel.add(scrollPane2, BorderLayout.CENTER);

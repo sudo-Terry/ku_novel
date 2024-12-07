@@ -102,10 +102,11 @@ public class NovelRoomSettingsModalUI extends JDialog {
         endNovelButton = new RoundedButton("소설 종료", Color.WHITE, Color.RED, Color.RED);
         endNovelButton.setPreferredSize(buttonSize);
         endNovelButton.setFont(FontSetting.getInstance().loadCustomFont(20f));
+        endNovelButton.setBorderColor(Color.LIGHT_GRAY);
+        endNovelButton.setBackground(Color.RED);
+        endNovelButton.setForeground(Color.WHITE);
         endNovelButton.addActionListener(e-> {
-            isNovelEnded = !isNovelEnded;
-            setEndButton();
-            saveSettings();
+            endNovel();
         });
         buttonPanel.add(endNovelButton);
 
@@ -121,9 +122,9 @@ public class NovelRoomSettingsModalUI extends JDialog {
         titleField.setText(dataModel.getNovelRoomTitle());
         descriptionField.setText(dataModel.getNovelRoomDescription());
         isNovelEnded = !dataModel.getNovelRoomStatus().equals("ACTIVE");
-        setEndButton();
     }
 
+    /*
     private void setEndButton() {
         if(isNovelEnded) {
             endNovelButton.setBorderColor(Color.LIGHT_GRAY);
@@ -136,15 +137,27 @@ public class NovelRoomSettingsModalUI extends JDialog {
         }
         repaint();
     }
+    */
 
     private void saveSettings() {
         String novelRoomTitle = titleField.getText();
         String novelRoomDescription = descriptionField.getText();
-        boolean isNovelEnded = !endNovelButton.isEnabled();
 
         // 서버로 요청
         ClientSenderThread.getInstance().requestRoomStatusUpdate(
-                ClientDataModel.getInstance().getNovelMaxParticipants(), novelRoomTitle, novelRoomDescription, isNovelEnded
+                ClientDataModel.getInstance().getNovelMaxParticipants(), novelRoomTitle, novelRoomDescription, false
+        );
+
+        this.dispose();
+    }
+
+    private void endNovel() {
+        String novelRoomTitle = titleField.getText();
+        String novelRoomDescription = descriptionField.getText();
+
+        // 서버로 요청
+        ClientSenderThread.getInstance().requestRoomStatusUpdate(
+                ClientDataModel.getInstance().getNovelMaxParticipants(), novelRoomTitle, novelRoomDescription, true
         );
 
         this.dispose();

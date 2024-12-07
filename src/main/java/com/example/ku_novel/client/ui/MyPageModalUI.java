@@ -8,6 +8,8 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class MyPageModalUI extends JDialog {
+    private JLabel pointLabel;
+
     public MyPageModalUI(JFrame parent) {
         super(parent, "마이페이지", true);
         setSize(800, 600);
@@ -100,7 +102,6 @@ public class MyPageModalUI extends JDialog {
         pointPanel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         // JLabel pointLabel = new JLabel("point: " + ClientDataModel.getInstance().getUserPoint());
-        JLabel pointLabel;
         if(ClientDataModel.getInstance().getUserPoint() == null) {
             pointLabel = new JLabel("1000");
         } else {
@@ -147,6 +148,7 @@ public class MyPageModalUI extends JDialog {
     }
 
     public void showModal() {
+        pointLabel = new JLabel(ClientDataModel.getInstance().getUserPoint());
         setVisible(true);
     }
 }
