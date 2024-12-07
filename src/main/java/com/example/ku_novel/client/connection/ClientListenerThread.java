@@ -154,7 +154,7 @@ public class ClientListenerThread extends Thread {
         // uiHandler.
     }
 
-    private void handleNovelFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+    private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
         ClientDataModel dataModel = ClientDataModel.getInstance();
 
         if (jsonObject.has("vote")) {
@@ -186,7 +186,7 @@ public class ClientListenerThread extends Thread {
         uiHandler.repaintVoteModalUI();
     }
 
-    private void handleVoteFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
+    private void handleNovelFetchByIdSuccess(JsonObject jsonObject, UIHandler uiHandler) {
         ClientDataModel dataModel = ClientDataModel.getInstance();
 
         if (jsonObject.has("vote")) {
