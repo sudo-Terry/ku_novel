@@ -135,9 +135,9 @@ class ClientHandler implements Runnable {
             case VOTE:
                 handleVote(message);
                 break;
-             case ROOM_STATUS_UPDATE:
-                 handleUpdateRoomSetting(message);
-                 break;
+            case ROOM_STATUS_UPDATE:
+                handleUpdateRoomSetting(message);
+                break;
             case ROOM_FETCH_RANK:
                 handleRankingNovelRooms();
                 break;
@@ -264,7 +264,7 @@ class ClientHandler implements Runnable {
                     break;
                 case "VOTE_COMPLETED":
                     // vote 시작 (synchronized 추후 고려)
-                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService, novelRoomService, roomUsers, activeClients,roomSubmittedAuthors);
+                    VoteHandler voteHandler = new VoteHandler(voteId, vote.getSubmissionDuration(), vote.getVotingDuration(), voteService, novelRoomService, roomUsers, activeClients, roomSubmittedAuthors);
                     voteHandler.start();
                     vote = voteService.getVoteById(voteId); // vote 상태 업데이트
                     break;
@@ -674,6 +674,8 @@ class ClientHandler implements Runnable {
             responseMessage.setType(MessageType.ROOM_UPDATE_SETTING_SUCCESS)
                     .setNovelRoomId(roomId)
                     .setContent("소설방 설정이 성공적으로 변경되었습니다.");
+
+            sendAllRefreshHome();
         } catch (Exception e) {
             // 실패 메시지
             responseMessage.setType(MessageType.ROOM_UPDATE_SETTING_FAILED)
