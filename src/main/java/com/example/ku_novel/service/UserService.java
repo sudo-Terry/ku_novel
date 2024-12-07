@@ -82,7 +82,7 @@ public class UserService {
             return true;
     }
 
-    public void attendanceCheck(String id){
+    public Integer attendanceCheck(String id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. : " + id));
 
@@ -93,8 +93,12 @@ public class UserService {
             throw new IllegalStateException("이미 오늘 출석 체크를 완료했습니다.");
         }
 
-        user.setPoint(user.getPoint() + 100);
+        int points = user.getPoint() + 100;
+
+        user.setPoint(points);
         user.setLastAttendance(today);
         userRepository.save(user);
+
+        return points;
     }
 }

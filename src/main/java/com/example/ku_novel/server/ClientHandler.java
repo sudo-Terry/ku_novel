@@ -614,10 +614,12 @@ class ClientHandler implements Runnable {
 
         try {
             String id = message.getSender();
-            userService.attendanceCheck(id);
+            int points = userService.attendanceCheck(id);
 
             responseMessage.setType(MessageType.ATTENDANCE_CHECK_SUCCESS)
                     .setContent("출석 체크 성공");
+            responseMessage.setPoint(points);
+
         } catch (Exception e) {
             responseMessage.setType(MessageType.ATTENDANCE_CHECK_FAILED)
                     .setContent("출석 체크 실패: " + e.getMessage());
