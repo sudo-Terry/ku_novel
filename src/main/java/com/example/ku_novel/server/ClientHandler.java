@@ -129,6 +129,7 @@ class ClientHandler implements Runnable {
             case AUTHOR_REJECTED:
                 handleRejectAuthor(message);
                 break;
+            case NOVEL_FETCH_BY_ID:
             case VOTE_FETCH_BY_ID:
                 handleVoteFetch(message);
                 break;
@@ -248,6 +249,7 @@ class ClientHandler implements Runnable {
 
     private void handleVoteFetch(Message message) {
         Message responseMessage = new Message();
+        responseMessage.setType(message.getType() == MessageType.NOVEL_FETCH_BY_ID ? MessageType.NOVEL_FETCH_BY_ID_FAILED : MessageType.VOTE_FETCH_BY_ID_FAILED);
 
         try {
             String userId = message.getSender();
@@ -276,9 +278,8 @@ class ClientHandler implements Runnable {
             Optional<NovelRoom> room = novelRoomService.getNovelRoomById(message.getNovelRoomId());
             room.ifPresent(novelRoom -> responseMessage.setNovelContent(novelRoom.getNovelContent()));
 
-            responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_SUCCESS).setVote(vote.toMessage());
+            responseMessage.setType(message.getType() == MessageType.NOVEL_FETCH_BY_ID ? MessageType.NOVEL_FETCH_BY_ID_SUCCESS : MessageType.VOTE_FETCH_BY_ID_SUCCESS).setVote(vote.toMessage());
         } catch (Exception e) {
-            responseMessage.setType(MessageType.VOTE_FETCH_BY_ID_FAILED);
             responseMessage.setContent("오류가 발생하였습니다 : " + e.getMessage());
         }
         sendMessageToCurrentClient(responseMessage);
