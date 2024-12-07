@@ -385,7 +385,6 @@ public class NovelRoomModalUI extends JDialog {
             ClientSenderThread.getInstance().requestVoteFetchByID(
                     ClientDataModel.getInstance().getNovelVoteId()
             );
-            UIHandler.getInstance().setVoteModalUIVisible();
         });
 
         bottomGbc.gridx = 3;
@@ -448,10 +447,9 @@ public class NovelRoomModalUI extends JDialog {
         }
 
         writeButton.addActionListener(e-> {
-            ClientSenderThread.getInstance().requestVoteFetchByID(
+            ClientSenderThread.getInstance().requestNovelFetchByID(
                     ClientDataModel.getInstance().getNovelVoteId()
             );
-            UIHandler.getInstance().showNovelInputModal();
         });
         bottomButtonPanel.add(writeLabel, bottomGbc);
 
