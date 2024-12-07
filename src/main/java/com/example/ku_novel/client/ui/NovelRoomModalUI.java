@@ -517,8 +517,10 @@ public class NovelRoomModalUI extends JDialog {
     }
 
     public void updateParticipantButton(){
-        participantButton.setText(String.valueOf(ClientDataModel.getInstance().getParticipantsCount()));
-        participantButton.repaint();
-        participantButton.revalidate();
+        if(participantButton != null) {
+            participantButton.setText(String.valueOf(ClientDataModel.getInstance().getParticipantsCount()));
+            participantButton.repaint();
+            participantButton.revalidate();
+        }
     }
 }
