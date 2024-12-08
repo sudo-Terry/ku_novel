@@ -3,6 +3,7 @@ package com.example.ku_novel.client.ui;
 import com.example.ku_novel.client.connection.ClientSenderThread;
 import com.example.ku_novel.client.model.ClientDataModel;
 import com.example.ku_novel.client.ui.component.*;
+import com.example.ku_novel.service.UserService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,17 +65,33 @@ public class NameEditModalUI extends JDialog {
         JButton okButton = new RoundedButton("변경", NovelColor.YELLOW, Color.BLACK);
         okButton.setFont(FontSetting.getInstance().loadCustomFont(16f));
         okButton.setPreferredSize(new Dimension(80, 40));
-        okButton.addActionListener(e -> {
-            ClientSenderThread.getInstance().requestNicknameChange(
-                    ClientDataModel.getInstance().getUserId(),
-                    ClientDataModel.getInstance().getUserName(),
-                    nameField.getText()
-            );
-        });
+        okButton.addActionListener(e -> handleOkButtonClicked());
         buttonPanel.add(okButton);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+    }
+
+    private void handleOkButtonClicked() {
+        String userName = nameField.getText();
+
+        if(userName.isEmpty()) {
+            CustomAlert.showAlert(this, "오류", "닉네임 필드를 입력하세요.", null);
+            //JOptionPane.showMessageDialog(this, "모든 필드를 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            ClientSenderThread.getInstance().requestNicknameChange(
+                    ClientDataModel.getInstance().getUserId(),
+                    ClientDataModel.getInstance().getUserName(),
+                    userName
+            );
+            dispose();
+        } catch (Exception ex) {
+            CustomAlert.showAlert(this, "오류", "제출 중 오류가 발생하였습니다.", null);
+            ex.printStackTrace();
+        }
     }
 
     private void handleUserNameValidation() {
