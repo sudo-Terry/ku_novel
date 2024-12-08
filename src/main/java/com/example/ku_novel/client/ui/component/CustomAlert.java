@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 public class CustomAlert extends JDialog {
     private static final int BASE_FONT_SIZE = 18;
     private static final int MIN_WIDTH = 300;
-    private static final int MAX_WIDTH = 600;
+    private static final int MAX_WIDTH = 800;
     private static final int MIN_HEIGHT = 150;
 
     public CustomAlert(Window owner, String title, String message, ActionListener onConfirm) {

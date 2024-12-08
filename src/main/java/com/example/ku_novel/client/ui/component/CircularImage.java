@@ -12,7 +12,6 @@ public class CircularImage extends JPanel {
 
     public CircularImage(String imagePath) {
         try {
-            // 이미지 로드
             image = ImageIO.read(new File(imagePath));
         } catch (Exception e) {
             e.printStackTrace();

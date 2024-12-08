@@ -24,7 +24,7 @@ public class RankingModalUI extends JDialog {
     private long lastRequestTime = 0;
 
     public RankingModalUI(Frame parent) {
-        super(parent, "완결 소설 다운", true);
+        super(parent, "인기 소설 랭킹", true);
 
         setSize(800, 600);
         setLocationRelativeTo(parent);
